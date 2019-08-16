@@ -6,21 +6,21 @@
 TSDL::TSDL::TSDL()
 {
     if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-	{
+    {
         SDL_Quit();
-		throw std::runtime_error("SDL could not initialize! SDL_Error: " + std::string(SDL_GetError()));
-	}
-	else
-	{
-		int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
-		if( !( IMG_Init( imgFlags ) & imgFlags ) )
-		{
+        throw std::runtime_error("SDL could not initialize! SDL_Error: " + std::string(SDL_GetError()));
+    }
+    else
+    {
+        int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
+        if( !( IMG_Init( imgFlags ) & imgFlags ) )
+        {
             IMG_Quit();
             SDL_Quit();
-			throw std::runtime_error("SDL_image could not initialize! SDL_image Error: " + std::string(IMG_GetError()));
-		}
-		else
-		{
+            throw std::runtime_error("SDL_image could not initialize! SDL_image Error: " + std::string(IMG_GetError()));
+        }
+        else
+        {
             return;
         }
     }
