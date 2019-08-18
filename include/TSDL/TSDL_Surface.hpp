@@ -52,6 +52,10 @@ namespace TSDL
 
         int fill_rect(const SDL_Rect* rect, Uint8 r, Uint8 g, Uint8 b);
 
+        int set_color_key(bool flag, Uint32 key);
+
+        int set_color_key(bool flag, Uint8 r, Uint8 g, Uint8 b);
+
         Uint32 map_rgb(Uint8 r, Uint8 g, Uint8 b) const;
 
         TSDL_Surface get_converted_surface(const SDL_PixelFormat* fmt, Uint32 flags) const;
@@ -83,11 +87,13 @@ namespace _PY
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Surface, enter_ctx), py::return_value_policy::reference)   \
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Surface, exit_ctx));                                        \
     py::class_<TSDL::TSDL_Surface>(m, "_Surface")                                                                     \
-        .def("get_format", &TSDL::TSDL_Surface::get_format, py::return_value_policy::reference_internal)              \
+        .def("get_format", &TSDL::TSDL_Surface::get_format)                                                           \
         .def("copy_from", &TSDL::TSDL_Surface::copy_from)                                                             \
         .def("scale_from", &TSDL::TSDL_Surface::scale_from)                                                           \
         .def("fill_rect", py::overload_cast<const SDL_Rect*, Uint32>(&TSDL::TSDL_Surface::fill_rect))                 \
         .def("fill_rect", py::overload_cast<const SDL_Rect*, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::fill_rect))    \
+        .def("set_color_key", py::overload_cast<bool, Uint32>(&TSDL::TSDL_Surface::set_color_key))                    \
+        .def("set_color_key", py::overload_cast<bool, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::set_color_key))       \
         .def("map_rgb", &TSDL::TSDL_Surface::map_rgb)                                                                 \
         .def("get_converted_surface", &TSDL::TSDL_Surface::get_converted_surface)                                     \
         .def("convert_surface", &TSDL::TSDL_Surface::convert_surface);                                                \

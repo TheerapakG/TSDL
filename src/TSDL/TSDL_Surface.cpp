@@ -66,6 +66,21 @@ int TSDL::TSDL_Surface::fill_rect(const SDL_Rect* rect, Uint8 r, Uint8 g, Uint8 
     return this->fill_rect(rect, this->map_rgb(r, g, b));
 }
 
+int TSDL::TSDL_Surface::set_color_key(bool flag, Uint32 key)
+{
+    int _t = SDL_SetColorKey(_internal_ptr, flag, key);
+    if(_t != 0)
+    {
+        throw std::runtime_error("Could not set surface color key! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return _t;
+}
+
+int TSDL::TSDL_Surface::set_color_key(bool flag, Uint8 r, Uint8 g, Uint8 b)
+{
+    return this->set_color_key(flag, this->map_rgb(r, g, b));
+}
+
 Uint32 TSDL::TSDL_Surface::map_rgb(Uint8 r, Uint8 g, Uint8 b) const
 {
     return SDL_MapRGB(_internal_ptr->format, r, g, b);
