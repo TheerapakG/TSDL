@@ -60,6 +60,46 @@ TSDL::TSDL_Texture::operator SDL_Texture*() const
     return _internal_ptr;
 }
 
+int TSDL::TSDL_Texture::set_blend_mode(SDL_BlendMode mode)
+{
+    int _t = SDL_SetTextureBlendMode(_internal_ptr, mode);
+    if(_t != 0)
+    {
+        throw std::runtime_error("Could not set blend mode! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return _t;
+}
+
+int TSDL::TSDL_Texture::get_blend_mode(SDL_BlendMode* mode)
+{
+    int _t = SDL_GetTextureBlendMode(_internal_ptr, mode);
+    if(_t != 0)
+    {
+        throw std::runtime_error("Could not get blend mode! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return _t;
+}
+
+int TSDL::TSDL_Texture::set_alpha_multiplier(Uint8 a)
+{
+    int _t = SDL_SetTextureAlphaMod(_internal_ptr, a);
+    if(_t != 0)
+    {
+        throw std::runtime_error("Could not set alpha! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return _t;
+}
+
+int TSDL::TSDL_Texture::get_alpha_multiplier(Uint8* a)
+{
+    int _t = SDL_GetTextureAlphaMod(_internal_ptr, a);
+    if(_t != 0)
+    {
+        throw std::runtime_error("Could not get alpha! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return _t;
+}
+
 int TSDL::TSDL_Texture::set_color_multiplier(Uint8 r, Uint8 g, Uint8 b)
 {
     int _t = SDL_SetTextureColorMod(_internal_ptr, r, g, b);

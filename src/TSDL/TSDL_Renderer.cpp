@@ -74,7 +74,17 @@ int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const SDL_Rect *s
     int _t = SDL_RenderCopy(_internal_ptr, texture, srcrect, dstrect);
     if(_t != 0)
     {
-        throw std::runtime_error("Could not clear render target! SDL Error: " + std::string(SDL_GetError()));
+        throw std::runtime_error("Could not copy to render target! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return _t;
+}
+
+int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const SDL_Rect *srcrect, const SDL_Rect *dstrect, const double angle, const SDL_Point* center, const SDL_RendererFlip flip)
+{
+    int _t = SDL_RenderCopyEx(_internal_ptr, texture, srcrect, dstrect, angle, center, flip);
+    if(_t != 0)
+    {
+        throw std::runtime_error("Could not copy/rotate to render target! SDL Error: " + std::string(SDL_GetError()));
     }
     return _t;
 }
