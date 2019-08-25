@@ -13,7 +13,53 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& file): _destroy(true)
         throw std::runtime_error("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
     }
     _internal_ptr = _t_internal_ptr;
-    _destroy = true;
+}
+
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, TSDL::TTF_Rendermethod m):
+    TSDL::TSDL_Surface(text, font, r, g, b, 255, m){}
+
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TSDL::TTF_Rendermethod m): _destroy(true)
+{
+    SDL_Surface* _t_internal_ptr = nullptr;
+    switch (m)
+    {
+    case TSDL::TTF_Rendermethod::Solid:
+        _t_internal_ptr = TTF_RenderUTF8_Solid(font, text.c_str(), {r, g, b, a});
+        break;
+
+    case TSDL::TTF_Rendermethod::Shaded:
+        // assume white bg with 0 as alpha
+        _t_internal_ptr = TTF_RenderUTF8_Shaded(font, text.c_str(), {r, g, b, a}, {255, 255, 255, 0});
+        break;
+
+    case TSDL::TTF_Rendermethod::Blended:
+        _t_internal_ptr = TTF_RenderUTF8_Blended(font, text.c_str(), {r, g, b, a});
+        break;
+    
+    default:
+        throw std::runtime_error("Invalid Rendermethod specified!");
+        break;
+    }
+    
+    if(_t_internal_ptr == NULL)
+    {
+        throw std::runtime_error("Surface could not be created! SDL_Error: " + std::string(TTF_GetError()));
+    }
+    _internal_ptr = _t_internal_ptr;
+}
+
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb):
+    TSDL::TSDL_Surface(text, font, fr, fg, fb, 255, br, bg, bb, 0){}
+
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba): 
+    _destroy(true)
+{
+    SDL_Surface* _t_internal_ptr = TTF_RenderUTF8_Shaded(font, text.c_str(), {fr, fg, fb, fa}, {br, bg, bb, ba});
+    if(_t_internal_ptr == NULL)
+    {
+        throw std::runtime_error("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
+    }
+    _internal_ptr = _t_internal_ptr;
 }
 
 TSDL::TSDL_Surface::~TSDL_Surface()

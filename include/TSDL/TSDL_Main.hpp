@@ -7,6 +7,7 @@ namespace TSDL
     {
         public:
         TSDL();
+        TSDL(int frequency);
         ~TSDL();
     };
 }

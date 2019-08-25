@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include "TSDL_SDLmask.hpp"
 #include <string>
 
@@ -10,6 +11,13 @@ namespace TSDL
 {
     class _TSDL_GET_MASK_TYPE(Surface);
     using _SDL_Surface = _TSDL_GET_MASK_TYPE(Surface);
+
+    enum class TTF_Rendermethod
+    {
+        Solid,
+        Shaded,
+        Blended,
+    };
 
     class TSDL_Surface
     {
@@ -23,6 +31,14 @@ namespace TSDL
         TSDL_Surface(SDL_Surface* ptr, bool handle_destroy);
 
         TSDL_Surface(const std::string& file);
+
+        TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, TTF_Rendermethod m);
+
+        TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TTF_Rendermethod m);
+
+        TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb);
+
+        TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba);
 
         ~TSDL_Surface();
 

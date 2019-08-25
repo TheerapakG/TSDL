@@ -1,11 +1,14 @@
 #include "TSDL/TSDL_Main.hpp"
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 #include <stdexcept>
 
-TSDL::TSDL::TSDL()
+TSDL::TSDL::TSDL(): TSDL::TSDL(44100) {}
+
+TSDL::TSDL::TSDL(int frequency)
 {
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+    if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
     {
         SDL_Quit();
         throw std::runtime_error("SDL could not initialize! SDL_Error: " + std::string(SDL_GetError()));
@@ -21,13 +24,24 @@ TSDL::TSDL::TSDL()
         }
         else
         {
-            return;
+            if( !Mix_OpenAudio( frequency, MIX_DEFAULT_FORMAT, 2, 2048 ) )
+            {
+                Mix_Quit();
+                IMG_Quit();
+                SDL_Quit();
+                throw std::runtime_error("SDL_mixer could not initialize! SDL_mixer Error: " + std::string(Mix_GetError()));
+            }
+            else
+            {
+                return;
+            }
         }
     }
 }
 
 TSDL::TSDL::~TSDL()
 {
+    Mix_Quit();
     IMG_Quit();
     SDL_Quit();
 }

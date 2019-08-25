@@ -30,14 +30,23 @@ namespace TSDL
         TSDL_Texture(TSDL_Renderer renderer, _SDL_Surface surface);
         ~TSDL_Texture();
 
+        operator SDL_Texture*() const;
+
+        int set_blend_mode(SDL_BlendMode mode);
+        int get_blend_mode(SDL_BlendMode* mode);
+
+        /*
+        When this texture is rendered, during the copy operation alpha is used to calculate each pixel based on blending mode.
+        */
+        int set_alpha_multiplier(Uint8 a);
+        int get_alpha_multiplier(Uint8* a);
+
         /*
         When this texture is rendered, during the copy operation each source color channel value is calculated using this:
             srcC = srcC * (color / 255)
         */
         int set_color_multiplier(Uint8 r, Uint8 g, Uint8 b);
         int get_color_multiplier(Uint8* r, Uint8* g, Uint8* b);
-
-        operator SDL_Texture*() const;
     };
 
     _TSDL_EXPAND_DEFINE_MASK_TYPE(Texture)
@@ -67,7 +76,33 @@ namespace _PY
         .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, TSDL::_SDL_Surface>())                      \
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Texture, enter_ctx), py::return_value_policy::reference)   \
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Texture, exit_ctx));                                        \
-    py::class_<TSDL::TSDL_Texture>(m, "_Texture");                                                                    \
+    py::class_<TSDL::TSDL_Texture>(m, "_Texture")                                                                     \
+        .def_property("color_multiplier",                                                                             \
+            [](TSDL::TSDL_Texture* _self, py::tuple color)                                                            \
+            {                                                                                                         \
+                if (py::len(color) != 3)                                                                              \
+                {                                                                                                     \
+                    throw py::value_error("color need to be a tuple with 3 members");                                 \
+                }                                                                                                     \
+                _self->set_color_multiplier(                                                                          \
+                    color[0].template cast<Uint8>(),                                                                  \
+                    color[1].template cast<Uint8>(),                                                                  \
+                    color[2].template cast<Uint8>()                                                                   \
+                );                                                                                                    \
+            },                                                                                                        \
+            [](TSDL::TSDL_Texture* _self)                                                                             \
+            {                                                                                                         \
+                Uint8* r = new Uint8();                                                                               \
+                Uint8* g = new Uint8();                                                                               \
+                Uint8* b = new Uint8();                                                                               \
+                _self->get_color_multiplier(r, g, b);                                                                 \
+                py::tuple _ret = py::make_tuple(*r, *g, *b);                                                          \
+                delete r;                                                                                             \
+                delete g;                                                                                             \
+                delete b;                                                                                             \
+                return _ret;                                                                                          \
+            }                                                                                                         \
+        );                                                                                                            \
     py::class_<TSDL::_TSDL_GET_MASK_TYPE(Texture)>(m, "_SDL_Texture");                                                \
     py::implicitly_convertible<TSDL::TSDL_Texture, TSDL::_TSDL_GET_MASK_TYPE(Texture)>();                             \
 
