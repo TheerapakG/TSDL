@@ -7,7 +7,7 @@ namespace py = pybind11;
 #include <tuple>
 #include <new>
 #include <utility>
-#include "boost/variant.hpp"
+#include <variant>
 
 namespace _PY_Util
 {
@@ -35,27 +35,7 @@ namespace _PY_TypeErase
     class TypeErase
     {
         private:
-        boost::variant<IntermediateVariants...> _underly;
-
-        class enter_visitor : public boost::static_visitor<ContextedCls*>
-        {
-        public:
-            template<typename T>
-            ContextedCls* operator()(T w) const
-            {
-                return w.enter();
-            }
-        };
-
-        class exit_visitor : public boost::static_visitor<void>
-        {
-        public:
-            template<typename T>
-            void operator()(T w) const
-            {
-                w.exit();
-            }
-        };
+        std::variant<IntermediateVariants...> _underly;
 
         public:
         template <typename T>
@@ -63,11 +43,11 @@ namespace _PY_TypeErase
 
         ContextedCls* enter()
         {
-            return boost::apply_visitor(enter_visitor(), _underly);
+            return std::visit([](auto&& arg){ return arg.enter(); }, _underly);
         }
         void exit()
         {
-            boost::apply_visitor(exit_visitor(), _underly);
+            std::visit([](auto&& arg){ return arg.exit(); }, _underly);
         }
     };
 }

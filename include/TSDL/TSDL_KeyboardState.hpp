@@ -5,13 +5,13 @@
 
 namespace TSDL
 {
-    class KeyboardState
+    class TSDL_KeyboardState
     {
         private:
         const Uint8* _internal_ptr;
 
         public:
-        KeyboardState();
+        TSDL_KeyboardState();
 
         bool operator[](SDL_Scancode code);
 
