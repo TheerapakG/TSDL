@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <string>
 
+using namespace std::literals::chrono_literals;
+
 TSDL::TSDL_Eventloop::TSDL_Eventloop() {}
 
 TSDL::TSDL_Eventloop::TSDL_Eventloop(bool thrownoevhandler, bool thrownorenderhandler) :
@@ -12,7 +14,7 @@ _throw_if_no_render_handler(thrownorenderhandler)
 
 TSDL::TSDL_Eventloop::~TSDL_Eventloop()
 {
-    if(_is_running)
+    if(_is_running.load())
     {
         this->interrupt();
     }
@@ -69,13 +71,19 @@ void TSDL::TSDL_Eventloop::_run_step()
     {
         if(_render != nullptr)
         {
+            if(_limit_fps.load())
+            {
+                clock::time_point now = clock::now();
+                if((now - _time_last_frame) < _fps_target_interval.load()) return;
+                _time_last_frame = now;
+            }
             _render();
-            if(_track_fps)
+            if(_track_fps.load())
             {
                 clock::time_point now = clock::now();
                 std::scoped_lock lock(_lock_frame_calc);
                 clock::duration diff = now - _time_since_last;
-                if(diff >= _fps_update_interval)
+                if(diff >= _fps_update_interval.load())
                 {
                     _previous_fps.store(static_cast<double>(_frame_since_last + 1) / std::chrono::duration_cast<std::chrono::seconds>(diff).count());
                     this->_reset_fps_count();
@@ -103,8 +111,9 @@ void TSDL::TSDL_Eventloop::_run_step()
 void TSDL::TSDL_Eventloop::run()
 {
     if(_track_fps) this->_reset_fps_count();
-    _is_running = true;
-    while(_is_running)
+    _time_last_frame = clock::now();
+    _is_running.store(true);
+    while(_is_running.load())
     {
         this->_run_step();
     }
@@ -114,7 +123,7 @@ void TSDL::TSDL_Eventloop::interrupt()
 {
     if(_is_running)
     {
-        _is_running = false;
+        _is_running.store(false);
     }
     else
     {
@@ -125,22 +134,41 @@ void TSDL::TSDL_Eventloop::interrupt()
 
 void TSDL::TSDL_Eventloop::track_fps(bool track)
 {
+    _track_fps.store(track);
     this->_reset_fps_count();
-    _track_fps = track;
 }
 
 void TSDL::TSDL_Eventloop::set_fps_update_interval(TSDL::TSDL_Eventloop::clock::duration interval)
 {
+    _fps_update_interval.store(interval);
     this->_reset_fps_count();
-    _fps_update_interval = interval;
 }
 
 TSDL::TSDL_Eventloop::clock::duration TSDL::TSDL_Eventloop::get_fps_update_interval() const
 {
-    return _fps_update_interval;
+    return _fps_update_interval.load();
 }
 
 double TSDL::TSDL_Eventloop::get_fps() const
 {
     return _previous_fps.load();
+}
+
+void TSDL::TSDL_Eventloop::limit_fps(bool limit)
+{
+    _limit_fps.store(limit);
+}
+
+void TSDL::TSDL_Eventloop::set_fps_target(double frames)
+{
+    _fps_target_interval.store(
+        std::chrono::duration_cast<TSDL::TSDL_Eventloop::clock::duration>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(1s)/frames
+        )
+    );
+}
+
+double TSDL::TSDL_Eventloop::get_fps_target() const
+{
+    return static_cast<double>((1s).count())/_fps_update_interval.load().count();
 }
