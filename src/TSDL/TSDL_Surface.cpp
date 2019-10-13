@@ -77,9 +77,9 @@ const SDL_PixelFormat* TSDL::TSDL_Surface::get_format() const
     return _internal_ptr->format;
 }
 
-int TSDL::TSDL_Surface::copy_from(_SDL_Surface src, const SDL_Rect* srcrect, SDL_Rect* dstrect)
+int TSDL::TSDL_Surface::copy_from(_SDL_Surface src, const rect& srcrect, rect& dstrect)
 {
-    int _t = SDL_BlitSurface(src, srcrect, _internal_ptr, dstrect);
+    int _t = SDL_BlitSurface(src, &srcrect, _internal_ptr, &dstrect);
     if(_t != 0)
     {
         throw std::runtime_error("Cannot copy from surface! SDL_Error: " + std::string(SDL_GetError()));
@@ -87,9 +87,9 @@ int TSDL::TSDL_Surface::copy_from(_SDL_Surface src, const SDL_Rect* srcrect, SDL
     return _t;
 }
 
-int TSDL::TSDL_Surface::scale_from(_SDL_Surface src, const SDL_Rect* srcrect, SDL_Rect* dstrect)
+int TSDL::TSDL_Surface::scale_from(_SDL_Surface src, const rect& srcrect, rect& dstrect)
 {
-    int _t = SDL_BlitScaled(src, srcrect, _internal_ptr, dstrect);
+    int _t = SDL_BlitScaled(src, &srcrect, _internal_ptr, &dstrect);
     if(_t != 0)
     {
         throw std::runtime_error("Cannot scaled copy from surface! SDL_Error: " + std::string(SDL_GetError()));
@@ -97,9 +97,9 @@ int TSDL::TSDL_Surface::scale_from(_SDL_Surface src, const SDL_Rect* srcrect, SD
     return _t;
 }
 
-int TSDL::TSDL_Surface::fill_rect(const SDL_Rect* rect, Uint32 color)
+int TSDL::TSDL_Surface::fill_rect(const rect& rect, Uint32 color)
 {
-    int _t = SDL_FillRect(_internal_ptr, rect, color);
+    int _t = SDL_FillRect(_internal_ptr, &rect, color);
     if(_t != 0)
     {
         throw std::runtime_error("Cannot copy from surface! SDL_Error: " + std::string(SDL_GetError()));
@@ -107,7 +107,7 @@ int TSDL::TSDL_Surface::fill_rect(const SDL_Rect* rect, Uint32 color)
     return _t;
 }
 
-int TSDL::TSDL_Surface::fill_rect(const SDL_Rect* rect, Uint8 r, Uint8 g, Uint8 b)
+int TSDL::TSDL_Surface::fill_rect(const rect& rect, Uint8 r, Uint8 g, Uint8 b)
 {
     return this->fill_rect(rect, this->map_rgb(r, g, b));
 }
