@@ -54,6 +54,37 @@ int TSDL::TSDL_Window::update_window_surface(void)
     return _t;
 }
 
+TSDL::TSDL_Display TSDL::TSDL_Window::get_display(void)
+{
+    int _t = SDL_GetWindowDisplayIndex(_internal_ptr);
+    if(_t < 0)
+    {
+        throw std::runtime_error("Cannot get display index! SDL_Error: " + std::string(SDL_GetError()));
+    }
+    return TSDL_Display(_t);
+}
+
+void TSDL::TSDL_Window::set_window_position(int x, int y)
+{
+    this->set_window_position(this->get_display(), x, y);
+}
+
+void TSDL::TSDL_Window::set_window_position(TSDL_Display& display, int x, int y)
+{
+    int _index = display.get_index();
+    TSDL::rect _bound = display.get_bound();
+
+    if(SDL_WINDOWPOS_ISCENTERED(x)) x = SDL_WINDOWPOS_CENTERED_DISPLAY(_index);
+    else if(SDL_WINDOWPOS_ISUNDEFINED(x)) x = SDL_WINDOWPOS_UNDEFINED_DISPLAY(_index);
+    else x += _bound.x;
+
+    if(SDL_WINDOWPOS_ISCENTERED(y)) y = SDL_WINDOWPOS_CENTERED_DISPLAY(display.get_index());
+    else if(SDL_WINDOWPOS_ISUNDEFINED(y)) y = SDL_WINDOWPOS_UNDEFINED_DISPLAY(display.get_index());
+    else y += _bound.y;
+
+    SDL_SetWindowPosition(_internal_ptr, x, y);
+}
+
 _TSDL_EXPAND_DECLARE_MASK_TYPE(TSDL, Window)
 
 #ifdef TSDL_EXPOSE_PYBIND11

@@ -6,6 +6,7 @@
 #define _TSDL_PY_EXPAND_OR_ENUM(T) [](T _self, T _other){ return static_cast<T>(_self|_other); }
 
 #define _TSDL_PY_CONSTANTS_PY                                                                               \
+    m.attr("SDL_WINDOWPOS_CENTERED") = SDL_WINDOWPOS_CENTERED;                                              \
     m.attr("SDL_WINDOWPOS_UNDEFINED") = SDL_WINDOWPOS_UNDEFINED;                                            \
     py::enum_<SDL_WindowFlags>(m, "SDL_WindowFlags")                                                        \
         .value("SDL_WINDOW_FULLSCREEN", SDL_WindowFlags::SDL_WINDOW_FULLSCREEN)                             \

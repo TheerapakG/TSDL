@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include "TSDL_Utility.hpp"
 #include "TSDL_SDLmask.hpp"
 #include <string>
 
@@ -57,16 +58,16 @@ namespace TSDL
         Only the position is used in the dstrect (the width and height are ignored).
         Blits with negative dstrect coordinates will be clipped properly.
         */
-        int copy_from(_SDL_Surface src, const SDL_Rect* srcrect, SDL_Rect* dstrect);
+        int copy_from(_SDL_Surface src, const rect& srcrect, rect& dstrect);
 
         /*
         Use this function to perform a scaled surface copy to a destination surface.
         */
-        int scale_from(_SDL_Surface src, const SDL_Rect* srcrect, SDL_Rect* dstrect);
+        int scale_from(_SDL_Surface src, const rect& srcrect, rect& dstrect);
 
-        int fill_rect(const SDL_Rect* rect, Uint32 color);
+        int fill_rect(const rect& rect, Uint32 color);
 
-        int fill_rect(const SDL_Rect* rect, Uint8 r, Uint8 g, Uint8 b);
+        int fill_rect(const rect& rect, Uint8 r, Uint8 g, Uint8 b);
 
         int set_color_key(bool flag, Uint32 key);
 
@@ -106,8 +107,8 @@ namespace _PY
         .def("get_format", &TSDL::TSDL_Surface::get_format)                                                           \
         .def("copy_from", &TSDL::TSDL_Surface::copy_from)                                                             \
         .def("scale_from", &TSDL::TSDL_Surface::scale_from)                                                           \
-        .def("fill_rect", py::overload_cast<const SDL_Rect*, Uint32>(&TSDL::TSDL_Surface::fill_rect))                 \
-        .def("fill_rect", py::overload_cast<const SDL_Rect*, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::fill_rect))    \
+        .def("fill_rect", py::overload_cast<const rect&, Uint32>(&TSDL::TSDL_Surface::fill_rect))                     \
+        .def("fill_rect", py::overload_cast<const rect&, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::fill_rect))        \
         .def("set_color_key", py::overload_cast<bool, Uint32>(&TSDL::TSDL_Surface::set_color_key))                    \
         .def("set_color_key", py::overload_cast<bool, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::set_color_key))       \
         .def("map_rgb", &TSDL::TSDL_Surface::map_rgb)                                                                 \

@@ -7,6 +7,7 @@ namespace TSDL
 }
 
 #include <SDL.h>
+#include "TSDL_Utility.hpp"
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Window.hpp"
 #include "TSDL_Texture.hpp"
@@ -32,22 +33,22 @@ namespace TSDL
 
         int clear();
 
-        int copy_from(TSDL_Texture texture, const SDL_Rect *srcrect, const SDL_Rect *dstrect);
+        int copy_from(TSDL_Texture texture, const rect& srcrect, const rect& dstrect);
         /*
         * like copy_from(texture, srcrect, dstrct) but after copy, optionally rotating it by angle around the given 
         * center and also optionally flipping it.
         */
         int copy_from(TSDL_Texture texture, 
-                      const SDL_Rect *srcrect, 
-                      const SDL_Rect *dstrect, 
+                      const rect& srcrect, 
+                      const rect& dstrect, 
                       const double angle, 
-                      const SDL_Point* center,
+                      const point_2d& center,
                       const SDL_RendererFlip flip);
 
-        int fill_rect(const SDL_Rect* rect);
+        int fill_rect(const rect& rect);
         int fill_rect(int x, int y, int w, int h);
 
-        int draw_rect(const SDL_Rect* rect);
+        int draw_rect(const rect& rect);
         int draw_rect(int x, int y, int w, int h);
 
         int draw_line(int x1, int y1, int x2, int y2);

@@ -69,9 +69,9 @@ int TSDL::TSDL_Renderer::clear()
     return _t;
 }
 
-int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const SDL_Rect *srcrect, const SDL_Rect *dstrect)
+int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const rect& srcrect, const rect& dstrect)
 {
-    int _t = SDL_RenderCopy(_internal_ptr, texture, srcrect, dstrect);
+    int _t = SDL_RenderCopy(_internal_ptr, texture, &srcrect, &dstrect);
     if(_t != 0)
     {
         throw std::runtime_error("Could not copy to render target! SDL Error: " + std::string(SDL_GetError()));
@@ -79,9 +79,9 @@ int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const SDL_Rect *s
     return _t;
 }
 
-int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const SDL_Rect *srcrect, const SDL_Rect *dstrect, const double angle, const SDL_Point* center, const SDL_RendererFlip flip)
+int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const rect& srcrect, const rect& dstrect, const double angle, const point_2d& center, const SDL_RendererFlip flip)
 {
-    int _t = SDL_RenderCopyEx(_internal_ptr, texture, srcrect, dstrect, angle, center, flip);
+    int _t = SDL_RenderCopyEx(_internal_ptr, texture, &srcrect, &dstrect, angle, &center, flip);
     if(_t != 0)
     {
         throw std::runtime_error("Could not copy/rotate to render target! SDL Error: " + std::string(SDL_GetError()));
@@ -89,9 +89,9 @@ int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const SDL_Rect *s
     return _t;
 }
 
-int TSDL::TSDL_Renderer::fill_rect(const SDL_Rect* rect)
+int TSDL::TSDL_Renderer::fill_rect(const rect& rect)
 {
-    int _t = SDL_RenderFillRect(_internal_ptr, rect);
+    int _t = SDL_RenderFillRect(_internal_ptr, &rect);
     if(_t != 0)
     {
         throw std::runtime_error("Could not fill rectangle on render target! SDL Error: " + std::string(SDL_GetError()));
@@ -101,13 +101,12 @@ int TSDL::TSDL_Renderer::fill_rect(const SDL_Rect* rect)
 
 int TSDL::TSDL_Renderer::fill_rect(int x, int y, int w, int h)
 {
-    SDL_Rect rect = {x, y, w, h};
-    return this->fill_rect(&rect);
+    return this->fill_rect(rect(x, y, w, h));
 }
 
-int TSDL::TSDL_Renderer::draw_rect(const SDL_Rect* rect)
+int TSDL::TSDL_Renderer::draw_rect(const rect& rect)
 {
-    int _t = SDL_RenderDrawRect(_internal_ptr, rect);
+    int _t = SDL_RenderDrawRect(_internal_ptr, &rect);
     if(_t != 0)
     {
         throw std::runtime_error("Could not draw rectangle on render target! SDL Error: " + std::string(SDL_GetError()));
@@ -117,8 +116,7 @@ int TSDL::TSDL_Renderer::draw_rect(const SDL_Rect* rect)
 
 int TSDL::TSDL_Renderer::draw_rect(int x, int y, int w, int h)
 {
-    SDL_Rect rect = {x, y, w, h};
-    return this->draw_rect(&rect);
+    return this->draw_rect(rect(x, y, w, h));
 }
 
 int TSDL::TSDL_Renderer::draw_line(int x1, int y1, int x2, int y2)
