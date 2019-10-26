@@ -12,16 +12,20 @@
     #include "TSDL/TSDL_Surface.hpp"
     #include "TSDL/TSDL_Texture.hpp"
     #include "TSDL/TSDL_Window.hpp"
+    #include "TSDL/TSDL_Chunk.hpp"
+    #include "TSDL/TSDL_Music.hpp"
 
     #ifdef TSDL_EXPOSE_PYBIND11
         #include "TSDL/TSDL_PY_Constants.hpp"
         PYBIND11_MODULE(tsdl, m)
         {
-            _TSDL_PY_CONSTANTS_PY
-            _TSDL_MAIN_PY
-            _TSDL_SURFACE_PY
-            _TSDL_TEXTURE_PY
-            _TSDL_WINDOW_PY
+            _tsdl_py_constant_py(m);
+            _tsdl_main_py(m);
+            _tsdl_surface_py(m);
+            _tsdl_texture_py(m);
+            _tsdl_window_py(m);
+            _tsdl_chunk_py(m);
+            _tsdl_music_py(m);
         }
     #endif
 

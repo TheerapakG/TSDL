@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Surface.hpp"
+#include "TSDL_Display.hpp"
 
 namespace TSDL
 {
@@ -21,11 +22,16 @@ namespace TSDL
 
         operator SDL_Window*() const;
 
-        SDL_Surface* get_window_surface(void);
+        SDL_Surface* window_surface(void);
 
-        TSDL_Surface get_window_surface_object(void);
+        TSDL_Surface window_surface_object(void);
 
         int update_window_surface(void);
+
+        TSDL_Display display(void);
+
+        void window_position(int x, int y);
+        void window_position(TSDL_Display& display, int x, int y);
     };
 
     _TSDL_EXPAND_DEFINE_MASK_TYPE(Window)
@@ -46,16 +52,7 @@ namespace _PY
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Window)
 }
 
-#define _TSDL_WINDOW_PY                                                                                               \
-    py::class_<_PY::_PY_GET_TYPEERASE(Window)>(m, "Window")                                                           \
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Window)<const std::string, int, int, int, int, Uint32>())                 \
-        .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Window, enter_ctx), py::return_value_policy::reference)    \
-        .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Window, exit_ctx));                                         \
-    py::class_<TSDL::TSDL_Window>(m, "_Window")                                                                       \
-        .def("get_window_surface_object", &TSDL::TSDL_Window::get_window_surface_object)                              \
-        .def("update_window_surface", &TSDL::TSDL_Window::update_window_surface);                                     \
-    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Window)>(m, "_SDL_Window");                                                  \
-    py::implicitly_convertible<TSDL::TSDL_Window, TSDL::_TSDL_GET_MASK_TYPE(Window)>();                               \
+void _tsdl_window_py(const py::module& m);
 
 #endif
 

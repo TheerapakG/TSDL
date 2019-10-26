@@ -3,7 +3,12 @@
 
 TSDL::TSDL_Display::TSDL_Display(int index): _index(index) {};
 
-TSDL::rect TSDL::TSDL_Display::get_bound()
+int TSDL::TSDL_Display::index(void)
+{
+    return _index;
+}
+
+TSDL::rect TSDL::TSDL_Display::bound(void)
 {
     SDL_Rect _rect;
     int _t = SDL_GetDisplayBounds(_index, &_rect);

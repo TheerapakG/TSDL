@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include "TSDL_SDLmask.hpp"
+#include <string>
 
 namespace TSDL
 {
@@ -55,14 +56,7 @@ namespace _PY
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Music)
 }
 
-#define _TSDL_MUSIC_PY                                                                                               \
-    py::class_<_PY::_PY_GET_TYPEERASE(Music)>(m, "Music")                                                             \
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Music)<const std::string>())                                              \
-        .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Music, enter_ctx), py::return_value_policy::reference)     \
-        .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Music, exit_ctx));                                          \
-    py::class_<TSDL::TSDL_Music>(m, "_Music");                                                                       \
-    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Music)>(m, "_SDL_Music");                                                    \
-    py::implicitly_convertible<TSDL::TSDL_Music, TSDL::_TSDL_GET_MASK_TYPE(Music)>();                                 \
+void _tsdl_music_py(const py::module& m);
 
 #endif
 

@@ -6,7 +6,7 @@
 
 namespace TSDL
 {
-    int get_total_display();
+    int total_display();
     class TSDL_Display
     {
         private:
@@ -15,9 +15,9 @@ namespace TSDL
         public:
         TSDL_Display(int index);
 
-        int get_index(void);
+        int index(void);
 
-        rect get_bound(void);
+        rect bound(void);
     };
 }
 

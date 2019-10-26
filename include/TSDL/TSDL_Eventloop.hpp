@@ -51,7 +51,7 @@ namespace TSDL
 
         void remove_event_handler(SDL_EventType evType);
 
-        void set_render_function(RenderHandler handler);
+        void render_function(RenderHandler handler);
 
         void run();
 
@@ -59,17 +59,17 @@ namespace TSDL
 
         void track_fps(bool track = true);
 
-        void set_fps_update_interval(clock::duration interval);
+        void fps_update_interval(clock::duration interval);
 
-        clock::duration get_fps_update_interval() const;
+        clock::duration fps_update_interval() const;
 
-        double get_fps() const;
+        double fps() const;
 
         void limit_fps(bool limit = true);
 
-        void set_fps_target(double frames);
+        void fps_target(double frames);
 
-        double get_fps_target() const;
+        double fps_target() const;
     };
 }
 

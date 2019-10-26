@@ -14,8 +14,8 @@ namespace TSDL
     {
         public:
         point_2d(int x, int y);
-        point_2d(SDL_Point p);
-        point_2d(_point_2d p);
+        point_2d(SDL_Point& p);
+        point_2d(_point_2d& p);
 
         operator _point_2d();
     };
@@ -25,10 +25,34 @@ namespace TSDL
     {
         public:
         rect(int x, int y, int w, int h);
-        rect(SDL_Rect r);
-        rect(_rect r);
+        rect(SDL_Rect& r);
+        rect(_rect& r);
 
         operator _rect();
+    };
+
+    using _color_rgb = tuple<Uint8, Uint8, Uint8>;
+    class color_rgb: public SDL_Color
+    {
+        public:
+        color_rgb(Uint8 r, Uint8 g, Uint8 b);
+        color_rgb(SDL_Color& c);
+        color_rgb(_color_rgb& c);
+
+        operator _color_rgb();
+    };
+
+    using _color_rgba = tuple<Uint8, Uint8, Uint8, Uint8>;
+    class color_rgba: public SDL_Color
+    {
+        public:
+        color_rgba(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+        color_rgba(SDL_Color& c);
+        color_rgba(_color_rgba& c);
+
+        color_rgba(color_rgb& c);
+
+        operator _color_rgba();
     };
 }
 

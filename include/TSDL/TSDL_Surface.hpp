@@ -34,12 +34,16 @@ namespace TSDL
         TSDL_Surface(const std::string& file);
 
         TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, TTF_Rendermethod m);
+        TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgb& c, TTF_Rendermethod m);
 
         TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TTF_Rendermethod m);
+        TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgba& c, TTF_Rendermethod m);
 
         TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb);
+        TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgb& fc, const color_rgb& bc);
 
         TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba);
+        TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgba& fc, const color_rgba& bc);
 
         ~TSDL_Surface();
 
@@ -48,7 +52,7 @@ namespace TSDL
         /*
         the format of the pixels stored in the surface; see SDL_PixelFormat for details (read-only)
         */
-        const SDL_PixelFormat* get_format() const;
+        const SDL_PixelFormat* format() const;
 
         /*
         Use this function to perform a fast surface copy to a destination surface.
@@ -68,14 +72,17 @@ namespace TSDL
         int fill_rect(const rect& rect, Uint32 color);
 
         int fill_rect(const rect& rect, Uint8 r, Uint8 g, Uint8 b);
+        int fill_rect(const rect& rect, const color_rgb& c);
 
-        int set_color_key(bool flag, Uint32 key);
+        int color_key(bool flag, Uint32 key);
 
-        int set_color_key(bool flag, Uint8 r, Uint8 g, Uint8 b);
+        int color_key(bool flag, Uint8 r, Uint8 g, Uint8 b);
+        int color_key(bool flag, const color_rgb& c);
 
         Uint32 map_rgb(Uint8 r, Uint8 g, Uint8 b) const;
+        Uint32 map_rgb(const color_rgb& c) const;
 
-        TSDL_Surface get_converted_surface(const SDL_PixelFormat* fmt, Uint32 flags) const;
+        TSDL_Surface converted_surface(const SDL_PixelFormat* fmt, Uint32 flags) const;
 
         void convert_surface(const SDL_PixelFormat* fmt, Uint32 flags);
     };
@@ -98,24 +105,7 @@ namespace _PY
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Surface)
 }
 
-#define _TSDL_SURFACE_PY                                                                                              \
-    py::class_<_PY::_PY_GET_TYPEERASE(Surface)>(m, "Surface")                                                         \
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Surface)<const std::string>())                                            \
-        .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Surface, enter_ctx), py::return_value_policy::reference)   \
-        .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Surface, exit_ctx));                                        \
-    py::class_<TSDL::TSDL_Surface>(m, "_Surface")                                                                     \
-        .def("get_format", &TSDL::TSDL_Surface::get_format)                                                           \
-        .def("copy_from", &TSDL::TSDL_Surface::copy_from)                                                             \
-        .def("scale_from", &TSDL::TSDL_Surface::scale_from)                                                           \
-        .def("fill_rect", py::overload_cast<const rect&, Uint32>(&TSDL::TSDL_Surface::fill_rect))                     \
-        .def("fill_rect", py::overload_cast<const rect&, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::fill_rect))        \
-        .def("set_color_key", py::overload_cast<bool, Uint32>(&TSDL::TSDL_Surface::set_color_key))                    \
-        .def("set_color_key", py::overload_cast<bool, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::set_color_key))       \
-        .def("map_rgb", &TSDL::TSDL_Surface::map_rgb)                                                                 \
-        .def("get_converted_surface", &TSDL::TSDL_Surface::get_converted_surface)                                     \
-        .def("convert_surface", &TSDL::TSDL_Surface::convert_surface);                                                \
-    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Surface)>(m, "_SDL_Surface");                                                \
-    py::implicitly_convertible<TSDL::TSDL_Surface, TSDL::_TSDL_GET_MASK_TYPE(Surface)>();                             \
+void _tsdl_surface_py(const py::module& m);
 
 #endif
 

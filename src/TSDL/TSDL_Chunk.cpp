@@ -56,4 +56,15 @@ _TSDL_EXPAND_DECLARE_MASK_MIX(TSDL, Chunk)
 
 _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Chunk)
 
+void _tsdl_chunk_py(const py::module& m)
+{
+    py::class_<_PY::_PY_GET_TYPEERASE(Chunk)>(m, "Chunk")
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Chunk)<const std::string>())
+        .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Chunk, enter_ctx), py::return_value_policy::reference)
+        .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Chunk, exit_ctx));
+    py::class_<TSDL::TSDL_Chunk>(m, "_Chunk");
+    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Chunk)>(m, "_SDL_Chunk");
+    py::implicitly_convertible<TSDL::TSDL_Chunk, TSDL::_TSDL_GET_MASK_TYPE(Chunk)>();
+}
+
 #endif

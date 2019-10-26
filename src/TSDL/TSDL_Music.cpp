@@ -66,4 +66,15 @@ _TSDL_EXPAND_DECLARE_MASK_MIX(TSDL, Music)
 
 _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Music)
 
+void _tsdl_music_py(const py::module& m)
+{
+    py::class_<_PY::_PY_GET_TYPEERASE(Music)>(m, "Music")
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Music)<const std::string>())
+        .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Music, enter_ctx), py::return_value_policy::reference)
+        .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Music, exit_ctx));
+    py::class_<TSDL::TSDL_Music>(m, "_Music");
+    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Music)>(m, "_SDL_Music");
+    py::implicitly_convertible<TSDL::TSDL_Music, TSDL::_TSDL_GET_MASK_TYPE(Music)>();
+}
+
 #endif

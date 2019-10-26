@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include "TSDL_SDLmask.hpp"
+#include <string>
 
 namespace TSDL
 {
@@ -32,7 +33,7 @@ namespace TSDL
     inline int play(const _SDL_Chunk& chunk, int loops);
     inline int play(const _SDL_Chunk& chunk, int loops, int limit);
     inline int play(int channel, const _SDL_Chunk& chunk, int loops);
-    int play(int channel, const TSDL::_SDL_Chunk& chunk, int loops, int limit);
+    int play(int channel, const _SDL_Chunk& chunk, int loops, int limit);
 }
 
 #ifdef TSDL_EXPOSE_PYBIND11
@@ -50,14 +51,7 @@ namespace _PY
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Chunk)
 }
 
-#define _TSDL_CHUNK_PY                                                                                                \
-    py::class_<_PY::_PY_GET_TYPEERASE(Chunk)>(m, "Chunk")                                                             \
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Chunk)<const std::string>())                                              \
-        .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Chunk, enter_ctx), py::return_value_policy::reference)     \
-        .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Chunk, exit_ctx));                                          \
-    py::class_<TSDL::TSDL_Chunk>(m, "_Chunk");                                                                        \
-    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Chunk)>(m, "_SDL_Chunk");                                                    \
-    py::implicitly_convertible<TSDL::TSDL_Chunk, TSDL::_TSDL_GET_MASK_TYPE(Chunk)>();                                 \
+void _tsdl_chunk_py(const py::module& m);
 
 #endif
 
