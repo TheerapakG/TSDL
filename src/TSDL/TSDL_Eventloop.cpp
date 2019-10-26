@@ -30,7 +30,7 @@ void TSDL::TSDL_Eventloop::remove_event_handler(SDL_EventType evType)
     _map.erase(evType);
 }
 
-void TSDL::TSDL_Eventloop::set_render_function(RenderHandler handler)
+void TSDL::TSDL_Eventloop::render_function(RenderHandler handler)
 {
     _render = handler;
 }
@@ -138,18 +138,18 @@ void TSDL::TSDL_Eventloop::track_fps(bool track)
     this->_reset_fps_count();
 }
 
-void TSDL::TSDL_Eventloop::set_fps_update_interval(TSDL::TSDL_Eventloop::clock::duration interval)
+void TSDL::TSDL_Eventloop::fps_update_interval(TSDL::TSDL_Eventloop::clock::duration interval)
 {
     _fps_update_interval.store(interval);
     this->_reset_fps_count();
 }
 
-TSDL::TSDL_Eventloop::clock::duration TSDL::TSDL_Eventloop::get_fps_update_interval() const
+TSDL::TSDL_Eventloop::clock::duration TSDL::TSDL_Eventloop::fps_update_interval() const
 {
     return _fps_update_interval.load();
 }
 
-double TSDL::TSDL_Eventloop::get_fps() const
+double TSDL::TSDL_Eventloop::fps() const
 {
     return _previous_fps.load();
 }
@@ -159,7 +159,7 @@ void TSDL::TSDL_Eventloop::limit_fps(bool limit)
     _limit_fps.store(limit);
 }
 
-void TSDL::TSDL_Eventloop::set_fps_target(double frames)
+void TSDL::TSDL_Eventloop::fps_target(double frames)
 {
     _fps_target_interval.store(
         std::chrono::duration_cast<TSDL::TSDL_Eventloop::clock::duration>(
@@ -168,7 +168,7 @@ void TSDL::TSDL_Eventloop::set_fps_target(double frames)
     );
 }
 
-double TSDL::TSDL_Eventloop::get_fps_target() const
+double TSDL::TSDL_Eventloop::fps_target() const
 {
     return static_cast<double>((1s).count())/_fps_update_interval.load().count();
 }

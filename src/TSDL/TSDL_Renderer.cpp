@@ -14,7 +14,7 @@ TSDL::TSDL_Renderer::TSDL_Renderer(TSDL::TSDL_Window window, Uint32 flags)
     _internal_ptr = _t_internal_ptr;
     try
     {
-        this->set_render_color(0xFF, 0xFF, 0xFF, 0xFF);
+        this->render_color(0xFF, 0xFF, 0xFF, 0xFF);
     }
     catch(...)
     {
@@ -33,7 +33,12 @@ TSDL::TSDL_Renderer::operator SDL_Renderer*() const
     return _internal_ptr;
 }
 
-int TSDL::TSDL_Renderer::set_render_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+int TSDL::TSDL_Renderer::render_color(const color_rgba& c)
+{
+    return this->render_color(c.r, c.g, c.b, c.a);
+}
+
+int TSDL::TSDL_Renderer::render_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
     int _t = SDL_SetRenderDrawColor(_internal_ptr, r, g, b, a);
     if(_t != 0)
@@ -43,9 +48,9 @@ int TSDL::TSDL_Renderer::set_render_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
     return _t;
 }
 
-int TSDL::TSDL_Renderer::set_viewport(const SDL_Rect* rect)
+int TSDL::TSDL_Renderer::viewport(const rect& rect)
 {
-    int _t = SDL_RenderSetViewport(_internal_ptr, rect);
+    int _t = SDL_RenderSetViewport(_internal_ptr, &rect);
     if(_t != 0)
     {
         throw std::runtime_error("Could not set renderer viewport! SDL Error: " + std::string(SDL_GetError()));
@@ -53,10 +58,9 @@ int TSDL::TSDL_Renderer::set_viewport(const SDL_Rect* rect)
     return _t;
 }
 
-int TSDL::TSDL_Renderer::set_viewport(int x, int y, int w, int h)
+int TSDL::TSDL_Renderer::viewport(int x, int y, int w, int h)
 {
-    SDL_Rect rect = {x, y, w, h};
-    return this->set_viewport(&rect);
+    return this->viewport(TSDL::rect(x, y, w, h));
 }
 
 int TSDL::TSDL_Renderer::clear()
@@ -69,7 +73,7 @@ int TSDL::TSDL_Renderer::clear()
     return _t;
 }
 
-int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const rect& srcrect, const rect& dstrect)
+int TSDL::TSDL_Renderer::copy_from(TSDL::_SDL_Texture texture, const rect& srcrect, const rect& dstrect)
 {
     int _t = SDL_RenderCopy(_internal_ptr, texture, &srcrect, &dstrect);
     if(_t != 0)
@@ -79,7 +83,7 @@ int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const rect& srcre
     return _t;
 }
 
-int TSDL::TSDL_Renderer::copy_from(TSDL::TSDL_Texture texture, const rect& srcrect, const rect& dstrect, const double angle, const point_2d& center, const SDL_RendererFlip flip)
+int TSDL::TSDL_Renderer::copy_from(TSDL::_SDL_Texture texture, const rect& srcrect, const rect& dstrect, const double angle, const point_2d& center, const SDL_RendererFlip flip)
 {
     int _t = SDL_RenderCopyEx(_internal_ptr, texture, &srcrect, &dstrect, angle, &center, flip);
     if(_t != 0)

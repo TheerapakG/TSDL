@@ -10,10 +10,12 @@ namespace TSDL
 #include "TSDL_Utility.hpp"
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Window.hpp"
-#include "TSDL_Texture.hpp"
 
 namespace TSDL
 {
+    class _TSDL_GET_MASK_TYPE(Texture);
+    using _SDL_Texture = _TSDL_GET_MASK_TYPE(Texture);
+
     class TSDL_Renderer
     {
         private:
@@ -26,19 +28,20 @@ namespace TSDL
 
         operator SDL_Renderer*() const;
 
-        int set_render_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+        int render_color(const color_rgba& c);
+        int render_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
-        int set_viewport(const SDL_Rect* rect);
-        int set_viewport(int x, int y, int w, int h);
+        int viewport(const rect& rect);
+        int viewport(int x, int y, int w, int h);
 
         int clear();
 
-        int copy_from(TSDL_Texture texture, const rect& srcrect, const rect& dstrect);
+        int copy_from(_SDL_Texture texture, const rect& srcrect, const rect& dstrect);
         /*
         * like copy_from(texture, srcrect, dstrct) but after copy, optionally rotating it by angle around the given 
         * center and also optionally flipping it.
         */
-        int copy_from(TSDL_Texture texture, 
+        int copy_from(_SDL_Texture texture, 
                       const rect& srcrect, 
                       const rect& dstrect, 
                       const double angle, 
@@ -60,5 +63,7 @@ namespace TSDL
 
     _TSDL_EXPAND_DEFINE_MASK_TYPE(Renderer)
 }
+
+#include "TSDL_Texture.hpp"
 
 #endif
