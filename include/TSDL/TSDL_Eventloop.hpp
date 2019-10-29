@@ -7,12 +7,12 @@
 #include <atomic>
 #include <mutex>
 
-typedef void (*EventHandler)(SDL_Event);
-
-typedef void (*RenderHandler)(void);
-
 namespace TSDL
 {
+    typedef void (*EventHandler)(SDL_Event);
+
+    typedef void (*RenderHandler)(void);
+
     using namespace std::literals::chrono_literals;
 
     class TSDL_Eventloop
@@ -72,5 +72,25 @@ namespace TSDL
         double fps_target() const;
     };
 }
+
+#ifdef TSDL_EXPOSE_PYBIND11
+
+#include "TSDL_PY_TypeErase.hpp"
+
+namespace _PY
+{
+    _PY_EXPAND_DEFINE_CONTEXTMANAGER(Eventloop)
+
+    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Eventloop)
+    _PY_GET_CONTEXTMANAGER(Eventloop)<>,
+    _PY_GET_CONTEXTMANAGER(Eventloop)<bool, bool>
+    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
+
+    _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Eventloop)
+}
+
+void _tsdl_eventloop_py(const py::module& m);
+
+#endif
 
 #endif

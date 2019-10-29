@@ -26,6 +26,8 @@ namespace TSDL
         SDL_Surface* _internal_ptr;
         bool _destroy;
 
+        int _fill_rect(const rect* rect, Uint32 color);
+
         public:
         TSDL_Surface(SDL_Surface* ptr);
 
@@ -69,9 +71,12 @@ namespace TSDL
         */
         int scale_from(_SDL_Surface src, const rect& srcrect, rect& dstrect);
 
+        int fill(Uint32 color);
         int fill_rect(const rect& rect, Uint32 color);
 
+        int fill(Uint8 r, Uint8 g, Uint8 b);
         int fill_rect(const rect& rect, Uint8 r, Uint8 g, Uint8 b);
+        int fill(const color_rgb& c);
         int fill_rect(const rect& rect, const color_rgb& c);
 
         int color_key(bool flag, Uint32 key);
