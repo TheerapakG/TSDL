@@ -26,6 +26,7 @@
             _tsdl_window_py(m);
             _tsdl_chunk_py(m);
             _tsdl_music_py(m);
+            _tsdl_eventloop_py(m);
         }
     #endif
 

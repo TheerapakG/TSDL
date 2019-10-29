@@ -20,7 +20,7 @@ TSDL::TSDL_Eventloop::~TSDL_Eventloop()
     }
 }
 
-void TSDL::TSDL_Eventloop::add_event_handler(SDL_EventType evType, EventHandler handler)
+void TSDL::TSDL_Eventloop::add_event_handler(SDL_EventType evType, TSDL::EventHandler handler)
 {
     _map[evType] = handler;
 }
@@ -30,7 +30,7 @@ void TSDL::TSDL_Eventloop::remove_event_handler(SDL_EventType evType)
     _map.erase(evType);
 }
 
-void TSDL::TSDL_Eventloop::render_function(RenderHandler handler)
+void TSDL::TSDL_Eventloop::render_function(TSDL::RenderHandler handler)
 {
     _render = handler;
 }
@@ -172,3 +172,36 @@ double TSDL::TSDL_Eventloop::fps_target() const
 {
     return static_cast<double>((1s).count())/_fps_update_interval.load().count();
 }
+
+#ifdef TSDL_EXPOSE_PYBIND11
+
+#include "TSDL/TSDL_PY_Utility.hpp"
+
+_PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Eventloop)
+
+void _tsdl_eventloop_py(const py::module& m)
+{
+    py::class_<_PY::_PY_GET_TYPEERASE(Eventloop)>(m, "Eventloop")
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Eventloop)<>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Eventloop)<bool, bool>())
+        .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Eventloop, enter_ctx), py::return_value_policy::reference)
+        .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Eventloop, exit_ctx));
+    py::class_<TSDL::TSDL_Eventloop>(m, "_Eventloop")
+        .def("add_event_handler", 
+            [](TSDL::TSDL_Eventloop* _self, SDL_EventType evType,  py::function handler)
+            {
+                _self->add_event_handler(evType, TSDL::py_function_cast_function_pointer<TSDL::EventHandler>(handler));
+            }
+        )
+        .def("remove_event_handler", &TSDL::TSDL_Eventloop::remove_event_handler)
+        .def("render_function",
+            [](TSDL::TSDL_Eventloop* _self, py::function handler)
+            {
+                _self->render_function(TSDL::py_function_cast_function_pointer<TSDL::RenderHandler>(handler));
+            }
+        )
+        .def("run", &TSDL::TSDL_Eventloop::run)
+        .def("interrupt", &TSDL::TSDL_Eventloop::interrupt);
+}
+
+#endif

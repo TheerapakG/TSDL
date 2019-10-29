@@ -109,9 +109,9 @@ int TSDL::TSDL_Surface::scale_from(_SDL_Surface src, const rect& srcrect, rect& 
     return _t;
 }
 
-int TSDL::TSDL_Surface::fill_rect(const rect& rect, Uint32 color)
+int TSDL::TSDL_Surface::_fill_rect(const rect* rect, Uint32 color)
 {
-    int _t = SDL_FillRect(_internal_ptr, &rect, color);
+    int _t = SDL_FillRect(_internal_ptr, rect, color);
     if(_t != 0)
     {
         throw std::runtime_error("Cannot copy from surface! SDL_Error: " + std::string(SDL_GetError()));
@@ -119,9 +119,29 @@ int TSDL::TSDL_Surface::fill_rect(const rect& rect, Uint32 color)
     return _t;
 }
 
+int TSDL::TSDL_Surface::fill(Uint32 color)
+{
+    return this->_fill_rect(NULL, color);
+}
+
+int TSDL::TSDL_Surface::fill_rect(const rect& rect, Uint32 color)
+{
+    return this->_fill_rect(&rect, color);
+}
+
+int TSDL::TSDL_Surface::fill(Uint8 r, Uint8 g, Uint8 b)
+{
+    return this->fill(this->map_rgb(r, g, b));
+}
+
 int TSDL::TSDL_Surface::fill_rect(const rect& rect, Uint8 r, Uint8 g, Uint8 b)
 {
     return this->fill_rect(rect, this->map_rgb(r, g, b));
+}
+
+int TSDL::TSDL_Surface::fill(const TSDL::color_rgb& c)
+{
+    return this->fill(c.r, c.g, c.b);
 }
 
 int TSDL::TSDL_Surface::fill_rect(const rect& rect, const TSDL::color_rgb& c)
@@ -198,8 +218,24 @@ void _tsdl_surface_py(const py::module& m)
         .def("format", &TSDL::TSDL_Surface::format)
         .def("copy_from", &TSDL::TSDL_Surface::copy_from)
         .def("scale_from", &TSDL::TSDL_Surface::scale_from)
-        .def("fill_rect", py::overload_cast<const TSDL::rect&, Uint32>(&TSDL::TSDL_Surface::fill_rect))
-        .def("fill_rect", py::overload_cast<const TSDL::rect&, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::fill_rect))
+        .def("fill_rect", py::overload_cast<const TSDL::rect&, Uint32>(&TSDL::TSDL_Surface::fill_rect), 
+            py::arg("rect"),
+            py::arg("color")
+        )
+        .def("fill", py::overload_cast<Uint32>(&TSDL::TSDL_Surface::fill), 
+            py::arg("color")
+        )
+        .def("fill_rect", py::overload_cast<const TSDL::rect&, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::fill_rect), 
+            py::arg("rect"),
+            py::arg("r"),
+            py::arg("g"),
+            py::arg("b")
+        )
+        .def("fill", py::overload_cast<Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::fill), 
+            py::arg("r"),
+            py::arg("g"),
+            py::arg("b")
+        )
         .def("color_key", py::overload_cast<bool, Uint32>(&TSDL::TSDL_Surface::color_key))
         .def("color_key", py::overload_cast<bool, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::color_key))
         .def("map_rgb", py::overload_cast<Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::map_rgb, py::const_))

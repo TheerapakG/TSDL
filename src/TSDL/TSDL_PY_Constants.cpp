@@ -44,5 +44,11 @@ void _tsdl_py_constant_py(const py::module& m)
         .value("SDL_FLIP_HORIZONTAL", SDL_RendererFlip::SDL_FLIP_HORIZONTAL)
         .value("SDL_FLIP_VERTICAL", SDL_RendererFlip::SDL_FLIP_VERTICAL)
         .def("__or__", _TSDL_PY_EXPAND_OR_ENUM(SDL_RendererFlip));
+    // TODO: INCOMPLETE
+    py::enum_<SDL_EventType>(m, "SDL_EventType")
+        .value("SDL_QUIT", SDL_EventType::SDL_QUIT)
+        .value("SDL_DISPLAYEVENT", SDL_EventType::SDL_DISPLAYEVENT)
+        .value("SDL_WINDOWEVENT", SDL_EventType::SDL_WINDOWEVENT)
+        .value("SDL_SYSWMEVENT", SDL_EventType::SDL_SYSWMEVENT);
 }
 #endif
