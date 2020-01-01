@@ -69,7 +69,7 @@ void TSDL::TSDL_Window::window_position(int x, int y)
     this->window_position(this->display(), x, y);
 }
 
-void TSDL::TSDL_Window::window_position(TSDL_Display& display, int x, int y)
+void TSDL::TSDL_Window::window_position(const TSDL_Display& display, int x, int y)
 {
     int _index = display.index();
     TSDL::rect _bound = display.bound();

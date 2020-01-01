@@ -30,4 +30,8 @@
         }
     #endif
 
+    #ifdef TSDL_USE_EMSCRIPTEN
+        #include <emscripten.h>
+    #endif
+
 #endif

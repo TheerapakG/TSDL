@@ -46,6 +46,9 @@ namespace TSDL
     class color_rgba: public SDL_Color
     {
         public:
+        #ifdef TSDL_USE_EMSCRIPTEN
+        Uint8 a;
+        #endif
         color_rgba(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
         color_rgba(SDL_Color& c);
         color_rgba(_color_rgba& c);

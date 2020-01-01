@@ -87,9 +87,9 @@ namespace TSDL
         Uint32 map_rgb(Uint8 r, Uint8 g, Uint8 b) const;
         Uint32 map_rgb(const color_rgb& c) const;
 
-        TSDL_Surface converted_surface(const SDL_PixelFormat* fmt, Uint32 flags) const;
+        TSDL_Surface converted_surface(SDL_PixelFormat* fmt, Uint32 flags) const;
 
-        void convert_surface(const SDL_PixelFormat* fmt, Uint32 flags);
+        void convert_surface(SDL_PixelFormat* fmt, Uint32 flags);
     };
 
     _TSDL_EXPAND_DEFINE_MASK_TYPE(Surface)

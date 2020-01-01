@@ -131,6 +131,29 @@ namespace TSDL
 
     template <typename F, std::size_t i>
     using get_argument_t = typename get_argument<F, i>::type;
+
+    template <typename T, typename R, typename... A> struct ptr_fun
+    {
+        template <R(T::*FUNC)(A...)> struct make
+        {
+            static R fun(T* p, A... args) { return (p->*FUNC)(args...); }
+        };
+
+        template <R(T::*FUNC)(A...) const> struct make_constant
+        {
+            static R fun(const T* p, A... args) { return (p->*FUNC)(args...); }
+        };
+
+        template <R(T::*FUNC)(A...)> struct make_void
+        {
+            static R fun(void* p, A... args) { return (static_cast<T*>(p)->*FUNC)(args...); }
+        };
+
+        template <R(T::*FUNC)(A...)> struct make_constant_void
+        {
+            static R fun(const void* p, A... args) { return (static_cast<const T*>(p)->*FUNC)(args...); }
+        };
+    };
 }
 
 #endif

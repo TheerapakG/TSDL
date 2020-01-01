@@ -179,7 +179,7 @@ Uint32 TSDL::TSDL_Surface::map_rgb(const TSDL::color_rgb& c) const
     return this->map_rgb(c.r, c.g, c.b);
 }
 
-SDL_Surface* _safe_convert_surface(SDL_Surface* src, const SDL_PixelFormat* fmt, Uint32 flags)
+SDL_Surface* _safe_convert_surface(SDL_Surface* src, SDL_PixelFormat* fmt, Uint32 flags)
 {
     SDL_Surface* _t = SDL_ConvertSurface(src, fmt, flags);
     if(_t == NULL)
@@ -189,12 +189,12 @@ SDL_Surface* _safe_convert_surface(SDL_Surface* src, const SDL_PixelFormat* fmt,
     return _t;
 }
 
-TSDL::TSDL_Surface TSDL::TSDL_Surface::converted_surface(const SDL_PixelFormat* fmt, Uint32 flags) const
+TSDL::TSDL_Surface TSDL::TSDL_Surface::converted_surface(SDL_PixelFormat* fmt, Uint32 flags) const
 {
     return TSDL::TSDL_Surface(_safe_convert_surface(_internal_ptr, fmt, flags), true);
 }
 
-void TSDL::TSDL_Surface::convert_surface(const SDL_PixelFormat* fmt, Uint32 flags)
+void TSDL::TSDL_Surface::convert_surface(SDL_PixelFormat* fmt, Uint32 flags)
 {
     SDL_Surface* _t_internal_ptr = _safe_convert_surface(_internal_ptr, fmt, flags);
     if(_destroy) SDL_FreeSurface(_internal_ptr);

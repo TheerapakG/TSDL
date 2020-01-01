@@ -1,7 +1,12 @@
 #include "TSDL/TSDL_Eventloop.hpp"
+#include "TSDL/TSDL_Meta.hpp"
 #include <iostream>
 #include <stdexcept>
 #include <string>
+
+#ifdef TSDL_USE_EMSCRIPTEN
+    #include <emscripten.h>
+#endif
 
 using namespace std::literals::chrono_literals;
 
@@ -45,7 +50,7 @@ void TSDL::TSDL_Eventloop::_reset_fps_count()
 void TSDL::TSDL_Eventloop::_run_step()
 {
     SDL_Event e;
-    if(SDL_PollEvent(&e) != 0)
+    while(SDL_PollEvent(&e) != 0)
     {
         EventHandler h;
         try
@@ -67,49 +72,49 @@ void TSDL::TSDL_Eventloop::_run_step()
         h(e);
         return;
     }
+    
+    if(_render != nullptr)
+    {
+    #ifndef TSDL_USE_EMSCRIPTEN
+        if(_limit_fps.load())
+        {
+            clock::time_point now = clock::now();
+            if((now - _time_last_frame) < _fps_target_interval.load()) return;
+            _time_last_frame = now;
+        }
+    #endif
+        _render();
+        if(_track_fps.load())
+        {
+            clock::time_point now = clock::now();
+            std::scoped_lock lock(_lock_frame_calc);
+            clock::duration diff = now - _time_since_last;
+            if(diff >= _fps_update_interval.load())
+            {
+                _previous_fps.store(static_cast<double>(_frame_since_last + 1) / std::chrono::duration_cast<std::chrono::seconds>(diff).count());
+                this->_reset_fps_count();
+            }
+            else _frame_since_last ++;
+        }
+        return;
+    }
     else
     {
-        if(_render != nullptr)
+        if(_throw_if_no_render_handler)
         {
-            if(_limit_fps.load())
-            {
-                clock::time_point now = clock::now();
-                if((now - _time_last_frame) < _fps_target_interval.load()) return;
-                _time_last_frame = now;
-            }
-            _render();
-            if(_track_fps.load())
-            {
-                clock::time_point now = clock::now();
-                std::scoped_lock lock(_lock_frame_calc);
-                clock::duration diff = now - _time_since_last;
-                if(diff >= _fps_update_interval.load())
-                {
-                    _previous_fps.store(static_cast<double>(_frame_since_last + 1) / std::chrono::duration_cast<std::chrono::seconds>(diff).count());
-                    this->_reset_fps_count();
-                }
-                else _frame_since_last ++;
-            }
-            return;
+            std::throw_with_nested(std::runtime_error("No handler for rendering"));
         }
         else
         {
-            if(_throw_if_no_render_handler)
-            {
-                std::throw_with_nested(std::runtime_error("No handler for rendering"));
-            }
-            else
-            {
-                std::cerr << "No handler for rendering." << std::endl;
-                return;
-            }
+            std::cerr << "No handler for rendering." << std::endl;
+            return;
         }
-        
     }
 }
 
 void TSDL::TSDL_Eventloop::run()
 {
+#ifndef TSDL_USE_EMSCRIPTEN
     if(_track_fps) this->_reset_fps_count();
     _time_last_frame = clock::now();
     _is_running.store(true);
@@ -117,10 +122,31 @@ void TSDL::TSDL_Eventloop::run()
     {
         this->_run_step();
     }
+#else
+    if (_limit_fps.load())
+    {
+        emscripten_set_main_loop_arg(
+            TSDL::ptr_fun<TSDL::TSDL_Eventloop, void>::make_void<&TSDL::TSDL_Eventloop::_run_step>::fun, 
+            this, 
+            static_cast<int>(1s/(_fps_target_interval.load())), 
+            1
+        );
+    }
+    else
+    {
+        emscripten_set_main_loop_arg(
+            TSDL::ptr_fun<TSDL::TSDL_Eventloop, void>::make_void<&TSDL::TSDL_Eventloop::_run_step>::fun, 
+            this, 
+            -1, 
+            1
+        );
+    }
+#endif
 }
 
 void TSDL::TSDL_Eventloop::interrupt()
 {
+#ifndef TSDL_USE_EMSCRIPTEN
     if(_is_running)
     {
         _is_running.store(false);
@@ -129,7 +155,9 @@ void TSDL::TSDL_Eventloop::interrupt()
     {
         throw std::runtime_error("Could not interrupt while event loop is not already running!");
     }
-    
+#else
+    emscripten_cancel_main_loop();
+#endif    
 }
 
 void TSDL::TSDL_Eventloop::track_fps(bool track)
@@ -157,6 +185,19 @@ double TSDL::TSDL_Eventloop::fps() const
 void TSDL::TSDL_Eventloop::limit_fps(bool limit)
 {
     _limit_fps.store(limit);
+#ifdef TSDL_USE_EMSCRIPTEN
+    if (limit)
+    {
+        emscripten_set_main_loop_timing(
+            EM_TIMING_SETTIMEOUT, 
+            static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(_fps_target_interval.load()).count())
+        );
+    }
+    else
+    {
+        emscripten_set_main_loop_timing(EM_TIMING_RAF, 1);
+    }    
+#endif
 }
 
 void TSDL::TSDL_Eventloop::fps_target(double frames)
@@ -166,6 +207,19 @@ void TSDL::TSDL_Eventloop::fps_target(double frames)
             std::chrono::duration_cast<std::chrono::nanoseconds>(1s)/frames
         )
     );
+#ifdef TSDL_USE_EMSCRIPTEN
+    if (_limit_fps.load())
+    {
+        emscripten_set_main_loop_timing(
+            EM_TIMING_SETTIMEOUT, 
+            static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(_fps_target_interval.load()).count())
+        );
+    }
+    else
+    {
+        emscripten_set_main_loop_timing(EM_TIMING_RAF, 1);
+    }  
+#endif
 }
 
 double TSDL::TSDL_Eventloop::fps_target() const
