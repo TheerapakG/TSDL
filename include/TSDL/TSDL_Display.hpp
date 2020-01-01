@@ -15,9 +15,9 @@ namespace TSDL
         public:
         TSDL_Display(int index);
 
-        int index(void);
+        int index(void) const;
 
-        rect bound(void);
+        rect bound(void) const;
     };
 }
 

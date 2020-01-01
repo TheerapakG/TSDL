@@ -42,6 +42,8 @@ int main(int argc, char* argv[])
     std::iostream::sync_with_stdio(false);
     std::cin.tie(NULL);
 
+    std::cout << "starting..." << std::endl;
+
     //Initialize SDL
     try
     {

@@ -28,7 +28,7 @@ namespace TSDL
         bool _throw_if_no_render_handler = false;
 
         std::atomic<bool> _track_fps = true;
-        std::atomic<clock::duration> _fps_update_interval = 1s;
+        std::atomic<clock::duration> _fps_update_interval = std::chrono::duration_cast<clock::duration>(1s);
         std::recursive_mutex _lock_frame_calc;
             int _frame_since_last = 0;
             clock::time_point _time_since_last;

@@ -31,7 +31,7 @@ namespace TSDL
         TSDL_Display display(void);
 
         void window_position(int x, int y);
-        void window_position(TSDL_Display& display, int x, int y);
+        void window_position(const TSDL_Display& display, int x, int y);
     };
 
     _TSDL_EXPAND_DEFINE_MASK_TYPE(Window)
