@@ -4,11 +4,13 @@
 #include <SDL_mixer.h>
 #include <string>
 #include <stdexcept>
+#include <iostream>
 
 TSDL::TSDL::TSDL(): TSDL::TSDL(44100) {}
 
 TSDL::TSDL::TSDL(int frequency)
 {
+    std::cout << "initializing SDL..." << std::endl;
     if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
     {
         std::string e = SDL_GetError();
@@ -17,6 +19,7 @@ TSDL::TSDL::TSDL(int frequency)
     }
     else
     {
+        std::cout << "initializing SDL_Image..." << std::endl;
         int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
         if( !( IMG_Init( imgFlags ) & imgFlags ) )
         {
@@ -27,6 +30,7 @@ TSDL::TSDL::TSDL(int frequency)
         }
         else
         {
+            std::cout << "initializing SDL_mixer..." << std::endl;
             if( Mix_OpenAudio( frequency, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0)
             {
                 std::string e = Mix_GetError();
