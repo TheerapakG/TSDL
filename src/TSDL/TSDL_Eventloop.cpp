@@ -53,6 +53,7 @@ void TSDL::TSDL_Eventloop::_run_step()
     while(SDL_PollEvent(&e) != 0)
     {
         EventHandler h;
+        #ifdef __cpp_exceptions
         try
         {
             h = _map.at(static_cast<SDL_EventType>(e.type));
@@ -69,6 +70,19 @@ void TSDL::TSDL_Eventloop::_run_step()
                 return;
             }
         }
+        #else
+        auto h_it = _map.find(static_cast<SDL_EventType>(e.type));
+        if(h_it != _map.end())
+        {
+            h = h_it->second;
+        }
+        else
+        {
+            std::cerr << "No handler for SDL event: " << e.type << " (" << exc.what() << "). You should consider adding handler." << std::endl;
+            return;
+        }
+        #endif
+        
         h(e);
         return;
     }
@@ -100,15 +114,15 @@ void TSDL::TSDL_Eventloop::_run_step()
     }
     else
     {
+        #ifdef __cpp_exceptions
         if(_throw_if_no_render_handler)
         {
             std::throw_with_nested(std::runtime_error("No handler for rendering"));
         }
-        else
-        {
-            std::cerr << "No handler for rendering." << std::endl;
-            return;
-        }
+        #endif
+
+        std::cerr << "No handler for rendering." << std::endl;
+        return;        
     }
 }
 

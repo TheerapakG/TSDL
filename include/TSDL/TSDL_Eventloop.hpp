@@ -6,12 +6,13 @@
 #include <chrono>
 #include <atomic>
 #include <mutex>
+#include <functional>
 
 namespace TSDL
 {
-    typedef void (*EventHandler)(SDL_Event);
+    using EventHandler = std::function<void(const SDL_Event&)>;
 
-    typedef void (*RenderHandler)(void);
+    using RenderHandler = std::function<void()>;
 
     using namespace std::literals::chrono_literals;
 
@@ -24,8 +25,10 @@ namespace TSDL
         std::map <SDL_EventType, EventHandler> _map;
         RenderHandler _render = nullptr;
         std::atomic<bool> _is_running = false;
+        #ifdef __cpp_exceptions
         bool _throw_if_no_event_handler = false;
         bool _throw_if_no_render_handler = false;
+        #endif
 
         std::atomic<bool> _track_fps = true;
         std::atomic<clock::duration> _fps_update_interval = std::chrono::duration_cast<clock::duration>(1s);
