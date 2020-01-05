@@ -3,9 +3,25 @@
 
 #include <SDL.h>
 #include <tuple>
+#include <stdexcept>
 
 namespace TSDL
 {
+
+#ifdef __cpp_exceptions    
+    template <typename Exc, typename ...Args>
+    bool safe_throw(Args... args)
+    {
+        throw Exc(args...);
+    }
+#else
+    template <typename Exc, typename ...Args>
+    bool safe_throw(Args... args)
+    {
+        return false;
+    }
+#endif
+
     template <typename ...Ts>
     using tuple = std::tuple<Ts...>;
 

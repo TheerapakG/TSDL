@@ -45,8 +45,11 @@ int main(int argc, char* argv[])
     std::cout << "starting..." << std::endl;
 
     //Initialize SDL
+    #ifdef __cpp_exceptions
     try
     {
+    #endif
+
         TSDL::TSDL tsdl;
 
         window = new TSDL::TSDL_Window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
@@ -64,6 +67,8 @@ int main(int argc, char* argv[])
         t.join();
 
         delete window;
+        
+    #ifdef __cpp_exceptions
     }
     catch(const std::exception& e)
     {
@@ -71,6 +76,7 @@ int main(int argc, char* argv[])
         std::cerr << e.what() << '\n';
         return -1;
     }
+    #endif
 
     return 0;    
 }

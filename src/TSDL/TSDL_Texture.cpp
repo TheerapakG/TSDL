@@ -1,42 +1,35 @@
 #include "TSDL/TSDL_Texture.hpp"
+#include "TSDL/TSDL_Utility.hpp"
+#include "TSDL/TSDL_Surface.hpp"
 #include <SDL.h>
 #include <SDL_image.h>
-#include <stdexcept>
 
 TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer renderer, const std::string& file)
 {
-    SDL_Surface* _t_surface = IMG_Load(file.c_str());
-    if(_t_surface == NULL)
-    {
-        throw std::runtime_error("Texture surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
-    }
+    TSDL::TSDL_Surface _t_surface(file);
     SDL_Texture* _t_internal_ptr = SDL_CreateTextureFromSurface(renderer, _t_surface);
-    SDL_FreeSurface(_t_surface);
     if(_t_internal_ptr == NULL)
     {
-        throw std::runtime_error("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     _internal_ptr = _t_internal_ptr;
 }
 
 TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b)
 {
-    SDL_Surface* _t_surface = IMG_Load(file.c_str());
-    if(_t_surface == NULL)
-    {
-        throw std::runtime_error("Texture surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
-    }
-    int _t = SDL_SetColorKey(_t_surface, true, SDL_MapRGB(_t_surface->format, r, g, b));
+    TSDL::TSDL_Surface _t_surface(file);
+    int _t = _t_surface.color_key(true, r, g, b);
     if(_t != 0)
     {
-        SDL_FreeSurface(_t_surface);
-        throw std::runtime_error("Could not set texture surface color key! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Could not set texture surface color key! SDL Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     SDL_Texture* _t_internal_ptr = SDL_CreateTextureFromSurface(renderer, _t_surface);
-    SDL_FreeSurface(_t_surface);
     if(_t_internal_ptr == NULL)
     {
-        throw std::runtime_error("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -46,7 +39,8 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer renderer, TSDL::_SDL_Surfac
     SDL_Texture* _t_internal_ptr = SDL_CreateTextureFromSurface(renderer, surface);
     if(_t_internal_ptr == NULL)
     {
-        throw std::runtime_error("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -61,13 +55,14 @@ TSDL::TSDL_Texture::operator SDL_Texture*() const
     return _internal_ptr;
 }
 
-void TSDL::TSDL_Texture::blend_mode(SDL_BlendMode mode)
+int TSDL::TSDL_Texture::blend_mode(SDL_BlendMode mode)
 {
     int _t = SDL_SetTextureBlendMode(_internal_ptr, mode);
     if(_t != 0)
     {
-        throw std::runtime_error("Could not set blend mode! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Could not set blend mode! SDL Error: " + std::string(SDL_GetError()));
     }
+    return _t;
 }
 
 SDL_BlendMode TSDL::TSDL_Texture::blend_mode()
@@ -76,18 +71,20 @@ SDL_BlendMode TSDL::TSDL_Texture::blend_mode()
     int _t = SDL_GetTextureBlendMode(_internal_ptr, &ret);
     if(_t != 0)
     {
-        throw std::runtime_error("Could not get blend mode! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Could not get blend mode! SDL Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     return ret;
 }
 
-void TSDL::TSDL_Texture::alpha_multiplier(Uint8 a)
+int TSDL::TSDL_Texture::alpha_multiplier(Uint8 a)
 {
     int _t = SDL_SetTextureAlphaMod(_internal_ptr, a);
     if(_t != 0)
     {
-        throw std::runtime_error("Could not set alpha! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Could not set alpha! SDL Error: " + std::string(SDL_GetError()));
     }
+    return _t;
 }
 
 Uint8 TSDL::TSDL_Texture::alpha_multiplier()
@@ -96,21 +93,23 @@ Uint8 TSDL::TSDL_Texture::alpha_multiplier()
     int _t = SDL_GetTextureAlphaMod(_internal_ptr, &ret);
     if(_t != 0)
     {
-        throw std::runtime_error("Could not get alpha! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Could not get alpha! SDL Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     return ret;
 }
 
-void TSDL::TSDL_Texture::color_multiplier(Uint8 r, Uint8 g, Uint8 b)
+int TSDL::TSDL_Texture::color_multiplier(Uint8 r, Uint8 g, Uint8 b)
 {
     int _t = SDL_SetTextureColorMod(_internal_ptr, r, g, b);
     if(_t != 0)
     {
-        throw std::runtime_error("Could not set color multiplier! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Could not set color multiplier! SDL Error: " + std::string(SDL_GetError()));
     }
+    return _t;
 }
 
-void TSDL::TSDL_Texture::color_multiplier(const color_rgb& c)
+int TSDL::TSDL_Texture::color_multiplier(const color_rgb& c)
 {
     return this->color_multiplier(c.r, c.g, c.b);
 }
@@ -121,7 +120,7 @@ TSDL::color_rgb TSDL::TSDL_Texture::color_multiplier()
     int _t = SDL_GetTextureColorMod(_internal_ptr, &ret.r, &ret.g, &ret.b);
     if(_t != 0)
     {
-        throw std::runtime_error("Could not get color multiplier! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Could not get color multiplier! SDL Error: " + std::string(SDL_GetError()));
     }
     return ret;
 }

@@ -12,10 +12,12 @@ using namespace std::literals::chrono_literals;
 
 TSDL::TSDL_Eventloop::TSDL_Eventloop() {}
 
+#ifdef __cpp_exceptions
 TSDL::TSDL_Eventloop::TSDL_Eventloop(bool thrownoevhandler, bool thrownorenderhandler) :
 _throw_if_no_event_handler(thrownoevhandler),
 _throw_if_no_render_handler(thrownorenderhandler)
 {}
+#endif
 
 TSDL::TSDL_Eventloop::~TSDL_Eventloop()
 {
@@ -78,7 +80,7 @@ void TSDL::TSDL_Eventloop::_run_step()
         }
         else
         {
-            std::cerr << "No handler for SDL event: " << e.type << " (" << exc.what() << "). You should consider adding handler." << std::endl;
+            std::cerr << "No handler for SDL event: " << e.type << ". You should consider adding handler." << std::endl;
             return;
         }
         #endif
