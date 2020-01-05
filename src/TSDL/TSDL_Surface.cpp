@@ -1,5 +1,5 @@
 #include "TSDL/TSDL_Surface.hpp"
-#include <stdexcept>
+#include "TSDL/TSDL_Utility.hpp"
 
 TSDL::TSDL_Surface::TSDL_Surface(SDL_Surface* ptr): TSDL_Surface(ptr, false) {}
 
@@ -10,7 +10,8 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& file): _destroy(true)
     SDL_Surface* _t_internal_ptr = IMG_Load(file.c_str());
     if(_t_internal_ptr == NULL)
     {
-        throw std::runtime_error("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -40,13 +41,15 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 
         break;
     
     default:
-        throw std::runtime_error("Invalid Rendermethod specified!");
+        TSDL::safe_throw<std::runtime_error>("Invalid Rendermethod specified!");
+        // TODO: noexcept signify error
         break;
     }
     
     if(_t_internal_ptr == NULL)
     {
-        throw std::runtime_error("Surface could not be created! SDL_Error: " + std::string(TTF_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(TTF_GetError()));
+        // TODO: noexcept signify error
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -66,7 +69,8 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 
     SDL_Surface* _t_internal_ptr = TTF_RenderUTF8_Shaded(font, text.c_str(), {fr, fg, fb, fa}, {br, bg, bb, ba});
     if(_t_internal_ptr == NULL)
     {
-        throw std::runtime_error("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -94,7 +98,7 @@ int TSDL::TSDL_Surface::copy_from(_SDL_Surface src, const rect& srcrect, rect& d
     int _t = SDL_BlitSurface(src, &srcrect, _internal_ptr, &dstrect);
     if(_t != 0)
     {
-        throw std::runtime_error("Cannot copy from surface! SDL_Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Cannot copy from surface! SDL_Error: " + std::string(SDL_GetError()));
     }
     return _t;
 }
@@ -104,7 +108,7 @@ int TSDL::TSDL_Surface::scale_from(_SDL_Surface src, const rect& srcrect, rect& 
     int _t = SDL_BlitScaled(src, &srcrect, _internal_ptr, &dstrect);
     if(_t != 0)
     {
-        throw std::runtime_error("Cannot scaled copy from surface! SDL_Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Cannot scaled copy from surface! SDL_Error: " + std::string(SDL_GetError()));
     }
     return _t;
 }
@@ -114,7 +118,7 @@ int TSDL::TSDL_Surface::_fill_rect(const rect* rect, Uint32 color)
     int _t = SDL_FillRect(_internal_ptr, rect, color);
     if(_t != 0)
     {
-        throw std::runtime_error("Cannot copy from surface! SDL_Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Cannot copy from surface! SDL_Error: " + std::string(SDL_GetError()));
     }
     return _t;
 }
@@ -154,7 +158,7 @@ int TSDL::TSDL_Surface::color_key(bool flag, Uint32 key)
     int _t = SDL_SetColorKey(_internal_ptr, flag, key);
     if(_t != 0)
     {
-        throw std::runtime_error("Could not set surface color key! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Could not set surface color key! SDL Error: " + std::string(SDL_GetError()));
     }
     return _t;
 }
@@ -184,7 +188,7 @@ SDL_Surface* _safe_convert_surface(SDL_Surface* src, SDL_PixelFormat* fmt, Uint3
     SDL_Surface* _t = SDL_ConvertSurface(src, fmt, flags);
     if(_t == NULL)
     {
-        throw std::runtime_error("Cannot convert surface! SDL_Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Cannot convert surface! SDL_Error: " + std::string(SDL_GetError()));
     }
     return _t;
 }

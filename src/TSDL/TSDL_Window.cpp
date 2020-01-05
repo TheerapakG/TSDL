@@ -1,5 +1,5 @@
 #include "TSDL/TSDL_Window.hpp"
-#include <stdexcept>
+#include "TSDL/TSDL_Utility.hpp"
 #include <string>
 #include <iostream>
 
@@ -13,7 +13,8 @@ TSDL::TSDL_Window::TSDL_Window(const std::string& title, int x, int y, int w, in
     SDL_Window* _t_internal_ptr = SDL_CreateWindow(title.c_str(), x, y, w, h, flags);
     if(_t_internal_ptr == NULL)
     {
-        throw std::runtime_error("Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     _internal_ptr = _t_internal_ptr;
     _destroy = true;
@@ -34,7 +35,7 @@ SDL_Surface* TSDL::TSDL_Window::window_surface(void)
     SDL_Surface* _t = SDL_GetWindowSurface(_internal_ptr);
     if(_t == NULL)
     {
-        throw std::runtime_error("Cannot get surface from window! SDL_Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Cannot get surface from window! SDL_Error: " + std::string(SDL_GetError()));
     }
     return _t;
 }
@@ -49,7 +50,7 @@ int TSDL::TSDL_Window::update_window_surface(void)
     int _t = SDL_UpdateWindowSurface(_internal_ptr);
     if(_t != 0)
     {
-        throw std::runtime_error("Cannot update window surface! SDL_Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Cannot update window surface! SDL_Error: " + std::string(SDL_GetError()));
     }
     return _t;
 }
@@ -59,7 +60,8 @@ TSDL::TSDL_Display TSDL::TSDL_Window::display(void)
     int _t = SDL_GetWindowDisplayIndex(_internal_ptr);
     if(_t < 0)
     {
-        throw std::runtime_error("Cannot get display index! SDL_Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Cannot get display index! SDL_Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     return TSDL_Display(_t);
 }

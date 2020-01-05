@@ -35,21 +35,21 @@ namespace TSDL
 
         operator SDL_Texture*() const;
 
-        void blend_mode(SDL_BlendMode mode);
+        int blend_mode(SDL_BlendMode mode);
         SDL_BlendMode blend_mode();
 
         /*
         When this texture is rendered, during the copy operation alpha is used to calculate each pixel based on blending mode.
         */
-        void alpha_multiplier(Uint8 a);
+        int alpha_multiplier(Uint8 a);
         Uint8 alpha_multiplier();
 
         /*
         When this texture is rendered, during the copy operation each source color channel value is calculated using this:
             srcC = srcC * (color / 255)
         */
-        void color_multiplier(Uint8 r, Uint8 g, Uint8 b);
-        void color_multiplier(const color_rgb& c);
+        int color_multiplier(Uint8 r, Uint8 g, Uint8 b);
+        int color_multiplier(const color_rgb& c);
         color_rgb color_multiplier();
     };
 

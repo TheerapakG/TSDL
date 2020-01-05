@@ -1,5 +1,5 @@
 #include "TSDL/TSDL_Display.hpp"
-#include <stdexcept>
+#include "TSDL/TSDL_Utility.hpp"
 
 TSDL::TSDL_Display::TSDL_Display(int index): _index(index) {};
 
@@ -14,7 +14,8 @@ TSDL::rect TSDL::TSDL_Display::bound(void) const
     int _t = SDL_GetDisplayBounds(_index, &_rect);
     if(_t != 0)
     {
-        throw std::runtime_error("Could not get display bound! SDL Error: " + std::string(SDL_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Could not get display bound! SDL Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
     }
     return _rect;
 }
