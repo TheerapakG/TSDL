@@ -1,5 +1,5 @@
 #include "TSDL/TSDL_Music.hpp"
-#include <stdexcept>
+#include "TSDL/TSDL_Utility.hpp"
 
 TSDL::TSDL_Music::TSDL_Music(Mix_Music* ptr): TSDL_Music(ptr, false) {}
 
@@ -10,7 +10,8 @@ TSDL::TSDL_Music::TSDL_Music(const std::string& file): _destroy(true)
     Mix_Music* _t_internal_ptr = Mix_LoadMUS(file.c_str());
     if(_t_internal_ptr == NULL)
     {
-        throw std::runtime_error("Music could not be loaded! SDL_Mixer_Error: " + std::string(Mix_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Music could not be loaded! SDL_Mixer_Error: " + std::string(Mix_GetError()));
+        // TODO: noexcept signify error
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -30,7 +31,8 @@ int TSDL::play(const TSDL::_SDL_Music& music, int loops)
     int _t = Mix_PlayMusic(music, loops);
     if(_t != 0)
     {
-        throw std::runtime_error("Cannot play music! SDL_Mixer_Error: " + std::string(Mix_GetError()));
+        TSDL::safe_throw<std::runtime_error>("Cannot play music! SDL_Mixer_Error: " + std::string(Mix_GetError()));
+        // TODO: noexcept signify error
     }
     return _t;
 }
