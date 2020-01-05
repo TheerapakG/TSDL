@@ -46,7 +46,9 @@ namespace TSDL
 
         public:
         TSDL_Eventloop();
+        #ifdef __cpp_exceptions
         TSDL_Eventloop(bool thrownoevhandler, bool thrownorenderhandler);
+        #endif
 
         ~TSDL_Eventloop();
 
