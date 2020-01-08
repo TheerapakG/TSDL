@@ -11,14 +11,14 @@ TSDL::TSDL_Chunk::TSDL_Chunk(const std::string& file): _destroy(true)
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Chunk could not be loaded! SDL_Mixer_Error: " + std::string(Mix_GetError()));
-        // TODO: noexcept signify error
+        return;
     }
     _internal_ptr = _t_internal_ptr;
 }
 
 TSDL::TSDL_Chunk::~TSDL_Chunk()
 {
-    if(_destroy) Mix_FreeChunk(*this);
+    if(_destroy && (_internal_ptr != nullptr)) Mix_FreeChunk(*this);
 }
 
 TSDL::TSDL_Chunk::operator Mix_Chunk*() const

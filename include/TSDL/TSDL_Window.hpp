@@ -11,13 +11,21 @@ namespace TSDL
     class TSDL_Window
     {
         private:
-        SDL_Window* _internal_ptr;
+        SDL_Window* _internal_ptr = nullptr;
         bool _destroy;
 
         public:
+        using SDL_Type = SDL_Window;
+
         TSDL_Window(SDL_Window* ptr);
         TSDL_Window(SDL_Window* ptr, bool handle_destroy);
+
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Window(const std::string& title, int x, int y, int w, int h, Uint32 flags);
+
         ~TSDL_Window();
 
         operator SDL_Window*() const;

@@ -11,7 +11,7 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& file): _destroy(true)
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
-        // TODO: noexcept signify error
+        return;
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -42,14 +42,14 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 
     
     default:
         TSDL::safe_throw<std::runtime_error>("Invalid Rendermethod specified!");
-        // TODO: noexcept signify error
-        break;
+        _internal_ptr = nullptr;
+        return;
     }
     
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(TTF_GetError()));
-        // TODO: noexcept signify error
+        return;
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -70,7 +70,7 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
-        // TODO: noexcept signify error
+        return;
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -80,7 +80,7 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, const 
 
 TSDL::TSDL_Surface::~TSDL_Surface()
 {
-    if(_destroy) SDL_FreeSurface(_internal_ptr);
+    if(_destroy && (_internal_ptr != nullptr)) SDL_FreeSurface(_internal_ptr);
 }
 
 TSDL::TSDL_Surface::operator SDL_Surface*() const
