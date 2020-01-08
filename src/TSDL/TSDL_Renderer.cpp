@@ -10,7 +10,7 @@ TSDL::TSDL_Renderer::TSDL_Renderer(TSDL::TSDL_Window window, Uint32 flags)
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Renderer could not be created! SDL Error: " + std::string(SDL_GetError()));
-        // TODO: noexcept signify error
+        return;
     }
     _internal_ptr = _t_internal_ptr;
 
@@ -29,13 +29,18 @@ TSDL::TSDL_Renderer::TSDL_Renderer(TSDL::TSDL_Window window, Uint32 flags)
     #endif
     {
         SDL_DestroyRenderer(_internal_ptr);
-        throw;        
+        #ifdef __cpp_exceptions 
+        throw; 
+        #else
+        _internal_ptr = nullptr;
+        return;
+        #endif       
     }
 }
 
 TSDL::TSDL_Renderer::~TSDL_Renderer()
 {
-    SDL_DestroyRenderer(_internal_ptr);
+    if(_internal_ptr != nullptr) SDL_DestroyRenderer(_internal_ptr);
 }
 
 TSDL::TSDL_Renderer::operator SDL_Renderer*() const

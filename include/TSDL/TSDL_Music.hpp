@@ -11,13 +11,21 @@ namespace TSDL
     class TSDL_Music
     {
         private:
-        Mix_Music* _internal_ptr;
+        Mix_Music* _internal_ptr = nullptr;
         bool _destroy;
 
         public:
+        using SDL_Type = Mix_Music;
+
         TSDL_Music(Mix_Music* ptr);
         TSDL_Music(Mix_Music* ptr, bool handle_destroy);
+
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Music(const std::string& file);
+
         ~TSDL_Music();
 
         operator Mix_Music*() const;

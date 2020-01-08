@@ -5,9 +5,12 @@
 #include <tuple>
 #include <stdexcept>
 
+#ifndef __cpp_exceptions
+#include <new>
+#endif
+
 namespace TSDL
 {
-
 #ifdef __cpp_exceptions    
     template <typename Exc, typename ...Args>
     bool safe_throw(Args... args)
@@ -15,11 +18,25 @@ namespace TSDL
         throw Exc(args...);
     }
 #else
+    extern std::exception* _current_exc;
+
     template <typename Exc, typename ...Args>
     bool safe_throw(Args... args)
     {
+        _current_exc = new (std::nothrow) Exc(args...);
+        if (_current_exc == nullptr)
         return false;
     }
+
+    template <typename T>
+    bool check_integrity(T& obj)
+    {
+        return static_cast<obj::SDL_Type*>(obj) != nullptr;
+    }
+
+    std::exception& get_exc();
+
+    void clear_exc();
 #endif
 
     template <typename ...Ts>

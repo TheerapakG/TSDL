@@ -15,6 +15,27 @@ const int SCREEN_HEIGHT = 720;
 TSDL::TSDL_Window* window;
 TSDL::TSDL_Eventloop eventloop;
 
+#ifndef __cpp_exceptions
+void print_exc()
+{
+    std::exception& e = TSDL::get_exc();
+    std::cerr << "Error: " << typeid(e).name() << "\n";
+    std::cerr << e.what() << '\n';
+}
+
+template <typename T>
+bool check(T& obj)
+{
+    if (!TSDL::check_integrity(obj))
+    {
+        print_exc();
+        return false;
+    }
+    return true;
+}
+
+#endif
+
 void render_handler()
 {
     window->update_window_surface();
@@ -37,6 +58,10 @@ void say_fps()
     }
 }
 
+// Error value, keep in mind that all functions throw if exception is enabled
+// so you only need to take error value only if exception is disabled
+int e = 0;
+
 int main(int argc, char* argv[])
 {
     std::iostream::sync_with_stdio(false);
@@ -53,11 +78,22 @@ int main(int argc, char* argv[])
         TSDL::TSDL tsdl;
 
         window = new TSDL::TSDL_Window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        #ifndef __cpp_exceptions
+        if(!check(*window)) return -1;
+        #endif
+        
         //Get window surface
         auto screenSurface = window->window_surface_object();
 
         //Fill the surface white
-        screenSurface.fill(0xFF, 0xFF, 0xFF);
+        e = screenSurface.fill(0xFF, 0xFF, 0xFF);
+        #ifndef __cpp_exceptions
+        if (e != 0)
+        {
+            print_exc();
+            return -1;
+        }
+        #endif
 
         eventloop.render_function(render_handler);
         eventloop.add_event_handler(SDL_QUIT, quit_handler);  

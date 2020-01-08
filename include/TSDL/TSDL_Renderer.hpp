@@ -19,11 +19,18 @@ namespace TSDL
     class TSDL_Renderer
     {
         private:
-        SDL_Renderer* _internal_ptr;
+        SDL_Renderer* _internal_ptr = nullptr;
 
         public:
+        using SDL_Type = SDL_Renderer;
+
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Renderer(TSDL_Window window);
         TSDL_Renderer(TSDL_Window window, Uint32 flags);
+
         ~TSDL_Renderer();
 
         operator SDL_Renderer*() const;

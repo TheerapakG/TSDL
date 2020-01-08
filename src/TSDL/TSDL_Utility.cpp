@@ -1,5 +1,23 @@
 #include "TSDL/TSDL_Utility.hpp"
 
+#ifndef __cpp_exceptions 
+std::exception* TSDL::_current_exc;
+
+std::exception& TSDL::get_exc()
+{
+    return *_current_exc;
+}
+
+void TSDL::clear_exc()
+{
+    if(_current_exc != nullptr)
+    {
+        delete _current_exc;
+        _current_exc = nullptr;
+    }
+}
+#endif
+
 TSDL::point_2d::point_2d(int x, int y): SDL_Point{x, y} {}
 
 TSDL::point_2d::point_2d(SDL_Point& p): SDL_Point(p) {}

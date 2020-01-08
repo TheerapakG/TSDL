@@ -14,7 +14,7 @@ TSDL::TSDL_Window::TSDL_Window(const std::string& title, int x, int y, int w, in
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
-        // TODO: noexcept signify error
+        return;
     }
     _internal_ptr = _t_internal_ptr;
     _destroy = true;
@@ -22,7 +22,7 @@ TSDL::TSDL_Window::TSDL_Window(const std::string& title, int x, int y, int w, in
 
 TSDL::TSDL_Window::~TSDL_Window()
 {
-    if(_destroy) SDL_DestroyWindow(_internal_ptr);
+    if(_destroy && (_internal_ptr != nullptr)) SDL_DestroyWindow(_internal_ptr);
 }
 
 TSDL::TSDL_Window::operator SDL_Window*() const

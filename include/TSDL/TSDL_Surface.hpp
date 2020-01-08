@@ -23,27 +23,48 @@ namespace TSDL
     class TSDL_Surface
     {
         private:
-        SDL_Surface* _internal_ptr;
+        SDL_Surface* _internal_ptr = nullptr;
         bool _destroy;
 
         int _fill_rect(const rect* rect, Uint32 color);
 
         public:
-        TSDL_Surface(SDL_Surface* ptr);
+        using SDL_Type = SDL_Surface;
 
+        TSDL_Surface(SDL_Surface* ptr);
         TSDL_Surface(SDL_Surface* ptr, bool handle_destroy);
 
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Surface(const std::string& file);
 
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, TTF_Rendermethod m);
         TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgb& c, TTF_Rendermethod m);
 
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TTF_Rendermethod m);
         TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgba& c, TTF_Rendermethod m);
 
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb);
         TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgb& fc, const color_rgb& bc);
 
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba);
         TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgba& fc, const color_rgba& bc);
 

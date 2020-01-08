@@ -11,13 +11,21 @@ namespace TSDL
     class TSDL_Chunk
     {
         private:
-        Mix_Chunk* _internal_ptr;
+        Mix_Chunk* _internal_ptr = nullptr;
         bool _destroy;
 
         public:
+        using SDL_Type = Mix_Chunk;
+
         TSDL_Chunk(Mix_Chunk* ptr);
         TSDL_Chunk(Mix_Chunk* ptr, bool handle_destroy);
+
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Chunk(const std::string& file);
+
         ~TSDL_Chunk();
 
         operator Mix_Chunk*() const;

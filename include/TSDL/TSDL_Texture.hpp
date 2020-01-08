@@ -22,15 +22,25 @@ namespace TSDL
     class TSDL_Texture
     {
         private:
-        SDL_Texture* _internal_ptr;
+        SDL_Texture* _internal_ptr = nullptr;
 
         public:
+        using SDL_Type = SDL_Texture;
+
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Texture(_SDL_Renderer renderer, const std::string& file);
         /*
         Create texture from file with color r, g, b as transparent color
+
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
         */
         TSDL_Texture(_SDL_Renderer renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b);
         TSDL_Texture(_SDL_Renderer renderer, _SDL_Surface surface);
+
         ~TSDL_Texture();
 
         operator SDL_Texture*() const;

@@ -11,7 +11,7 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer renderer, const std::string
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
-        // TODO: noexcept signify error
+        return;
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -23,13 +23,13 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer renderer, const std::string
     if(_t != 0)
     {
         TSDL::safe_throw<std::runtime_error>("Could not set texture surface color key! SDL Error: " + std::string(SDL_GetError()));
-        // TODO: noexcept signify error
+        return;
     }
     SDL_Texture* _t_internal_ptr = SDL_CreateTextureFromSurface(renderer, _t_surface);
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
-        // TODO: noexcept signify error
+        return;
     }
     _internal_ptr = _t_internal_ptr;
 }
@@ -40,14 +40,14 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer renderer, TSDL::_SDL_Surfac
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
-        // TODO: noexcept signify error
+        return;
     }
     _internal_ptr = _t_internal_ptr;
 }
 
 TSDL::TSDL_Texture::~TSDL_Texture()
 {
-    SDL_DestroyTexture(_internal_ptr);
+    if(_internal_ptr != nullptr) SDL_DestroyTexture(_internal_ptr);
 }
 
 TSDL::TSDL_Texture::operator SDL_Texture*() const
