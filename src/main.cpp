@@ -76,6 +76,9 @@ int main(int argc, char* argv[])
     #endif
 
         TSDL::TSDL tsdl;
+        #ifndef __cpp_exceptions
+        if(!check(tsdl)) return -1;
+        #endif
 
         window = new TSDL::TSDL_Window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         #ifndef __cpp_exceptions
