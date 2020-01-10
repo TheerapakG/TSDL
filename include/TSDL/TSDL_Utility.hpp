@@ -2,6 +2,7 @@
 #define TSDL_UTILITY_
 
 #include <SDL.h>
+#include <functional>
 #include <tuple>
 #include <stdexcept>
 
@@ -19,24 +20,26 @@ namespace TSDL
     }
 #else
     extern std::exception* _current_exc;
+    extern std::function<void(void)> unhandleable_exc_handler;
+
+    void clear_exc();
 
     template <typename Exc, typename ...Args>
     bool safe_throw(Args... args)
     {
+        delete _current_exc;
         _current_exc = new (std::nothrow) Exc(args...);
-        if (_current_exc == nullptr)
+        if (_current_exc == nullptr) unhandleable_exc_handler();
         return false;
     }
 
     template <typename T>
     bool check_integrity(T& obj)
     {
-        return static_cast<obj::SDL_Type*>(obj) != nullptr;
+        return static_cast<typename T::SDL_Type*>(obj) != nullptr;
     }
 
     std::exception& get_exc();
-
-    void clear_exc();
 #endif
 
     template <typename ...Ts>
