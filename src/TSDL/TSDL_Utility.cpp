@@ -1,7 +1,10 @@
 #include "TSDL/TSDL_Utility.hpp"
 
 #ifndef __cpp_exceptions 
+#include <exception>
+
 std::exception* TSDL::_current_exc;
+std::function<void(void)> TSDL::unhandleable_exc_handler = std::terminate;
 
 std::exception& TSDL::get_exc()
 {
