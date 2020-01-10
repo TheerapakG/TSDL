@@ -17,7 +17,6 @@ TSDL::TSDL::TSDL(int frequency)
         std::string e = SDL_GetError();
         SDL_Quit();
         safe_throw<std::runtime_error>("SDL could not initialize! SDL_Error: " + e);
-        // TODO: noexcept signify error
     }
     else
     {
@@ -29,7 +28,6 @@ TSDL::TSDL::TSDL(int frequency)
             IMG_Quit();
             SDL_Quit();
             safe_throw<std::runtime_error>("SDL_image could not initialize! SDL_image Error: " + e);
-            // TODO: noexcept signify error
         }
         else
         {
@@ -41,10 +39,12 @@ TSDL::TSDL::TSDL(int frequency)
                 IMG_Quit();
                 SDL_Quit();
                 safe_throw<std::runtime_error>("SDL_mixer could not initialize! SDL_mixer Error: " + e);
-                // TODO: noexcept signify error
             }
             else
             {
+                #ifndef __cpp_exceptions
+                constructed = true;
+                #endif
                 return;
             }
         }

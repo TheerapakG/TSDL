@@ -33,10 +33,16 @@ namespace TSDL
         return false;
     }
 
-    template <typename T>
+    template <typename T, typename SDLType = typename T::SDL_Type>
     bool check_integrity(T& obj)
     {
-        return static_cast<typename T::SDL_Type*>(obj) != nullptr;
+        return static_cast<SDLType*>(obj) != nullptr;
+    }
+
+    template <typename T, std::enable_if_t<std::is_same_v<decltype(T::constructed), bool>>* = nullptr>
+    bool check_integrity(T& obj)
+    {
+        return obj.constructed;
     }
 
     std::exception& get_exc();

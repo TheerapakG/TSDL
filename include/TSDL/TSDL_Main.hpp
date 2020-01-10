@@ -6,6 +6,9 @@ namespace TSDL
     class TSDL
     {
         public:
+        #ifndef __cpp_exceptions
+        bool constructed = false;
+        #endif
         TSDL();
         TSDL(int frequency);
         ~TSDL();
