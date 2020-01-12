@@ -31,7 +31,7 @@ namespace TSDL
         operator Mix_Music*() const;
     };
 
-    _TSDL_EXPAND_DEFINE_MASK_MIX(Music)
+    _TSDL_EXPAND_DEFINE_MASK_TYPE(Music)
     using _SDL_Music = _TSDL_GET_MASK_TYPE(Music);
 
     /*
