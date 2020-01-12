@@ -61,7 +61,7 @@ bool TSDL::is_paused()
     return Mix_PausedMusic();
 }
 
-_TSDL_EXPAND_DECLARE_MASK_MIX(TSDL, Music)
+_TSDL_EXPAND_DECLARE_MASK_TYPE(TSDL, Music)
 
 #ifdef TSDL_EXPOSE_PYBIND11
 

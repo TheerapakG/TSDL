@@ -5,6 +5,17 @@ TSDL::TSDL_Chunk::TSDL_Chunk(Mix_Chunk* ptr): TSDL_Chunk(ptr, false) {}
 
 TSDL::TSDL_Chunk::TSDL_Chunk(Mix_Chunk* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
 
+Mix_Chunk* _create_chunk_from_buffer(TSDL::TSDL_Buffer& buffer)
+{
+    Mix_Chunk* _t_ptr = Mix_LoadWAV_RW(buffer, 0); // We free buffer by utilizing the scope
+    if(_t_ptr == NULL)
+    {
+        TSDL::safe_throw<std::runtime_error>("Chunk could not be loaded! SDL_Mixer_Error: " + std::string(Mix_GetError()));
+        return nullptr;
+    }
+    return _t_ptr;
+}
+
 TSDL::TSDL_Chunk::TSDL_Chunk(const std::string& file): _destroy(true)
 {
     Mix_Chunk* _t_internal_ptr = Mix_LoadWAV(file.c_str());
@@ -13,6 +24,19 @@ TSDL::TSDL_Chunk::TSDL_Chunk(const std::string& file): _destroy(true)
         TSDL::safe_throw<std::runtime_error>("Chunk could not be loaded! SDL_Mixer_Error: " + std::string(Mix_GetError()));
         return;
     }
+    _internal_ptr = _t_internal_ptr;
+}
+
+TSDL::TSDL_Chunk::TSDL_Chunk(TSDL::TSDL_Buffer& buffer)
+{
+    Mix_Chunk* _t_internal_ptr = _create_chunk_from_buffer(buffer);
+    _internal_ptr = _t_internal_ptr;
+}
+
+TSDL::TSDL_Chunk::TSDL_Chunk(const void* mem, size_t size)
+{
+    TSDL::TSDL_Buffer _t_buffer = TSDL::TSDL_Buffer(mem, size);
+    Mix_Chunk* _t_internal_ptr = _create_chunk_from_buffer(_t_buffer);
     _internal_ptr = _t_internal_ptr;
 }
 
@@ -51,7 +75,7 @@ int TSDL::play(int channel, const TSDL::_SDL_Chunk& chunk, int loops, int limit)
     return _t;
 }
 
-_TSDL_EXPAND_DECLARE_MASK_MIX(TSDL, Chunk)
+_TSDL_EXPAND_DECLARE_MASK_TYPE(TSDL, Chunk)
 
 #ifdef TSDL_EXPOSE_PYBIND11
 

@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include "TSDL_SDLmask.hpp"
+#include "TSDL_Buffer.hpp"
 #include <string>
 
 namespace TSDL
@@ -25,13 +26,15 @@ namespace TSDL
         if the object creation resulted in an error or not
         */
         TSDL_Chunk(const std::string& file);
+        TSDL_Chunk(TSDL::TSDL_Buffer& buffer);
+        TSDL_Chunk(const void* mem, size_t size);
 
         ~TSDL_Chunk();
 
         operator Mix_Chunk*() const;
     };
 
-    _TSDL_EXPAND_DEFINE_MASK_MIX(Chunk)
+    _TSDL_EXPAND_DEFINE_MASK_TYPE(Chunk)
     using _SDL_Chunk = _TSDL_GET_MASK_TYPE(Chunk);
 
     /*
@@ -54,6 +57,7 @@ namespace _PY
 
     _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Chunk)
     _PY_GET_CONTEXTMANAGER(Chunk)<const std::string>
+    _PY_GET_CONTEXTMANAGER(Chunk)<TSDL::TSDL_Buffer>
     _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Chunk)
