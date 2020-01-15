@@ -6,6 +6,7 @@
 #include <SDL_ttf.h>
 #include "TSDL_Utility.hpp"
 #include "TSDL_SDLmask.hpp"
+#include "TSDL_Buffer.hpp"
 #include <string>
 
 namespace TSDL
@@ -39,6 +40,8 @@ namespace TSDL
         if the object creation resulted in an error or not
         */
         TSDL_Surface(const std::string& file);
+        TSDL_Surface(TSDL_Buffer& buffer);
+        TSDL_Surface(const void* mem, size_t size);
 
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
@@ -105,6 +108,10 @@ namespace TSDL
         int color_key(bool flag, Uint8 r, Uint8 g, Uint8 b);
         int color_key(bool flag, const color_rgb& c);
 
+        Uint32 color_key_Uint32();
+
+        bool has_color_key();
+
         Uint32 map_rgb(Uint8 r, Uint8 g, Uint8 b) const;
         Uint32 map_rgb(const color_rgb& c) const;
 
@@ -125,7 +132,8 @@ namespace _PY
     _PY_EXPAND_DEFINE_CONTEXTMANAGER(Surface)
 
     _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Surface)
-    _PY_GET_CONTEXTMANAGER(Surface)<const std::string>
+    _PY_GET_CONTEXTMANAGER(Surface)<const std::string>, 
+    _PY_GET_CONTEXTMANAGER(Surface)<TSDL::TSDL_Buffer>
     _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Surface)

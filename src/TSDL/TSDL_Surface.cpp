@@ -16,6 +16,30 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& file): _destroy(true)
     _internal_ptr = _t_internal_ptr;
 }
 
+SDL_Surface* _create_surface_from_buffer(TSDL::TSDL_Buffer& buffer)
+{
+    SDL_Surface* _t_ptr = IMG_Load_RW(buffer, 0); // We free buffer by utilizing the scope
+    if(_t_ptr == NULL)
+    {
+        TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
+        return nullptr;
+    }
+    return _t_ptr;
+}
+
+TSDL::TSDL_Surface::TSDL_Surface(TSDL_Buffer& buffer)
+{
+    SDL_Surface* _t_internal_ptr = _create_surface_from_buffer(buffer);
+    _internal_ptr = _t_internal_ptr;
+}
+
+TSDL::TSDL_Surface::TSDL_Surface(const void* mem, size_t size)
+{
+    TSDL::TSDL_Buffer _t_buffer = TSDL::TSDL_Buffer(mem, size);
+    SDL_Surface* _t_internal_ptr = _create_surface_from_buffer(_t_buffer);
+    _internal_ptr = _t_internal_ptr;
+}
+
 TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, TSDL::TTF_Rendermethod m):
     TSDL::TSDL_Surface(text, font, r, g, b, 255, m){}
 
@@ -173,6 +197,28 @@ int TSDL::TSDL_Surface::color_key(bool flag, const TSDL::color_rgb& c)
     return this->color_key(flag, c.r, c.g, c.b);
 }
 
+Uint32 TSDL::TSDL_Surface::color_key_Uint32()
+{
+    Uint32 _ret;
+    int _t = SDL_GetColorKey(_internal_ptr, &_ret);
+    if(_t == -1)
+    {
+        TSDL::safe_throw<std::runtime_error>("Could not get surface color key! Color Key is not enabled for this suface!");
+        // TODO: noexcept signify error
+    }
+    else if(_t != 0)
+    {
+        TSDL::safe_throw<std::runtime_error>("Could not get surface color key! SDL Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
+    }
+    return _ret;
+}
+
+bool TSDL::TSDL_Surface::has_color_key()
+{
+    return static_cast<bool>(SDL_HasColorKey(_internal_ptr));
+}
+
 Uint32 TSDL::TSDL_Surface::map_rgb(Uint8 r, Uint8 g, Uint8 b) const
 {
     return SDL_MapRGB(_internal_ptr->format, r, g, b);
@@ -242,6 +288,8 @@ void _tsdl_surface_py(const py::module& m)
         )
         .def("color_key", py::overload_cast<bool, Uint32>(&TSDL::TSDL_Surface::color_key))
         .def("color_key", py::overload_cast<bool, Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::color_key))
+        .def("color_key_Uint32", &TSDL::TSDL_Surface::color_key_Uint32)
+        .def("has_color_key", &TSDL::TSDL_Surface::has_color_key)
         .def("map_rgb", py::overload_cast<Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::map_rgb, py::const_))
         .def("converted_surface", &TSDL::TSDL_Surface::converted_surface)
         .def("convert_surface", &TSDL::TSDL_Surface::convert_surface);

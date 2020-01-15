@@ -26,7 +26,7 @@ namespace TSDL
         if the object creation resulted in an error or not
         */
         TSDL_Chunk(const std::string& file);
-        TSDL_Chunk(TSDL::TSDL_Buffer& buffer);
+        TSDL_Chunk(TSDL_Buffer& buffer);
         TSDL_Chunk(const void* mem, size_t size);
 
         ~TSDL_Chunk();

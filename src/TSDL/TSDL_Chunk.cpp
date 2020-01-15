@@ -5,17 +5,6 @@ TSDL::TSDL_Chunk::TSDL_Chunk(Mix_Chunk* ptr): TSDL_Chunk(ptr, false) {}
 
 TSDL::TSDL_Chunk::TSDL_Chunk(Mix_Chunk* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
 
-Mix_Chunk* _create_chunk_from_buffer(TSDL::TSDL_Buffer& buffer)
-{
-    Mix_Chunk* _t_ptr = Mix_LoadWAV_RW(buffer, 0); // We free buffer by utilizing the scope
-    if(_t_ptr == NULL)
-    {
-        TSDL::safe_throw<std::runtime_error>("Chunk could not be loaded! SDL_Mixer_Error: " + std::string(Mix_GetError()));
-        return nullptr;
-    }
-    return _t_ptr;
-}
-
 TSDL::TSDL_Chunk::TSDL_Chunk(const std::string& file): _destroy(true)
 {
     Mix_Chunk* _t_internal_ptr = Mix_LoadWAV(file.c_str());
@@ -25,6 +14,17 @@ TSDL::TSDL_Chunk::TSDL_Chunk(const std::string& file): _destroy(true)
         return;
     }
     _internal_ptr = _t_internal_ptr;
+}
+
+Mix_Chunk* _create_chunk_from_buffer(SDL_RWops* buffer)
+{
+    Mix_Chunk* _t_ptr = Mix_LoadWAV_RW(buffer, 0); // We free buffer by utilizing the scope
+    if(_t_ptr == NULL)
+    {
+        TSDL::safe_throw<std::runtime_error>("Chunk could not be loaded! SDL_Mixer_Error: " + std::string(Mix_GetError()));
+        return nullptr;
+    }
+    return _t_ptr;
 }
 
 TSDL::TSDL_Chunk::TSDL_Chunk(TSDL::TSDL_Buffer& buffer)
