@@ -31,15 +31,21 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Texture(_SDL_Renderer renderer, const std::string& file);
+        TSDL_Texture(_SDL_Renderer renderer, _SDL_Surface surface);
+        TSDL_Texture(_SDL_Renderer renderer, const std::string& file);        
+        TSDL_Texture(_SDL_Renderer renderer, TSDL_Buffer& buffer);
+        TSDL_Texture(_SDL_Renderer renderer, const void* mem, size_t size);
+
         /*
         Create texture from file with color r, g, b as transparent color
 
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
+        TSDL_Texture(_SDL_Renderer renderer, _SDL_Surface surface, Uint8 r, Uint8 g, Uint8 b);
         TSDL_Texture(_SDL_Renderer renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b);
-        TSDL_Texture(_SDL_Renderer renderer, _SDL_Surface surface);
+        TSDL_Texture(_SDL_Renderer renderer, TSDL_Buffer& buffer, Uint8 r, Uint8 g, Uint8 b);
+        TSDL_Texture(_SDL_Renderer renderer, const void* mem, size_t size, Uint8 r, Uint8 g, Uint8 b);
 
         ~TSDL_Texture();
 
@@ -78,9 +84,12 @@ namespace _PY
     _PY_EXPAND_DEFINE_CONTEXTMANAGER(Texture)
 
     _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Texture)
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface>, 
     _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, const std::string>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::TSDL_Buffer>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface, Uint8, Uint8, Uint8>,
     _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, const std::string, Uint8, Uint8, Uint8>, 
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface>
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>
     _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Texture)
