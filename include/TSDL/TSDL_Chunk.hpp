@@ -7,6 +7,21 @@
 #include "TSDL_Buffer.hpp"
 #include <string>
 
+#ifdef TSDL_EXPOSE_PYBIND11
+#include "TSDL_PY_TypeErase.hpp"
+_PY_EXPAND_DECLARE_CLASS(Chunk)
+namespace _PY
+{
+    _PY_EXPAND_DECLARE_CONTEXTMANAGER(Chunk)
+    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Chunk)
+    _PY_GET_CONTEXTMANAGER(Chunk)<const std::string>, 
+    _PY_GET_CONTEXTMANAGER(Chunk)<TSDL::TSDL_Buffer>
+    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
+}
+#else
+#define _PY_DECLARE_TYPEERASE_OWNER(TSDL_NAME)
+#endif
+
 namespace TSDL
 {
     class TSDL_Chunk
@@ -17,6 +32,8 @@ namespace TSDL
 
         public:
         using SDL_Type = Mix_Chunk;
+
+        _PY_DECLARE_TYPEERASE_OWNER(Chunk)
 
         TSDL_Chunk(Mix_Chunk* ptr);
         TSDL_Chunk(Mix_Chunk* ptr, bool handle_destroy);
@@ -49,16 +66,9 @@ namespace TSDL
 
 #ifdef TSDL_EXPOSE_PYBIND11
 
-#include "TSDL_PY_TypeErase.hpp"
-
 namespace _PY
 {
     _PY_EXPAND_DEFINE_CONTEXTMANAGER(Chunk)
-
-    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Chunk)
-    _PY_GET_CONTEXTMANAGER(Chunk)<const std::string>
-    _PY_GET_CONTEXTMANAGER(Chunk)<TSDL::TSDL_Buffer>
-    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Chunk)
 }

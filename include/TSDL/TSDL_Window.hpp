@@ -6,6 +6,20 @@
 #include "TSDL_Surface.hpp"
 #include "TSDL_Display.hpp"
 
+#ifdef TSDL_EXPOSE_PYBIND11
+#include "TSDL_PY_TypeErase.hpp"
+_PY_EXPAND_DECLARE_CLASS(Window)
+namespace _PY
+{
+    _PY_EXPAND_DECLARE_CONTEXTMANAGER(Window)
+    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Window)
+    _PY_GET_CONTEXTMANAGER(Window)<const std::string, int, int, int, int, Uint32>
+    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
+}
+#else
+#define _PY_DECLARE_TYPEERASE_OWNER(TSDL_NAME)
+#endif
+
 namespace TSDL
 {
     class TSDL_Window
@@ -16,6 +30,8 @@ namespace TSDL
 
         public:
         using SDL_Type = SDL_Window;
+
+        _PY_DECLARE_TYPEERASE_OWNER(Window)
 
         TSDL_Window(SDL_Window* ptr);
         TSDL_Window(SDL_Window* ptr, bool handle_destroy);
@@ -47,15 +63,9 @@ namespace TSDL
 
 #ifdef TSDL_EXPOSE_PYBIND11
 
-#include "TSDL_PY_TypeErase.hpp"
-
 namespace _PY
 {
     _PY_EXPAND_DEFINE_CONTEXTMANAGER(Window)
-
-    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Window)
-    _PY_GET_CONTEXTMANAGER(Window)<const std::string, int, int, int, int, Uint32>
-    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Window)
 }

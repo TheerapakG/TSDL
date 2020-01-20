@@ -255,6 +255,7 @@ void _tsdl_eventloop_py(const py::module& m)
         .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Eventloop)<>())
         .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Eventloop)<bool, bool>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Eventloop, enter_ctx), py::return_value_policy::reference)
+        .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Eventloop, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Eventloop, exit_ctx));
     py::class_<TSDL::TSDL_Eventloop>(m, "_Eventloop")
         .def("add_event_handler", 

@@ -1,6 +1,7 @@
 #include "TSDL.hpp"
 #ifndef TSDL_EXPOSE_PYBIND11
 #ifdef TSDL_EXAMPLE_CPP
+#ifndef __cpp_exceptions
 #include <iostream>
 #include <thread>
 #include <atomic>
@@ -94,5 +95,6 @@ int main(int argc, char* argv[])
 
     return 0;    
 }
+#endif
 #endif
 #endif

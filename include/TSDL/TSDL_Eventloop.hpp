@@ -8,6 +8,21 @@
 #include <mutex>
 #include <functional>
 
+#ifdef TSDL_EXPOSE_PYBIND11
+#include "TSDL_PY_TypeErase.hpp"
+_PY_EXPAND_DECLARE_CLASS(Eventloop)
+namespace _PY
+{
+    _PY_EXPAND_DECLARE_CONTEXTMANAGER(Eventloop)
+    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Eventloop)
+    _PY_GET_CONTEXTMANAGER(Eventloop)<>,
+    _PY_GET_CONTEXTMANAGER(Eventloop)<bool, bool>
+    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
+}
+#else
+#define _PY_DECLARE_TYPEERASE_OWNER(TSDL_NAME)
+#endif
+
 namespace TSDL
 {
     using EventHandler = std::function<void(const SDL_Event&)>;
@@ -37,7 +52,7 @@ namespace TSDL
             clock::time_point _time_since_last;
         std::atomic<double> _previous_fps = 0;
 
-        std::atomic<bool> _limit_fps = true;
+        std::atomic<bool> _limit_fps = false;
         std::atomic<clock::duration> _fps_target_interval = std::chrono::duration_cast<std::chrono::nanoseconds>(1s)/60;
         clock::time_point _time_last_frame;
 
@@ -45,6 +60,9 @@ namespace TSDL
         void _run_step();
 
         public:
+
+        _PY_DECLARE_TYPEERASE_OWNER(Eventloop)
+
         TSDL_Eventloop();
         #ifdef __cpp_exceptions
         TSDL_Eventloop(bool thrownoevhandler, bool thrownorenderhandler);
@@ -80,16 +98,9 @@ namespace TSDL
 
 #ifdef TSDL_EXPOSE_PYBIND11
 
-#include "TSDL_PY_TypeErase.hpp"
-
 namespace _PY
 {
     _PY_EXPAND_DEFINE_CONTEXTMANAGER(Eventloop)
-
-    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Eventloop)
-    _PY_GET_CONTEXTMANAGER(Eventloop)<>,
-    _PY_GET_CONTEXTMANAGER(Eventloop)<bool, bool>
-    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Eventloop)
 }
