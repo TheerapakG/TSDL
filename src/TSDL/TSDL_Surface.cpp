@@ -263,6 +263,7 @@ void _tsdl_surface_py(const py::module& m)
     py::class_<_PY::_PY_GET_TYPEERASE(Surface)>(m, "Surface")
         .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Surface)<const std::string>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Surface, enter_ctx), py::return_value_policy::reference)
+        .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Surface, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Surface, exit_ctx));
     py::class_<TSDL::TSDL_Surface>(m, "_Surface")
         .def("format", &TSDL::TSDL_Surface::format)

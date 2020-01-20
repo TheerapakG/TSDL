@@ -86,6 +86,7 @@ void _tsdl_chunk_py(const py::module& m)
     py::class_<_PY::_PY_GET_TYPEERASE(Chunk)>(m, "Chunk")
         .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Chunk)<const std::string>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Chunk, enter_ctx), py::return_value_policy::reference)
+        .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Chunk, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Chunk, exit_ctx));
     py::class_<TSDL::TSDL_Chunk>(m, "_Chunk");
     py::class_<TSDL::_TSDL_GET_MASK_TYPE(Chunk)>(m, "_SDL_Chunk");

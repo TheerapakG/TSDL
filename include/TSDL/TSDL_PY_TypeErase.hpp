@@ -8,6 +8,7 @@ namespace py = pybind11;
 #include <new>
 #include <utility>
 #include <variant>
+#include <stdexcept>
 
 namespace _PY_Util
 {
@@ -43,7 +44,9 @@ namespace _PY_TypeErase
 
         ContextedCls* enter()
         {
-            return std::visit([](auto&& arg){ return arg.enter(); }, _underly);
+            ContextedCls* ret = std::visit([](auto&& arg){ return arg.enter(); }, _underly);
+            ret->_owner = this;
+            return ret;
         }
         void exit()
         {
@@ -52,12 +55,16 @@ namespace _PY_TypeErase
     };
 }
 
+#define _PY_EXPAND_DECLARE_CONTEXTMANAGER(TSDL_NAME)      \
+template <typename... ConstructTypes>                     \
+class _##TSDL_NAME;                                       \
+
 #define _PY_EXPAND_DEFINE_CONTEXTMANAGER(TSDL_NAME)                                               \
 template <typename... ConstructTypes>                                                             \
 class _##TSDL_NAME                                                                                \
 {                                                                                                 \
     private:                                                                                      \
-    TSDL::TSDL_##TSDL_NAME* _o;                                                                   \
+    TSDL::TSDL_##TSDL_NAME* _o = nullptr;                                                         \
     std::tuple<ConstructTypes...> _t;                                                             \
                                                                                                   \
     public:                                                                                       \
@@ -65,17 +72,31 @@ class _##TSDL_NAME                                                              
     ~_##TSDL_NAME(){}                                                                             \
     TSDL::TSDL_##TSDL_NAME* enter()                                                               \
     {                                                                                             \
+        if(_o != nullptr) throw std::runtime_error("Object has already been made!");              \
         _o = static_cast<TSDL::TSDL_##TSDL_NAME*>(::operator new(sizeof(TSDL::TSDL_##TSDL_NAME)));\
-        _PY_Util::construct_in_place_from_tuple<TSDL::TSDL_##TSDL_NAME>(_o, std::move(_t));       \
+        try                                                                                       \
+        {                                                                                         \
+            _PY_Util::construct_in_place_from_tuple<TSDL::TSDL_##TSDL_NAME>(_o, std::move(_t));   \
+        }                                                                                         \
+        catch (...)                                                                               \
+        {                                                                                         \
+            delete _o;                                                                            \
+            throw;                                                                                \
+        }                                                                                         \
         return _o;                                                                                \
     }                                                                                             \
     void exit()                                                                                   \
     {                                                                                             \
         _o->~TSDL_##TSDL_NAME();                                                                  \
         ::operator delete(_o);                                                                    \
-        _o = nullptr;                                                                             \
     }                                                                                             \
 };                                                                                                \
+
+#define _PY_EXPAND_DECLARE_CLASS(TSDL_NAME)     \
+namespace TSDL                                  \
+{                                               \
+    class TSDL_##TSDL_NAME;                     \
+}                                               \
 
 #define _PY_EXPAND_DEFINE_TYPEERASE_OPEN(TSDL_NAME) using _##TSDL_NAME##_TypeErase = _PY_TypeErase::TypeErase<TSDL::TSDL_##TSDL_NAME, 
 
@@ -122,5 +143,7 @@ _PY_EXPAND_DEFINE_TYPEERASE_EXIT(NAMESPACE, TSDL_NAME)              \
 #define _PY_GET_TYPEERASE_FUNCTION(TSDL_NAME, function) _##TSDL_NAME##_##function
 
 #define _PY_GET_TYPEERASE(TSDL_NAME) _##TSDL_NAME##_TypeErase
+
+#define _PY_DECLARE_TYPEERASE_OWNER(TSDL_NAME) _PY::_PY_GET_TYPEERASE(TSDL_NAME)* _owner = nullptr;
 
 #endif

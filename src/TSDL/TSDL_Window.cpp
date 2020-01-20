@@ -98,6 +98,7 @@ void _tsdl_window_py(const py::module& m)
     py::class_<_PY::_PY_GET_TYPEERASE(Window)>(m, "Window")
         .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Window)<const std::string, int, int, int, int, Uint32>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Window, enter_ctx), py::return_value_policy::reference)
+        .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Window, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Window, exit_ctx));
     py::class_<TSDL::TSDL_Window>(m, "_Window")
         .def("window_surface_object", &TSDL::TSDL_Window::window_surface_object)

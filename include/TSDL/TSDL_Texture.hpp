@@ -1,14 +1,10 @@
 #ifndef TSDL_TEXTURE_
 #define TSDL_TEXTURE_
 
-namespace TSDL
-{
-    class TSDL_Texture;
-}
-
 #include <SDL.h>
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Utility.hpp"
+#include "TSDL_Buffer.hpp"
 #include <string>
 
 namespace TSDL
@@ -19,6 +15,29 @@ namespace TSDL
     class _TSDL_GET_MASK_TYPE(Renderer);
     using _SDL_Renderer = _TSDL_GET_MASK_TYPE(Renderer);
 
+    class TSDL_Texture;
+}
+
+#ifdef TSDL_EXPOSE_PYBIND11
+#include "TSDL_PY_TypeErase.hpp"
+namespace _PY
+{
+    _PY_EXPAND_DECLARE_CONTEXTMANAGER(Texture)
+    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Texture)
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, const std::string>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::TSDL_Buffer>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface, Uint8, Uint8, Uint8>,
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, const std::string, Uint8, Uint8, Uint8>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>
+    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
+}
+#else
+#define _PY_DECLARE_TYPEERASE_OWNER(TSDL_NAME)
+#endif
+
+namespace TSDL
+{
     class TSDL_Texture
     {
         private:
@@ -27,14 +46,16 @@ namespace TSDL
         public:
         using SDL_Type = SDL_Texture;
 
+        _PY_DECLARE_TYPEERASE_OWNER(Texture)
+
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Texture(_SDL_Renderer renderer, _SDL_Surface surface);
-        TSDL_Texture(_SDL_Renderer renderer, const std::string& file);        
-        TSDL_Texture(_SDL_Renderer renderer, TSDL_Buffer& buffer);
-        TSDL_Texture(_SDL_Renderer renderer, const void* mem, size_t size);
+        TSDL_Texture(_SDL_Renderer& renderer, _SDL_Surface surface);
+        TSDL_Texture(_SDL_Renderer& renderer, const std::string& file);        
+        TSDL_Texture(_SDL_Renderer& renderer, TSDL_Buffer& buffer);
+        TSDL_Texture(_SDL_Renderer& renderer, const void* mem, size_t size);
 
         /*
         Create texture from file with color r, g, b as transparent color
@@ -42,10 +63,10 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Texture(_SDL_Renderer renderer, _SDL_Surface surface, Uint8 r, Uint8 g, Uint8 b);
-        TSDL_Texture(_SDL_Renderer renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b);
-        TSDL_Texture(_SDL_Renderer renderer, TSDL_Buffer& buffer, Uint8 r, Uint8 g, Uint8 b);
-        TSDL_Texture(_SDL_Renderer renderer, const void* mem, size_t size, Uint8 r, Uint8 g, Uint8 b);
+        TSDL_Texture(_SDL_Renderer& renderer, _SDL_Surface surface, Uint8 r, Uint8 g, Uint8 b);
+        TSDL_Texture(_SDL_Renderer& renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b);
+        TSDL_Texture(_SDL_Renderer& renderer, TSDL_Buffer& buffer, Uint8 r, Uint8 g, Uint8 b);
+        TSDL_Texture(_SDL_Renderer& renderer, const void* mem, size_t size, Uint8 r, Uint8 g, Uint8 b);
 
         ~TSDL_Texture();
 
@@ -77,20 +98,9 @@ namespace TSDL
 
 #ifdef TSDL_EXPOSE_PYBIND11
 
-#include "TSDL_PY_TypeErase.hpp"
-
 namespace _PY
 {
     _PY_EXPAND_DEFINE_CONTEXTMANAGER(Texture)
-
-    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Texture)
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface>, 
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, const std::string>, 
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::TSDL_Buffer>, 
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface, Uint8, Uint8, Uint8>,
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, const std::string, Uint8, Uint8, Uint8>, 
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>
-    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Texture)
 }

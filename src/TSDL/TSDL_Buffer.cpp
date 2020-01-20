@@ -76,8 +76,9 @@ void _tsdl_buffer_py(const py::module& m)
     py::class_<_PY::_PY_GET_TYPEERASE(Buffer)>(m, "Buffer")
         .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Buffer)<const std::string, const std::string>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Buffer, enter_ctx), py::return_value_policy::reference)
+        .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Buffer, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Buffer, exit_ctx));
-    py::class_<TSDL::TSDL_Window>(m, "_Window");
+    py::class_<TSDL::TSDL_Buffer>(m, "_Buffer");
     py::class_<TSDL::_TSDL_GET_MASK_TYPE(Buffer)>(m, "_SDL_Buffer");
     py::implicitly_convertible<TSDL::TSDL_Buffer, TSDL::_TSDL_GET_MASK_TYPE(Buffer)>();
 }

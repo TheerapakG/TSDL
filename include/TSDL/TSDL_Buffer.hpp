@@ -5,6 +5,20 @@
 #include "TSDL_SDLmask.hpp"
 #include <string>
 
+#ifdef TSDL_EXPOSE_PYBIND11
+#include "TSDL_PY_TypeErase.hpp"
+_PY_EXPAND_DECLARE_CLASS(Buffer)
+namespace _PY
+{
+    _PY_EXPAND_DECLARE_CONTEXTMANAGER(Buffer)
+    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Buffer)
+    _PY_GET_CONTEXTMANAGER(Buffer)<const std::string, const std::string>
+    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
+}
+#else
+#define _PY_DECLARE_TYPEERASE_OWNER(TSDL_NAME)
+#endif
+
 namespace TSDL
 {
     class TSDL_Buffer
@@ -15,6 +29,8 @@ namespace TSDL
 
         public:
         using SDL_Type = SDL_RWops;
+
+        _PY_DECLARE_TYPEERASE_OWNER(Buffer)
 
         TSDL_Buffer(SDL_RWops* ptr);
         TSDL_Buffer(SDL_RWops* ptr, bool handle_destroy);
@@ -37,15 +53,9 @@ namespace TSDL
 
 #ifdef TSDL_EXPOSE_PYBIND11
 
-#include "TSDL_PY_TypeErase.hpp"
-
 namespace _PY
 {
     _PY_EXPAND_DEFINE_CONTEXTMANAGER(Buffer)
-
-    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Buffer)
-    _PY_GET_CONTEXTMANAGER(Buffer)<const std::string, const std::string>
-    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 
     _PY_EXPAND_DECLARE_TYPEERASE_FUNCTIONS(Buffer)
 }
