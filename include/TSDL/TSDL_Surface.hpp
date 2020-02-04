@@ -56,6 +56,15 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
+        TSDL_Surface(int width, int height);
+        TSDL_Surface(int width, int height, int depth);
+        TSDL_Surface(int width, int height, Uint32 format);
+        TSDL_Surface(int width, int height, int depth, Uint32 format);
+
+        /*
+        If exceptions is disabled, use TSDL::check_integrity to check
+        if the object creation resulted in an error or not
+        */
         TSDL_Surface(const std::string& file);
         TSDL_Surface(TSDL_Buffer& buffer);
         TSDL_Surface(const void* mem, size_t size);
@@ -126,6 +135,7 @@ namespace TSDL
         int color_key(bool flag, const color_rgb& c);
 
         Uint32 color_key_Uint32();
+        color_rgb color_key();
 
         bool has_color_key();
 

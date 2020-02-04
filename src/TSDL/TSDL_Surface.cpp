@@ -5,6 +5,32 @@ TSDL::TSDL_Surface::TSDL_Surface(SDL_Surface* ptr): TSDL_Surface(ptr, false) {}
 
 TSDL::TSDL_Surface::TSDL_Surface(SDL_Surface* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
 
+TSDL::TSDL_Surface::TSDL_Surface(int width, int height): TSDL_Surface(width, height, 32) {}
+
+TSDL::TSDL_Surface::TSDL_Surface(int width, int height, int depth): _destroy(true)
+{
+    SDL_Surface* _t_internal_ptr = SDL_CreateRGBSurface(0, width, height, depth, 0, 0, 0, 0);
+    if(_t_internal_ptr == NULL)
+    {
+        TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
+        return;
+    }
+    _internal_ptr = _t_internal_ptr;
+}
+
+TSDL::TSDL_Surface::TSDL_Surface(int width, int height, Uint32 format): TSDL_Surface(width, height, 32, format) {}
+
+TSDL::TSDL_Surface::TSDL_Surface(int width, int height, int depth, Uint32 format): _destroy(true)
+{
+    SDL_Surface* _t_internal_ptr = SDL_CreateRGBSurfaceWithFormat(0, width, height, depth, format);;
+    if(_t_internal_ptr == NULL)
+    {
+        TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
+        return;
+    }
+    _internal_ptr = _t_internal_ptr;
+}
+
 TSDL::TSDL_Surface::TSDL_Surface(const std::string& file): _destroy(true)
 {
     SDL_Surface* _t_internal_ptr = IMG_Load(file.c_str());
@@ -212,6 +238,14 @@ Uint32 TSDL::TSDL_Surface::color_key_Uint32()
         // TODO: noexcept signify error
     }
     return _ret;
+}
+
+TSDL::color_rgb TSDL::TSDL_Surface::color_key()
+{
+    Uint8 r, g, b;
+    Uint32 _col = this->color_key_Uint32(); // TODO: check when noexcept signify error
+    SDL_GetRGB(_col, _internal_ptr->format, &r, &g, &b);
+    return TSDL::color_rgb(r, g, b);
 }
 
 bool TSDL::TSDL_Surface::has_color_key()
