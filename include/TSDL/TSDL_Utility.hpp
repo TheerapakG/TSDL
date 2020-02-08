@@ -59,6 +59,14 @@ namespace TSDL
         point_2d(SDL_Point& p);
         point_2d(_point_2d& p);
 
+        point_2d operator+() const;
+        point_2d operator+(const point_2d& other) const;
+        point_2d operator-() const;
+        point_2d operator-(const point_2d& other) const;
+
+        point_2d& operator+=(const point_2d& other);
+        point_2d& operator-=(const point_2d& other);
+
         operator _point_2d();
     };
 
@@ -69,6 +77,8 @@ namespace TSDL
         rect(int x, int y, int w, int h);
         rect(SDL_Rect& r);
         rect(_rect& r);
+        rect(const std::pair<point_2d, point_2d>& point_pair);
+        rect(const point_2d& topleft, const point_2d& bottomright);
 
         operator _rect();
     };

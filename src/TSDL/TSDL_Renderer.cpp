@@ -48,6 +48,35 @@ TSDL::TSDL_Renderer::operator SDL_Renderer*() const
     return _internal_ptr;
 }
 
+std::optional<TSDL::_SDL_Texture> TSDL::TSDL_Renderer::target()
+{
+    SDL_Texture* _t = SDL_GetRenderTarget(_internal_ptr);
+    if(_t == NULL) return std::optional<TSDL::_SDL_Texture>();
+    else return _t;
+}
+
+int TSDL::TSDL_Renderer::target(std::optional<const TSDL::_SDL_Texture&> texture)
+{
+    int _t = SDL_SetRenderTarget(_internal_ptr, texture.value_or(NULL));
+    if(_t != 0)
+    {
+        TSDL::safe_throw<std::runtime_error>("Could not set render target! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return _t;
+}
+
+TSDL::point_2d TSDL::TSDL_Renderer::render_size()
+{
+    int x, y;
+    int _t = SDL_GetRendererOutputSize(_internal_ptr, &x, &y);
+    if(_t != 0)
+    {
+        //TODO: noexcept signify error
+        TSDL::safe_throw<std::runtime_error>("Could not get renderer size! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return TSDL::point_2d(x, y);
+}
+
 int TSDL::TSDL_Renderer::render_color(const color_rgba& c)
 {
     return this->render_color(c.r, c.g, c.b, c.a);
@@ -88,9 +117,14 @@ int TSDL::TSDL_Renderer::clear()
     return _t;
 }
 
-int TSDL::TSDL_Renderer::copy_from(TSDL::_SDL_Texture texture, const rect& srcrect, const rect& dstrect)
+int TSDL::TSDL_Renderer::copy_from(TSDL::_SDL_Texture texture, std::optional<const rect&> srcrect, std::optional<const rect&> dstrect)
 {
-    int _t = SDL_RenderCopy(_internal_ptr, texture, &srcrect, &dstrect);
+    int _t = SDL_RenderCopy(
+        _internal_ptr, 
+        texture, 
+        srcrect ? &srcrect.value(): NULL, 
+        dstrect ? &dstrect.value(): NULL
+    );
     if(_t != 0)
     {
         TSDL::safe_throw<std::runtime_error>("Could not copy to render target! SDL Error: " + std::string(SDL_GetError()));
@@ -98,9 +132,17 @@ int TSDL::TSDL_Renderer::copy_from(TSDL::_SDL_Texture texture, const rect& srcre
     return _t;
 }
 
-int TSDL::TSDL_Renderer::copy_from(TSDL::_SDL_Texture texture, const rect& srcrect, const rect& dstrect, const double angle, const point_2d& center, const SDL_RendererFlip flip)
+int TSDL::TSDL_Renderer::copy_from(TSDL::_SDL_Texture texture, std::optional<const rect&> srcrect, std::optional<const rect&> dstrect, const double angle, std::optional<const point_2d&> center, const SDL_RendererFlip flip)
 {
-    int _t = SDL_RenderCopyEx(_internal_ptr, texture, &srcrect, &dstrect, angle, &center, flip);
+    int _t = SDL_RenderCopyEx(
+        _internal_ptr, 
+        texture, 
+        srcrect ? &srcrect.value(): NULL, 
+        dstrect ? &dstrect.value(): NULL, 
+        angle, 
+        center ? &center.value(): NULL, 
+        flip
+    );
     if(_t != 0)
     {
         TSDL::safe_throw<std::runtime_error>("Could not copy/rotate to render target! SDL Error: " + std::string(SDL_GetError()));

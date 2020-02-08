@@ -1,17 +1,16 @@
 #include "abstract/elements/Grid.hpp"
 #include "TSDL_Meta.hpp"
 
-TSDL::elements::Grid::Grid(): Grid(ListenerMap()) {}
+TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const point_2d& size): Grid(renderer, size, ListenerMap()) {}
 
-TSDL::elements::Grid::Grid(const ListenerMap& listeners): EventDispatcher(listeners)
+TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const point_2d& size , const ListenerMap& listeners): 
+    Element(renderer), ElementHolder(renderer, size), EventDispatcher(renderer, listeners)
 {
     Element::add_event_handler(
         TSDL::events::MouseMotion, 
-        [this](const Caller& caller, const SDL_Event& event)
+        [this](const Caller& caller, const SDL_Event& event) -> bool
         {
-            point_2d _this_dist = caller.second;
-            int x = event.motion.x - _this_dist.x;
-            int y = event.motion.y - _this_dist.y;
+            point_2d _dist = caller.second;
 
             for(const Subelement& subelement: TSDL::reverse(get_child_order()))
             {
@@ -20,23 +19,23 @@ TSDL::elements::Grid::Grid(const ListenerMap& listeners): EventDispatcher(listen
 
                 Element& element = element_ref;
 
-                if(topleft.x < x && x < bottomright.x &&
-                    topleft.y < y && y < bottomright.y)
+                if(topleft.x < _dist.x && _dist.x < bottomright.x &&
+                    topleft.y < _dist.y && _dist.y < bottomright.y)
                     {
                         if(!_current_mouse_focus.has_value())
                         {
-                            element.dispatch_event(Caller(*this, {x - topleft.x, y - topleft.y}), TSDL::events::MouseIn, event);
+                            element.dispatch_event(Caller(*this, _dist - topleft), TSDL::events::MouseIn, event);
                         }
                         else if(element == _current_mouse_focus.value().first)
                         {
-                            element.dispatch_event(Caller(*this, {x - topleft.x, y - topleft.y}), TSDL::events::MouseMotion, event);
+                            element.dispatch_event(Caller(*this, _dist - topleft), TSDL::events::MouseMotion, event);
                         }
                         else
                         {
                             Subelement _actual_focus = _current_mouse_focus.value();
-                            _actual_focus.first.get().dispatch_event(Caller(*this, {x - _actual_focus.second.first.x, y - _actual_focus.second.first.y}), TSDL::events::MouseOut, event);
+                            _actual_focus.first.get().dispatch_event(Caller(*this, _dist - _actual_focus.second.first), TSDL::events::MouseOut, event);
                             _current_mouse_focus = subelement;
-                            element.dispatch_event(Caller(*this, {x - topleft.x, y - topleft.y}), TSDL::events::MouseIn, event);
+                            element.dispatch_event(Caller(*this, _dist - topleft), TSDL::events::MouseIn, event);
                         }
                         return false;
                     }
@@ -44,7 +43,7 @@ TSDL::elements::Grid::Grid(const ListenerMap& listeners): EventDispatcher(listen
             if(_current_mouse_focus.has_value())
             {
                 Subelement _actual_focus = _current_mouse_focus.value();
-                _actual_focus.first.get().dispatch_event(Caller(*this, {x - _actual_focus.second.first.x, y - _actual_focus.second.first.y}), TSDL::events::MouseOut, event);
+                _actual_focus.first.get().dispatch_event(Caller(*this, _dist - _actual_focus.second.first), TSDL::events::MouseOut, event);
                 _current_mouse_focus.reset();
             }
             return false;
@@ -52,15 +51,13 @@ TSDL::elements::Grid::Grid(const ListenerMap& listeners): EventDispatcher(listen
     );
     Element::add_event_handler(
         TSDL::events::LeftDown, 
-        [this](const Caller& caller, const SDL_Event& event)
+        [this](const Caller& caller, const SDL_Event& event) -> bool
         {
             if(_current_mouse_focus.has_value())
             {
-                point_2d _this_dist = caller.second;
-                int x = event.button.x - _this_dist.x;
-                int y = event.button.y - _this_dist.y;
+                point_2d _dist = caller.second;
                 Subelement _actual_focus = _current_mouse_focus.value();
-                _actual_focus.first.get().dispatch_event(Caller(*this, {x - _actual_focus.second.first.x, y - _actual_focus.second.first.y}), TSDL::events::LeftDown, event);
+                _actual_focus.first.get().dispatch_event(Caller(*this, _dist - _actual_focus.second.first), TSDL::events::LeftDown, event);
                 _current_mouse_focus.reset();
             }
             return false;
@@ -68,15 +65,13 @@ TSDL::elements::Grid::Grid(const ListenerMap& listeners): EventDispatcher(listen
     );
     Element::add_event_handler(
         TSDL::events::LeftUp, 
-        [this](const Caller& caller, const SDL_Event& event)
+        [this](const Caller& caller, const SDL_Event& event) -> bool
         {
             if(_current_mouse_focus.has_value())
             {
-                point_2d _this_dist = caller.second;
-                int x = event.button.x - _this_dist.x;
-                int y = event.button.y - _this_dist.y;
+                point_2d _dist = caller.second;
                 Subelement _actual_focus = _current_mouse_focus.value();
-                _actual_focus.first.get().dispatch_event(Caller(*this, {x - _actual_focus.second.first.x, y - _actual_focus.second.first.y}), TSDL::events::LeftUp, event);
+                _actual_focus.first.get().dispatch_event(Caller(*this, _dist - _actual_focus.second.first), TSDL::events::LeftUp, event);
                 _current_mouse_focus.reset();
             }
             return false;
@@ -84,15 +79,13 @@ TSDL::elements::Grid::Grid(const ListenerMap& listeners): EventDispatcher(listen
     );
     Element::add_event_handler(
         TSDL::events::RightDown, 
-        [this](const Caller& caller, const SDL_Event& event)
+        [this](const Caller& caller, const SDL_Event& event) -> bool
         {
             if(_current_mouse_focus.has_value())
             {
-                point_2d _this_dist = caller.second;
-                int x = event.button.x - _this_dist.x;
-                int y = event.button.y - _this_dist.y;
+                point_2d _dist = caller.second;
                 Subelement _actual_focus = _current_mouse_focus.value();
-                _actual_focus.first.get().dispatch_event(Caller(*this, {x - _actual_focus.second.first.x, y - _actual_focus.second.first.y}), TSDL::events::RightDown, event);
+                _actual_focus.first.get().dispatch_event(Caller(*this, _dist - _actual_focus.second.first), TSDL::events::RightDown, event);
                 _current_mouse_focus.reset();
             }
             return false;
@@ -100,15 +93,13 @@ TSDL::elements::Grid::Grid(const ListenerMap& listeners): EventDispatcher(listen
     );
     Element::add_event_handler(
         TSDL::events::RightUp, 
-        [this](const Caller& caller, const SDL_Event& event)
+        [this](const Caller& caller, const SDL_Event& event) -> bool
         {
             if(_current_mouse_focus.has_value())
             {
-                point_2d _this_dist = caller.second;
-                int x = event.button.x - _this_dist.x;
-                int y = event.button.y - _this_dist.y;
+                point_2d _dist = caller.second;
                 Subelement _actual_focus = _current_mouse_focus.value();
-                _actual_focus.first.get().dispatch_event(Caller(*this, {x - _actual_focus.second.first.x, y - _actual_focus.second.first.y}), TSDL::events::RightUp, event);
+                _actual_focus.first.get().dispatch_event(Caller(*this, _dist - _actual_focus.second.first), TSDL::events::RightUp, event);
                 _current_mouse_focus.reset();
             }
             return false;
@@ -116,15 +107,13 @@ TSDL::elements::Grid::Grid(const ListenerMap& listeners): EventDispatcher(listen
     );
     Element::add_event_handler(
         TSDL::events::MiddleDown, 
-        [this](const Caller& caller, const SDL_Event& event)
+        [this](const Caller& caller, const SDL_Event& event) -> bool
         {
             if(_current_mouse_focus.has_value())
             {
-                point_2d _this_dist = caller.second;
-                int x = event.button.x - _this_dist.x;
-                int y = event.button.y - _this_dist.y;
+                point_2d _dist = caller.second;
                 Subelement _actual_focus = _current_mouse_focus.value();
-                _actual_focus.first.get().dispatch_event(Caller(*this, {x - _actual_focus.second.first.x, y - _actual_focus.second.first.y}), TSDL::events::MiddleDown, event);
+                _actual_focus.first.get().dispatch_event(Caller(*this, _dist - _actual_focus.second.first), TSDL::events::MiddleDown, event);
                 _current_mouse_focus.reset();
             }
             return false;
@@ -132,15 +121,13 @@ TSDL::elements::Grid::Grid(const ListenerMap& listeners): EventDispatcher(listen
     );
     Element::add_event_handler(
         TSDL::events::MiddleUp, 
-        [this](const Caller& caller, const SDL_Event& event)
+        [this](const Caller& caller, const SDL_Event& event) -> bool
         {
             if(_current_mouse_focus.has_value())
             {
-                point_2d _this_dist = caller.second;
-                int x = event.button.x - _this_dist.x;
-                int y = event.button.y - _this_dist.y;
+                point_2d _dist = caller.second;
                 Subelement _actual_focus = _current_mouse_focus.value();
-                _actual_focus.first.get().dispatch_event(Caller(*this, {x - _actual_focus.second.first.x, y - _actual_focus.second.first.y}), TSDL::events::MiddleUp, event);
+                _actual_focus.first.get().dispatch_event(Caller(*this, _dist - _actual_focus.second.first), TSDL::events::MiddleUp, event);
                 _current_mouse_focus.reset();
             }
             return false;

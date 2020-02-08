@@ -1,10 +1,13 @@
 #include "abstract/elements/EventDispatcher.hpp"
 
-TSDL::elements::EventDispatcher::EventDispatcher() = default;
+TSDL::elements::EventDispatcher::EventDispatcher(TSDL_Renderer& renderer): 
+    Element(renderer) {}
 
-TSDL::elements::EventDispatcher::EventDispatcher(const ListenerMap& listeners): _event_listeners(listeners) {}
+TSDL::elements::EventDispatcher::EventDispatcher(TSDL_Renderer& renderer, const ListenerMap& listeners): 
+    Element(renderer), _event_listeners(listeners) {}
 
-TSDL::elements::EventDispatcher::EventDispatcher(ListenerMap&& listeners): _event_listeners(listeners) {}
+TSDL::elements::EventDispatcher::EventDispatcher(TSDL_Renderer& renderer, ListenerMap&& listeners): 
+    Element(renderer), _event_listeners(listeners) {}
 
 void TSDL::elements::EventDispatcher::dispatch_event_direct(const TSDL::events::EventType& eventtype, Element& subelement)
 {

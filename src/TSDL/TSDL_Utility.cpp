@@ -27,6 +27,40 @@ TSDL::point_2d::point_2d(SDL_Point& p): SDL_Point(p) {}
 
 TSDL::point_2d::point_2d(TSDL::_point_2d& p): SDL_Point({std::get<0>(p), std::get<1>(p)}) {}
 
+TSDL::point_2d TSDL::point_2d::operator+() const
+{
+    return *this;
+}
+
+TSDL::point_2d TSDL::point_2d::operator+(const point_2d& other) const
+{
+    return TSDL::point_2d(this->x + other.x, this->y + other.y);
+}
+
+TSDL::point_2d TSDL::point_2d::operator-() const
+{
+    return TSDL::point_2d(-(this->x), -(this->y));
+}
+
+TSDL::point_2d TSDL::point_2d::operator-(const point_2d& other) const
+{
+    return TSDL::point_2d(this->x + other.x, this->y + other.y);
+}
+
+TSDL::point_2d& TSDL::point_2d::operator+=(const point_2d& other)
+{
+    this->x += other.x;
+    this->y += other.y;
+    return *this;
+}
+
+TSDL::point_2d& TSDL::point_2d::operator-=(const point_2d& other)
+{
+    this->x -= other.x;
+    this->y -= other.y;
+    return *this;
+}
+
 TSDL::point_2d::operator TSDL::_point_2d()
 {
     return std::make_tuple(x, y);
@@ -40,6 +74,17 @@ TSDL::rect::rect(TSDL::_rect& r): SDL_Rect(
     {
         std::get<0>(r).x, std::get<0>(r).y,
         std::get<1>(r).x, std::get<1>(r).y
+    }
+) {}
+
+TSDL::rect::rect(const std::pair<point_2d, point_2d>& point_pair): rect(point_pair.first, point_pair.second) {}
+
+TSDL::rect::rect(const point_2d& topleft, const point_2d& bottomright): SDL_Rect(
+    {
+        topleft.x, 
+        topleft.y, 
+        bottomright.x - topleft.x, 
+        bottomright.y - topleft.y
     }
 ) {}
 

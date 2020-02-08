@@ -1,9 +1,16 @@
 #include "abstract/elements/Element.hpp"
 #include <memory>
 
+TSDL::elements::Element::Element(TSDL_Renderer& renderer): _renderer(renderer) {}
+
 bool TSDL::elements::Element::operator==(const Element& other)
 {
     return this == std::addressof(other);
+}
+
+TSDL::TSDL_Renderer& TSDL::elements::Element::renderer() const
+{
+    return _renderer;
 }
 
 void TSDL::elements::Element::update()
@@ -11,7 +18,12 @@ void TSDL::elements::Element::update()
     _update = true;
 }
 
-bool TSDL::elements::Element::need_update()
+void TSDL::elements::Element::not_update()
+{
+    _update = true;
+}
+
+bool TSDL::elements::Element::need_update() const
 {
     return _update;
 }

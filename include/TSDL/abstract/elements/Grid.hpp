@@ -20,18 +20,8 @@ namespace TSDL
             std::optional <Subelement> _current_mouse_focus;
 
             public:
-            Grid();
-            Grid(const ListenerMap& listeners);
-
-            /*
-            Re-render this element
-            */
-            void render() final;
-
-            /*
-            Get previously rendered texture
-            */
-            TSDL_Texture& get_texture() final;
+            Grid(TSDL_Renderer& renderer, const point_2d& size); 
+            Grid(TSDL_Renderer& renderer, const point_2d& size, const ListenerMap& listeners);
         };
     }
 }

@@ -13,15 +13,15 @@ namespace TSDL
     namespace elements
     {
         using ListenerMap = std::map <const TSDL::events::EventType, std::set<std::reference_wrapper<Element>>>;
-        class EventDispatcher: public Element
+        class EventDispatcher: virtual public Element
         {
             private:
             ListenerMap _event_listeners;
 
             public:
-            EventDispatcher();
-            EventDispatcher(const ListenerMap& listeners);
-            EventDispatcher(ListenerMap&& listeners);
+            EventDispatcher(TSDL_Renderer& renderer);
+            EventDispatcher(TSDL_Renderer& renderer, const ListenerMap& listeners);
+            EventDispatcher(TSDL_Renderer& renderer, ListenerMap&& listeners);
 
             void dispatch_event_direct(const TSDL::events::EventType& eventtype, Element& subelement);
             void stop_dispatch_event_direct(const TSDL::events::EventType& eventtype, Element& subelement);
