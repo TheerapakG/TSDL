@@ -6,6 +6,7 @@ namespace TSDL
     class TSDL_Renderer;
 }
 
+#include <optional>
 #include <SDL.h>
 #include "TSDL_Utility.hpp"
 #include "TSDL_SDLmask.hpp"
@@ -35,6 +36,14 @@ namespace TSDL
 
         operator SDL_Renderer*() const;
 
+        std::optional<_SDL_Texture> target();
+        int target(std::optional<const _SDL_Texture&> texture);
+
+        /*
+        Size of the rendering target
+        */
+        point_2d render_size();
+
         int render_color(const color_rgba& c);
         int render_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
@@ -43,16 +52,16 @@ namespace TSDL
 
         int clear();
 
-        int copy_from(_SDL_Texture texture, const rect& srcrect, const rect& dstrect);
+        int copy_from(_SDL_Texture texture, std::optional<const rect&> srcrect, std::optional<const rect&> dstrect);
         /*
         * like copy_from(texture, srcrect, dstrct) but after copy, optionally rotating it by angle around the given 
         * center and also optionally flipping it.
         */
         int copy_from(_SDL_Texture texture, 
-                      const rect& srcrect, 
-                      const rect& dstrect, 
+                      std::optional<const rect&> srcrect, 
+                      std::optional<const rect&> dstrect, 
                       const double angle, 
-                      const point_2d& center,
+                      std::optional<const point_2d&> center,
                       const SDL_RendererFlip flip);
 
         int fill_rect(const rect& rect);

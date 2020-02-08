@@ -18,7 +18,6 @@ namespace TSDL
             WindowClose,
             KeyDown,
             KeyUp,
-            KeyDown,
             TextInput,
             MouseMotion,
             MouseIn,

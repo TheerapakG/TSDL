@@ -42,6 +42,11 @@ void TSDL::TSDL_Eventloop::render_function(TSDL::RenderHandler handler)
     _render = handler;
 }
 
+const TSDL::RenderHandler& TSDL::TSDL_Eventloop::render_function()
+{
+    return _render;
+}
+
 void TSDL::TSDL_Eventloop::_reset_fps_count()
 {
     std::scoped_lock lock(_lock_frame_calc);

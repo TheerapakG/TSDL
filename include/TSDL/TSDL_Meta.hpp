@@ -166,6 +166,24 @@ namespace TSDL
 
     template <typename T>
     reversion_wrapper<T> reverse (T&& iterable) { return { iterable }; }
+
+    template <typename T, typename Callable = std::function<T>, std::size_t... I>
+    T* _callable_cast_function_pointer_gen_lambda(Callable& func, std::index_sequence<I...>)
+    {
+        static Callable f = func;
+        return [](get_argument_t<T, I>... args)
+        {
+            if (std::is_same_v<function_traits<T>::return_type, void>) f(args...);
+            else return static_cast<typename function_traits<T>::return_type>(f(args...));
+        };
+    }
+
+    template <typename T, typename Callable = std::function<T>, typename Indices = std::make_index_sequence<function_traits<T>::arity>>
+    T* callable_cast_function_pointer(Callable func)
+    {
+        static_assert(is_callable_not_overloaded_v<T>, "T is not callable or is ambiguous");
+        return _callable_cast_function_pointer_gen_lambda<T>(func, Indices {});
+    }
 }
 
 #endif

@@ -21,11 +21,20 @@ namespace TSDL
         class Element
         {
             private:
+            TSDL_Renderer& _renderer;
             std::atomic<bool> _update = false;
             std::map <TSDL::events::EventType, EventHandler> _evhdlrmap;
             
             public:
+            Element() = delete;
+            Element(TSDL_Renderer& renderer);
+
             bool operator==(const Element& other);
+
+            /*
+            Get bounded renderer
+            */
+            TSDL_Renderer& renderer() const;
 
             /*
             Make parent update this element on the next cycle
@@ -33,9 +42,14 @@ namespace TSDL
             void update();
 
             /*
+            Reverse what update() did
+            */
+            void not_update();
+
+            /*
             Query if parent need to update this element on the next cycle
             */
-            bool need_update();
+            bool need_update() const;
 
             /*
             Re-render this element

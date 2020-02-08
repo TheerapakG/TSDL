@@ -4,6 +4,17 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, const TSDL::point_2d& size, SDL_TextureAccess access)
+{
+    SDL_Texture* _t_internal_ptr = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, access, size.x, size.y);
+    if(_t_internal_ptr == NULL)
+    {
+        TSDL::safe_throw<std::runtime_error>("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
+        return;
+    }
+    _internal_ptr = _t_internal_ptr;
+}
+
 TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, TSDL::_SDL_Surface surface)
 {
     SDL_Texture* _t_internal_ptr = SDL_CreateTextureFromSurface(renderer, surface);

@@ -52,6 +52,7 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
+        TSDL_Texture(_SDL_Renderer& renderer, const point_2d& size, SDL_TextureAccess access);
         TSDL_Texture(_SDL_Renderer& renderer, _SDL_Surface surface);
         TSDL_Texture(_SDL_Renderer& renderer, const std::string& file);        
         TSDL_Texture(_SDL_Renderer& renderer, TSDL_Buffer& buffer);
