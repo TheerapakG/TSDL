@@ -55,6 +55,7 @@ namespace TSDL
     class point_2d: public SDL_Point
     {
         public:
+        point_2d() = default;
         point_2d(int x, int y);
         point_2d(SDL_Point& p);
         point_2d(_point_2d& p);
@@ -110,5 +111,7 @@ namespace TSDL
         operator _color_rgba();
     };
 }
+
+bool operator==(const TSDL::point_2d& lhs, const TSDL::point_2d& rhs);
 
 #endif

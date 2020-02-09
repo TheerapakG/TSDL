@@ -2,6 +2,7 @@
 #define TSDL_META_
 
 #include <type_traits>
+#include <optional>
 #include <functional>
 #include <tuple>
 
@@ -167,22 +168,28 @@ namespace TSDL
     template <typename T>
     reversion_wrapper<T> reverse (T&& iterable) { return { iterable }; }
 
-    template <typename T, typename Callable = std::function<T>, std::size_t... I>
-    T* _callable_cast_function_pointer_gen_lambda(Callable& func, std::index_sequence<I...>)
+    template <typename T>
+    std::optional<std::reference_wrapper<T>> make_optional_ref(T&& ref)
     {
-        static Callable f = func;
-        return [](get_argument_t<T, I>... args)
-        {
-            if (std::is_same_v<function_traits<T>::return_type, void>) f(args...);
-            else return static_cast<typename function_traits<T>::return_type>(f(args...));
-        };
+        return ref;
     }
 
-    template <typename T, typename Callable = std::function<T>, typename Indices = std::make_index_sequence<function_traits<T>::arity>>
-    T* callable_cast_function_pointer(Callable func)
+    template <typename T>
+    std::optional<std::reference_wrapper<T>> make_optional_ref()
     {
-        static_assert(is_callable_not_overloaded_v<T>, "T is not callable or is ambiguous");
-        return _callable_cast_function_pointer_gen_lambda<T>(func, Indices {});
+        return std::optional<std::reference_wrapper<T>>();
+    }
+
+    template <typename T>
+    std::optional<const std::reference_wrapper<T>> make_optional_const_ref(T&& ref)
+    {
+        return ref;
+    }
+
+    template <typename T>
+    std::optional<const std::reference_wrapper<T>> make_optional_const_ref()
+    {
+        return std::optional<const std::reference_wrapper<T>>();
     }
 }
 

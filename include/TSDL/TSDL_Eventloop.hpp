@@ -25,7 +25,7 @@ namespace _PY
 
 namespace TSDL
 {
-    using EventHandler = void(const SDL_Event&);
+    using EventHandler = std::function<void(const SDL_Event&)>;
 
     using RenderHandler = std::function<void()>;
 

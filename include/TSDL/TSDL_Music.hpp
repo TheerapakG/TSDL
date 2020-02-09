@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include "TSDL_SDLmask.hpp"
+#include "TSDL_Macro.hpp"
 #include <string>
 
 #ifdef TSDL_EXPOSE_PYBIND11
@@ -32,6 +33,8 @@ namespace TSDL
         using SDL_Type = Mix_Music;
 
         _PY_DECLARE_TYPEERASE_OWNER(Music)
+
+        TSDL_DECLARE_CONSTRUCT(Music)
 
         TSDL_Music(Mix_Music* ptr);
         TSDL_Music(Mix_Music* ptr, bool handle_destroy);

@@ -15,6 +15,8 @@
     #include "TSDL/TSDL_Chunk.hpp"
     #include "TSDL/TSDL_Music.hpp"
 
+    #include "TSDL/abstract/elements.hpp"
+
     #ifdef TSDL_EXPOSE_PYBIND11
         #include "TSDL/TSDL_PY_Constants.hpp"
         PYBIND11_MODULE(tsdl, m)

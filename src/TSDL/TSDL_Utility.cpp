@@ -61,6 +61,11 @@ TSDL::point_2d& TSDL::point_2d::operator-=(const point_2d& other)
     return *this;
 }
 
+bool operator==(const TSDL::point_2d& lhs, const TSDL::point_2d& rhs)
+{
+    return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
 TSDL::point_2d::operator TSDL::_point_2d()
 {
     return std::make_tuple(x, y);

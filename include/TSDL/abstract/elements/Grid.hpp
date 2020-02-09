@@ -6,14 +6,13 @@
 #include <map>
 #include <functional>
 #include <optional>
-#include "abstract/elements/ElementHolder.hpp"
-#include "abstract/elements/EventDispatcher.hpp"
+#include "TSDL/abstract/elements/ElementHolder.hpp"
+#include "TSDL/abstract/elements/EventDispatcher.hpp"
 
 namespace TSDL
 {
     namespace elements
     {
-        using Subelement = std::pair<std::reference_wrapper<Element>, std::pair<point_2d, point_2d>>;
         class Grid: public EventDispatcher, public ElementHolder
         {
             private:

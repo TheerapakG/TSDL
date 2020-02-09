@@ -4,10 +4,10 @@
 #include <atomic>
 #include <map>
 #include <functional>
-#include "TSDL_Utility.hpp"
-#include "TSDL_Texture.hpp"
-#include "TSDL_Renderer.hpp"
-#include "abstract/events/EventType.hpp"
+#include "TSDL/TSDL_Utility.hpp"
+#include "TSDL/TSDL_Texture.hpp"
+#include "TSDL/TSDL_Renderer.hpp"
+#include "TSDL/abstract/events/EventType.hpp"
 
 namespace TSDL
 {
@@ -23,7 +23,7 @@ namespace TSDL
             private:
             TSDL_Renderer& _renderer;
             std::atomic<bool> _update = false;
-            std::map <TSDL::events::EventType, EventHandler> _evhdlrmap;
+            std::map <::TSDL::events::EventType, EventHandler> _evhdlrmap;
             
             public:
             Element() = delete;
@@ -61,9 +61,9 @@ namespace TSDL
             */
             virtual TSDL_Texture& get_texture() = 0;
 
-            virtual bool dispatch_event(const Caller& caller, const TSDL::events::EventType& eventtype, const SDL_Event& event);            
-            void add_event_handler(const TSDL::events::EventType& eventtype, const EventHandler& evhandler);
-            void remove_event_handler(const TSDL::events::EventType& eventtype);
+            virtual bool dispatch_event(const Caller& caller, const ::TSDL::events::EventType& eventtype, const SDL_Event& event);            
+            void add_event_handler(const ::TSDL::events::EventType& eventtype, const EventHandler& evhandler);
+            void remove_event_handler(const ::TSDL::events::EventType& eventtype);
         };
     }
 }

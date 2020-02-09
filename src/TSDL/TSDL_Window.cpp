@@ -3,6 +3,8 @@
 #include <string>
 #include <iostream>
 
+TSDL_DEFINE_CONSTRUCT(TSDL, Window)
+
 TSDL::TSDL_Window::TSDL_Window(SDL_Window* ptr): TSDL_Window(ptr, false) {}
 
 TSDL::TSDL_Window::TSDL_Window(SDL_Window* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}

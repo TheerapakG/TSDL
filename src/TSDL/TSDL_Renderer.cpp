@@ -2,9 +2,11 @@
 #include "TSDL/TSDL_Utility.hpp"
 #include <string>
 
-TSDL::TSDL_Renderer::TSDL_Renderer(TSDL::TSDL_Window window): TSDL_Renderer(window, 0) {}
+TSDL_DEFINE_CONSTRUCT(TSDL, Renderer)
 
-TSDL::TSDL_Renderer::TSDL_Renderer(TSDL::TSDL_Window window, Uint32 flags)
+TSDL::TSDL_Renderer::TSDL_Renderer(TSDL::TSDL_Window& window): TSDL_Renderer(window, 0) {}
+
+TSDL::TSDL_Renderer::TSDL_Renderer(TSDL::TSDL_Window& window, Uint32 flags): _destroy(true)
 {
     SDL_Renderer* _t_internal_ptr = SDL_CreateRenderer(window, -1, flags);
     if(_t_internal_ptr == NULL)
@@ -13,34 +15,11 @@ TSDL::TSDL_Renderer::TSDL_Renderer(TSDL::TSDL_Window window, Uint32 flags)
         return;
     }
     _internal_ptr = _t_internal_ptr;
-
-    #ifdef __cpp_exceptions 
-    try
-    {
-    #else
-        int error =
-    #endif
-        this->render_color(0xFF, 0xFF, 0xFF, 0xFF);
-    #ifdef __cpp_exceptions 
-    }
-    catch(...)
-    #else
-    if(error != 0)
-    #endif
-    {
-        SDL_DestroyRenderer(_internal_ptr);
-        #ifdef __cpp_exceptions 
-        throw; 
-        #else
-        _internal_ptr = nullptr;
-        return;
-        #endif       
-    }
 }
 
 TSDL::TSDL_Renderer::~TSDL_Renderer()
 {
-    if(_internal_ptr != nullptr) SDL_DestroyRenderer(_internal_ptr);
+    if(_destroy && (_internal_ptr != nullptr)) SDL_DestroyRenderer(_internal_ptr);
 }
 
 TSDL::TSDL_Renderer::operator SDL_Renderer*() const
@@ -55,9 +34,9 @@ std::optional<TSDL::_SDL_Texture> TSDL::TSDL_Renderer::target()
     else return _t;
 }
 
-int TSDL::TSDL_Renderer::target(std::optional<const TSDL::_SDL_Texture&> texture)
+int TSDL::TSDL_Renderer::target(std::optional<std::reference_wrapper<TSDL::_SDL_Texture>> texture)
 {
-    int _t = SDL_SetRenderTarget(_internal_ptr, texture.value_or(NULL));
+    int _t = SDL_SetRenderTarget(_internal_ptr, texture ? texture.value().get(): NULL);
     if(_t != 0)
     {
         TSDL::safe_throw<std::runtime_error>("Could not set render target! SDL Error: " + std::string(SDL_GetError()));
@@ -75,6 +54,18 @@ TSDL::point_2d TSDL::TSDL_Renderer::render_size()
         TSDL::safe_throw<std::runtime_error>("Could not get renderer size! SDL Error: " + std::string(SDL_GetError()));
     }
     return TSDL::point_2d(x, y);
+}
+
+TSDL::color_rgba TSDL::TSDL_Renderer::render_color()
+{
+    Uint8 r, g, b, a;
+    int _t = SDL_GetRenderDrawColor(_internal_ptr, &r, &g, &b, &a);
+    if(_t != 0)
+    {
+        //TODO: noexcept signify error
+        TSDL::safe_throw<std::runtime_error>("Could not set renderer color! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return TSDL::color_rgba(r, g, b, a);
 }
 
 int TSDL::TSDL_Renderer::render_color(const color_rgba& c)
@@ -117,13 +108,27 @@ int TSDL::TSDL_Renderer::clear()
     return _t;
 }
 
-int TSDL::TSDL_Renderer::copy_from(TSDL::_SDL_Texture texture, std::optional<const rect&> srcrect, std::optional<const rect&> dstrect)
+int TSDL::TSDL_Renderer::clear(const color_rgba& c)
+{
+    color_rgba prev_col = render_color();
+    render_color(c); // TODO: check when noexcept signify error
+    int _t = clear();
+    if(_t != 0) return _t;
+    render_color(prev_col); // TODO: check when noexcept signify error
+	return _t;
+}
+
+int TSDL::TSDL_Renderer::copy_from(
+    TSDL::_SDL_Texture texture, 
+    std::optional<const std::reference_wrapper<rect>> srcrect, 
+    std::optional<const std::reference_wrapper<rect>> dstrect
+)
 {
     int _t = SDL_RenderCopy(
         _internal_ptr, 
         texture, 
-        srcrect ? &srcrect.value(): NULL, 
-        dstrect ? &dstrect.value(): NULL
+        srcrect ? &srcrect.value().get(): NULL, 
+        dstrect ? &dstrect.value().get(): NULL
     );
     if(_t != 0)
     {
@@ -132,15 +137,22 @@ int TSDL::TSDL_Renderer::copy_from(TSDL::_SDL_Texture texture, std::optional<con
     return _t;
 }
 
-int TSDL::TSDL_Renderer::copy_from(TSDL::_SDL_Texture texture, std::optional<const rect&> srcrect, std::optional<const rect&> dstrect, const double angle, std::optional<const point_2d&> center, const SDL_RendererFlip flip)
+int TSDL::TSDL_Renderer::copy_from(
+    TSDL::_SDL_Texture texture, 
+    std::optional<const std::reference_wrapper<rect>> srcrect, 
+    std::optional<const std::reference_wrapper<rect>> dstrect, 
+    const double angle, 
+    std::optional<const std::reference_wrapper<point_2d>> center, 
+    const SDL_RendererFlip flip
+)
 {
     int _t = SDL_RenderCopyEx(
         _internal_ptr, 
         texture, 
-        srcrect ? &srcrect.value(): NULL, 
-        dstrect ? &dstrect.value(): NULL, 
+        srcrect ? &srcrect.value().get(): NULL, 
+        dstrect ? &dstrect.value().get(): NULL, 
         angle, 
-        center ? &center.value(): NULL, 
+        center ? &center.value().get(): NULL, 
         flip
     );
     if(_t != 0)

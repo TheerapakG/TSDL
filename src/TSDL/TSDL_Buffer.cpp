@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 
+TSDL_DEFINE_CONSTRUCT(TSDL, Buffer)
+
 TSDL::TSDL_Buffer::TSDL_Buffer(SDL_RWops* ptr): TSDL_Buffer(ptr, false) {}
 
 TSDL::TSDL_Buffer::TSDL_Buffer(SDL_RWops* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
