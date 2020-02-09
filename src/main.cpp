@@ -12,13 +12,7 @@ using namespace std::literals::chrono_literals;
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 
-TSDL::TSDL_Window* window;
 TSDL::TSDL_Eventloop eventloop;
-
-void render_handler()
-{
-    window->update_window_surface();
-}
 
 std::atomic_bool quit(false);
 
@@ -49,23 +43,17 @@ int main(int argc, char* argv[])
         //Initialize SDL
         TSDL::TSDL tsdl;
 
-        window = new TSDL::TSDL_Window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        TSDL::TSDL_Window window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         
-        //Get window surface
-        auto screenSurface = window->window_surface_object();
+        TSDL::TSDL_Renderer renderer(window, SDL_RENDERER_TARGETTEXTURE);
+        TSDL::elements::Grid grid(renderer, {SCREEN_WIDTH, SCREEN_HEIGHT});
+        TSDL::elements::EventloopAdapter elementAdapter(renderer, eventloop, grid);
 
-        //Fill the surface white
-        screenSurface.fill(0xFF, 0xFF, 0xFF);
-
-        eventloop.render_function(render_handler);
-        eventloop.add_event_handler(SDL_QUIT, quit_handler);  
+        eventloop.add_event_handler(SDL_QUIT, quit_handler);
 
         std::thread t(say_fps);
         eventloop.run();
-        t.join();
-
-        delete window;
-        
+        t.join();        
     }
     catch(const std::exception& e)
     {

@@ -1,4 +1,4 @@
-#include "abstract/elements/Element.hpp"
+#include "TSDL/abstract/elements/Element.hpp"
 #include <memory>
 
 TSDL::elements::Element::Element(TSDL_Renderer& renderer): _renderer(renderer) {}
@@ -40,5 +40,16 @@ void TSDL::elements::Element::remove_event_handler(const TSDL::events::EventType
 
 bool TSDL::elements::Element::dispatch_event(const Caller& caller, const TSDL::events::EventType& eventtype, const SDL_Event& event)
 {
-    _evhdlrmap[eventtype](caller, event);
+    EventHandler h;
+
+    try
+    {
+        h = _evhdlrmap.at(eventtype);
+    }
+    catch(const std::out_of_range&)
+    {
+        return false;
+    }
+
+    return h(caller, event);
 }

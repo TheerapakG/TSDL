@@ -5,6 +5,7 @@
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Surface.hpp"
 #include "TSDL_Display.hpp"
+#include "TSDL_Macro.hpp"
 
 #ifdef TSDL_EXPOSE_PYBIND11
 #include "TSDL_PY_TypeErase.hpp"
@@ -32,6 +33,8 @@ namespace TSDL
         using SDL_Type = SDL_Window;
 
         _PY_DECLARE_TYPEERASE_OWNER(Window)
+
+        TSDL_DECLARE_CONSTRUCT(Window)
 
         TSDL_Window(SDL_Window* ptr);
         TSDL_Window(SDL_Window* ptr, bool handle_destroy);

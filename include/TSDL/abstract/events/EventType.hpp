@@ -5,7 +5,7 @@ namespace TSDL
 {
     namespace events
     {
-        enum EventType
+        enum class EventType
         {
             WindowShown,
             WindowHidden,

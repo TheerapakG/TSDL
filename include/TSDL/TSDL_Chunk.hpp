@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include "TSDL_SDLmask.hpp"
+#include "TSDL_Macro.hpp"
 #include "TSDL_Buffer.hpp"
 #include <string>
 
@@ -34,6 +35,8 @@ namespace TSDL
         using SDL_Type = Mix_Chunk;
 
         _PY_DECLARE_TYPEERASE_OWNER(Chunk)
+
+        TSDL_DECLARE_CONSTRUCT(Chunk)
 
         TSDL_Chunk(Mix_Chunk* ptr);
         TSDL_Chunk(Mix_Chunk* ptr, bool handle_destroy);

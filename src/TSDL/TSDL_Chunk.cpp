@@ -1,6 +1,8 @@
 #include "TSDL/TSDL_Chunk.hpp"
 #include "TSDL/TSDL_Utility.hpp"
 
+TSDL_DEFINE_CONSTRUCT(TSDL, Chunk)
+
 TSDL::TSDL_Chunk::TSDL_Chunk(Mix_Chunk* ptr): TSDL_Chunk(ptr, false) {}
 
 TSDL::TSDL_Chunk::TSDL_Chunk(Mix_Chunk* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}

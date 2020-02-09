@@ -6,19 +6,27 @@
 #include <map>
 #include <functional>
 #include <optional>
-#include "abstract/elements/Element.hpp"
+#include "TSDL/abstract/elements/Element.hpp"
 
 namespace TSDL
 {
     namespace elements
     {
-        using Subelement = std::pair<std::reference_wrapper<Element>, std::pair<point_2d, point_2d>>;
+        struct Subelement
+        {
+            Element* element = nullptr;
+            std::pair<point_2d, point_2d> dimension;
+
+            bool operator == (const Subelement& other);
+        };
+
         class ElementHolder: virtual public Element
         {
             private:
+            TSDL_Surface _surface;
             TSDL_Texture _rendered;
             std::vector <Subelement> _subelements_order;
-            std::map <std::reference_wrapper<Element>, Subelement> _subelements_info;
+            std::map <Element*, Subelement> _subelements_info;
 
             public:
             ElementHolder(TSDL_Renderer& renderer, const point_2d& size);

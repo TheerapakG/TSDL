@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include "TSDL_SDLmask.hpp"
+#include "TSDL_Macro.hpp"
 #include <string>
 
 #ifdef TSDL_EXPOSE_PYBIND11
@@ -31,6 +32,8 @@ namespace TSDL
         using SDL_Type = SDL_RWops;
 
         _PY_DECLARE_TYPEERASE_OWNER(Buffer)
+
+        TSDL_DECLARE_CONSTRUCT(Buffer)
 
         TSDL_Buffer(SDL_RWops* ptr);
         TSDL_Buffer(SDL_RWops* ptr, bool handle_destroy);

@@ -1,6 +1,8 @@
 #include "TSDL/TSDL_Music.hpp"
 #include "TSDL/TSDL_Utility.hpp"
 
+TSDL_DEFINE_CONSTRUCT(TSDL, Music)
+
 TSDL::TSDL_Music::TSDL_Music(Mix_Music* ptr): TSDL_Music(ptr, false) {}
 
 TSDL::TSDL_Music::TSDL_Music(Mix_Music* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}

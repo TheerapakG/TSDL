@@ -89,7 +89,6 @@ void TSDL::TSDL_Eventloop::_run_step()
             return;
         }
         #endif
-        
         h(e);
         return;
     }

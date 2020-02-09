@@ -1,4 +1,4 @@
-#include "abstract/elements/EventDispatcher.hpp"
+#include "TSDL/abstract/elements/EventDispatcher.hpp"
 
 TSDL::elements::EventDispatcher::EventDispatcher(TSDL_Renderer& renderer): 
     Element(renderer) {}
@@ -11,20 +11,20 @@ TSDL::elements::EventDispatcher::EventDispatcher(TSDL_Renderer& renderer, Listen
 
 void TSDL::elements::EventDispatcher::dispatch_event_direct(const TSDL::events::EventType& eventtype, Element& subelement)
 {
-    _event_listeners[eventtype].insert(std::reference_wrapper(subelement));
+    _event_listeners[eventtype].insert(&subelement);
 }
 
 void TSDL::elements::EventDispatcher::stop_dispatch_event_direct(const TSDL::events::EventType& eventtype, Element& subelement)
 {
-    _event_listeners[eventtype].erase(std::reference_wrapper(subelement));
+    _event_listeners[eventtype].erase(&subelement);
 }
 
 bool TSDL::elements::EventDispatcher::dispatch_event(const Caller& caller, const TSDL::events::EventType& eventtype, const SDL_Event& event)
 {
     const Caller _this_caller = Caller(*this, caller.second);
-    for(Element& subelement: _event_listeners[eventtype])
+    for(Element* subelement: _event_listeners[eventtype])
     {
-        if(subelement.dispatch_event(_this_caller, eventtype, event)) return true;
+        if(subelement->dispatch_event(_this_caller, eventtype, event)) return true;
     }
     return Element::dispatch_event(_this_caller, eventtype, event);
 }

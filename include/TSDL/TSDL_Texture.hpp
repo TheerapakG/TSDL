@@ -5,6 +5,7 @@
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Utility.hpp"
 #include "TSDL_Buffer.hpp"
+#include "TSDL_Macro.hpp"
 #include <string>
 
 namespace TSDL
@@ -42,17 +43,19 @@ namespace TSDL
     {
         private:
         SDL_Texture* _internal_ptr = nullptr;
+        bool _destroy;
 
         public:
         using SDL_Type = SDL_Texture;
 
         _PY_DECLARE_TYPEERASE_OWNER(Texture)
 
+        TSDL_DECLARE_CONSTRUCT(Texture)
+
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Texture(_SDL_Renderer& renderer, const point_2d& size, SDL_TextureAccess access);
         TSDL_Texture(_SDL_Renderer& renderer, _SDL_Surface surface);
         TSDL_Texture(_SDL_Renderer& renderer, const std::string& file);        
         TSDL_Texture(_SDL_Renderer& renderer, TSDL_Buffer& buffer);

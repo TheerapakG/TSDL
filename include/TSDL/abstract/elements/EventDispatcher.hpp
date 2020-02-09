@@ -4,15 +4,15 @@
 #include <set>
 #include <map>
 #include <functional>
-#include "TSDL_Utility.hpp"
-#include "abstract/elements/Element.hpp"
-#include "abstract/events/EventType.hpp"
+#include "TSDL/TSDL_Utility.hpp"
+#include "TSDL/abstract/elements/Element.hpp"
+#include "TSDL/abstract/events/EventType.hpp"
 
 namespace TSDL
 {
     namespace elements
     {
-        using ListenerMap = std::map <const TSDL::events::EventType, std::set<std::reference_wrapper<Element>>>;
+        using ListenerMap = std::map <const ::TSDL::events::EventType, std::set<Element*>>;
         class EventDispatcher: virtual public Element
         {
             private:
@@ -23,9 +23,9 @@ namespace TSDL
             EventDispatcher(TSDL_Renderer& renderer, const ListenerMap& listeners);
             EventDispatcher(TSDL_Renderer& renderer, ListenerMap&& listeners);
 
-            void dispatch_event_direct(const TSDL::events::EventType& eventtype, Element& subelement);
-            void stop_dispatch_event_direct(const TSDL::events::EventType& eventtype, Element& subelement);
-            virtual bool dispatch_event(const Caller& caller, const TSDL::events::EventType& eventtype, const SDL_Event& event) override;
+            void dispatch_event_direct(const ::TSDL::events::EventType& eventtype, Element& subelement);
+            void stop_dispatch_event_direct(const ::TSDL::events::EventType& eventtype, Element& subelement);
+            virtual bool dispatch_event(const Caller& caller, const ::TSDL::events::EventType& eventtype, const SDL_Event& event) override;
         };
     }
 }

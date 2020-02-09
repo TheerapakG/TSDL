@@ -7,6 +7,7 @@
 #include "TSDL_Utility.hpp"
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Buffer.hpp"
+#include "TSDL_Macro.hpp"
 #include <string>
 
 #ifdef TSDL_EXPOSE_PYBIND11
@@ -47,7 +48,9 @@ namespace TSDL
         public:
         using SDL_Type = SDL_Surface;
 
-        _PY_DECLARE_TYPEERASE_OWNER(Surface)
+        _PY_DECLARE_TYPEERASE_OWNER(Surface)        
+
+        TSDL_DECLARE_CONSTRUCT(Surface)
 
         TSDL_Surface(SDL_Surface* ptr);
         TSDL_Surface(SDL_Surface* ptr, bool handle_destroy);
