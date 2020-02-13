@@ -2,15 +2,15 @@
 #include "TSDL/TSDL_Meta.hpp"
 #include <algorithm>
 
-bool TSDL::elements::Subelement::operator==(const TSDL::elements::Subelement& other)
+bool ::TSDL::elements::Subelement::operator==(const ::TSDL::elements::Subelement& other)
 {
     return element == other.element && dimension == other.dimension;
 }
 
 TSDL::elements::ElementHolder::ElementHolder(TSDL_Renderer& renderer, const point_2d& size): 
-    Element(renderer), _surface(size.x, size.y), _rendered(static_cast<_SDL_Renderer>(renderer), _surface) {}
+    Element(renderer) {}
 
-void TSDL::elements::ElementHolder::add_child(Element&& subelement, const point_2d& topleft, const point_2d& bottomright)
+void TSDL::elements::ElementHolder::add_child(Element& subelement, const point_2d& topleft, const point_2d& bottomright)
 {
     std::pair el_loc(topleft, bottomright);
     Subelement el_all{&subelement, el_loc};
@@ -19,7 +19,7 @@ void TSDL::elements::ElementHolder::add_child(Element&& subelement, const point_
     _subelements_info[&subelement] = el_all;
 }
 
-void TSDL::elements::ElementHolder::add_child(Element&& subelement, const point_2d& topleft, const point_2d& bottomright, int order)
+void TSDL::elements::ElementHolder::add_child(Element& subelement, const point_2d& topleft, const point_2d& bottomright, int order)
 {
     std::pair el_loc(topleft, bottomright);
     Subelement el_all{&subelement, el_loc};
@@ -57,46 +57,40 @@ const std::vector<TSDL::elements::Subelement>& TSDL::elements::ElementHolder::ge
     return _subelements_order;
 }
 
-TSDL::elements::Subelement& TSDL::elements::ElementHolder::highest_child(const point_2d& point)
+std::optional<TSDL::elements::Subelement> TSDL::elements::ElementHolder::highest_child(const point_2d& point)
 {
-    for(Subelement& subelement: TSDL::reverse(_subelements_order))
+    for(Subelement& subelement: ::TSDL::reverse(_subelements_order))
     {
         auto& [topleft, bottomright] = subelement.dimension;
         if(topleft.x < point.x && point.x < bottomright.x &&
             topleft.y < point.y && point.y < bottomright.y) return subelement;
     }
+
+    return std::optional<::TSDL::elements::Subelement>();
 }
 
-void TSDL::elements::ElementHolder::render()
+bool TSDL::elements::ElementHolder::need_update() const
 {
-    for(Subelement& subelement: _subelements_order)
-    {
-        auto& [el_ptr, dim] = subelement;
-        auto el = el_ptr;
-        if (el->need_update())
-        {
-            el->render();
-            el->not_update();
-        }
-    }
+    return Element::need_update() ||
+        std::any_of(
+            _subelements_order.cbegin(), 
+            _subelements_order.cend(), 
+            [](const ::TSDL::elements::Subelement& subel){ return subel.element->need_update(); }
+        );
+}
 
-    auto& _renderer = renderer();
-    auto prev_target = _renderer.target();
-    _renderer.target(make_optional_ref<_SDL_Texture>(_rendered));
-    _renderer.clear(color_rgba(0xFF, 0xFF, 0xFF, 0xFF));
+void TSDL::elements::ElementHolder::render(const ::TSDL::point_2d& dist)
+{
+    ::TSDL::TSDL_Renderer& _renderer = renderer();
+
+    _renderer.clear({0xFF, 0xFF, 0xFF, 0xFF});
     for(Subelement& subelement: _subelements_order)
     {
-        auto& [el_ptr, dim] = subelement;
-        auto& el = *el_ptr;
-        _renderer.copy_from(el.get_texture(), make_optional_const_ref<TSDL::rect>(), make_optional_const_ref<TSDL::rect>(dim));
+        auto& [el_ptr, dim, sized] = subelement;
+        auto el = el_ptr;
+        el->render(dim.first);
     }
     _renderer.update();
 
-    if(prev_target) _renderer.target(prev_target.value());
-    else _renderer.target(make_optional_ref<_SDL_Texture>());
-}
-
-TSDL::TSDL_Texture& TSDL::elements::ElementHolder::get_texture()
-{
-    return _rendered;
+	not_update();
 }

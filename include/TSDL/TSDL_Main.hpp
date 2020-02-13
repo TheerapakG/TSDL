@@ -1,6 +1,8 @@
 #ifndef TSDL_MAIN_
 #define TSDL_MAIN_
 
+#include <SDL.h>
+
 #ifdef TSDL_EXPOSE_PYBIND11
 #define TSDL_TSDL TSDL
 #include "TSDL_PY_TypeErase.hpp"
@@ -18,6 +20,8 @@ namespace _PY
 
 namespace TSDL
 {
+    extern SDL_Event null_event;
+
     class TSDL
     {
         public:

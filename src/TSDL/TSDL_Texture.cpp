@@ -17,6 +17,17 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, TSDL::_SDL_Surfa
     _internal_ptr = _t_internal_ptr;
 }
 
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, const TSDL::point_2d& size, int access)
+{
+	SDL_Texture* _t_internal_ptr = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, access, size.x, size.y);
+	if (_t_internal_ptr == NULL)
+	{
+		TSDL::safe_throw<std::runtime_error>("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
+		return;
+	}
+	_internal_ptr = _t_internal_ptr;
+}
+
 TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, const std::string& file): 
     TSDL_Texture(renderer, TSDL::TSDL_Surface(file)) {}
 

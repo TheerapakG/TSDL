@@ -1,4 +1,3 @@
-#include <iostream>
 #include <optional>
 #include <functional>
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
@@ -14,13 +13,7 @@ namespace
         TSDL::elements::Element& src = adapter->src();
 
         if (!src.need_update()) return;
-        src.render();
-        src.not_update();
-        renderer.copy_from(
-            src.get_texture(), 
-            TSDL::make_optional_const_ref<TSDL::rect>(), 
-            TSDL::make_optional_const_ref<TSDL::rect>()
-        );
+        src.render({0, 0});
     }
 
     void _handle_window_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
@@ -165,7 +158,7 @@ namespace
 }
 
 TSDL::elements::EventloopAdapter::EventloopAdapter(TSDL_Renderer& renderer, TSDL_Eventloop& evloop, Element& src):
-    Element(renderer), EventDispatcher(renderer), _evloop(evloop), _src(src)
+    Element(renderer), eventdispatcher<Element>(renderer), _evloop(evloop), _src(src)
 {
     if(_evloop.render_function()) 
     {
@@ -208,14 +201,9 @@ TSDL::elements::EventloopAdapter::~EventloopAdapter()
     _evloop.remove_event_handler(SDL_MOUSEBUTTONUP);
 }
 
-void TSDL::elements::EventloopAdapter::render()
+void TSDL::elements::EventloopAdapter::render(const ::TSDL::point_2d& dist)
 {
-    _src.render();
-}
-
-TSDL::TSDL_Texture& TSDL::elements::EventloopAdapter::get_texture()
-{
-    return _src.get_texture();
+    _src.render({0, 0});
 }
 
 TSDL::elements::Element& TSDL::elements::EventloopAdapter::src() const

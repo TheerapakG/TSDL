@@ -20,7 +20,7 @@ void TSDL::elements::Element::update()
 
 void TSDL::elements::Element::not_update()
 {
-    _update = true;
+    _update = false;
 }
 
 bool TSDL::elements::Element::need_update() const

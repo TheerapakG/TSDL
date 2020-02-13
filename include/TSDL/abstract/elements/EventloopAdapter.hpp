@@ -15,7 +15,7 @@ namespace TSDL
 {
     namespace elements
     {
-        class EventloopAdapter: public EventDispatcher
+        class EventloopAdapter: public eventdispatcher<Element>
         {
             private:
             TSDL_Eventloop& _evloop;
@@ -31,12 +31,7 @@ namespace TSDL
             /*
             Re-render this element
             */
-            virtual void render() override;
-
-            /*
-            Get previously rendered texture
-            */
-            virtual TSDL_Texture& get_texture() override;
+            virtual void render(const ::TSDL::point_2d& dist) override;
 
             Element& src() const;
         };

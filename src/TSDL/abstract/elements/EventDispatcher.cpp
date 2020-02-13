@@ -26,5 +26,5 @@ bool TSDL::elements::EventDispatcher::dispatch_event(const Caller& caller, const
     {
         if(subelement->dispatch_event(_this_caller, eventtype, event)) return true;
     }
-    return Element::dispatch_event(_this_caller, eventtype, event);
+    return false;
 }
