@@ -1,11 +1,15 @@
 #include "TSDL/TSDL_Main.hpp"
 #include "TSDL/TSDL_Utility.hpp"
-#include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
 #include <string>
 #include <stdexcept>
 #include <iostream>
+
+namespace TSDL
+{
+	SDL_Event null_event;
+}
 
 TSDL::TSDL::TSDL(): TSDL::TSDL(44100) {}
 
@@ -20,32 +24,47 @@ TSDL::TSDL::TSDL(int frequency)
     }
     else
     {
-        std::cout << "initializing SDL_Image..." << std::endl;
-        int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
-        if( !( IMG_Init( imgFlags ) & imgFlags ) )
+        Uint32 userEventType = SDL_RegisterEvents(1);
+        if (userEventType == ((Uint32)-1))
         {
-            std::string e = IMG_GetError();
-            IMG_Quit();
             SDL_Quit();
-            safe_throw<std::runtime_error>("SDL_image could not initialize! SDL_image Error: " + e);
+            safe_throw<std::runtime_error>("TSDL Error: could not register null event");
         }
         else
         {
-            std::cout << "initializing SDL_mixer..." << std::endl;
-            if( Mix_OpenAudio( frequency, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0)
+            SDL_zero(null_event); /* or SDL_zero(event) */
+            null_event.type = userEventType;
+            null_event.user.code = 0;
+            null_event.user.data1 = 0;
+            null_event.user.data2 = 0;
+
+            std::cout << "initializing SDL_Image..." << std::endl;
+            int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
+            if( !( IMG_Init( imgFlags ) & imgFlags ) )
             {
-                std::string e = Mix_GetError();
-                Mix_Quit();
+                std::string e = IMG_GetError();
                 IMG_Quit();
                 SDL_Quit();
-                safe_throw<std::runtime_error>("SDL_mixer could not initialize! SDL_mixer Error: " + e);
+                safe_throw<std::runtime_error>("SDL_image could not initialize! SDL_image Error: " + e);
             }
             else
             {
-                #ifndef __cpp_exceptions
-                constructed = true;
-                #endif
-                return;
+                std::cout << "initializing SDL_mixer..." << std::endl;
+                if( Mix_OpenAudio( frequency, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0)
+                {
+                    std::string e = Mix_GetError();
+                    Mix_Quit();
+                    IMG_Quit();
+                    SDL_Quit();
+                    safe_throw<std::runtime_error>("SDL_mixer could not initialize! SDL_mixer Error: " + e);
+                }
+                else
+                {
+                    #ifndef __cpp_exceptions
+                    constructed = true;
+                    #endif
+                    return;
+                }
             }
         }
     }

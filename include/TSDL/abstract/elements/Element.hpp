@@ -15,14 +15,14 @@ namespace TSDL
     {
         class Element;
 
-        using Caller = std::pair<std::reference_wrapper<Element>, point_2d>;
+        using Caller = std::pair<std::reference_wrapper<::TSDL::elements::Element>, point_2d>;
         using EventHandler = std::function<bool(const Caller&, const SDL_Event&)>;
         
         class Element
         {
             private:
             TSDL_Renderer& _renderer;
-            std::atomic<bool> _update = false;
+            std::atomic<bool> _update = true;
             std::map <::TSDL::events::EventType, EventHandler> _evhdlrmap;
             
             public:
@@ -49,17 +49,12 @@ namespace TSDL
             /*
             Query if parent need to update this element on the next cycle
             */
-            bool need_update() const;
+            virtual bool need_update() const;
 
             /*
             Re-render this element
             */
-            virtual void render() = 0;
-
-            /*
-            Get previously rendered texture
-            */
-            virtual TSDL_Texture& get_texture() = 0;
+            virtual void render(const ::TSDL::point_2d& dist) = 0;
 
             virtual bool dispatch_event(const Caller& caller, const ::TSDL::events::EventType& eventtype, const SDL_Event& event);            
             void add_event_handler(const ::TSDL::events::EventType& eventtype, const EventHandler& evhandler);

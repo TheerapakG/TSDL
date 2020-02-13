@@ -174,7 +174,22 @@ int TSDL::TSDL_Renderer::fill_rect(const rect& rect)
 
 int TSDL::TSDL_Renderer::fill_rect(int x, int y, int w, int h)
 {
-    return this->fill_rect(rect(x, y, w, h));
+    return fill_rect(rect(x, y, w, h));
+}
+
+int TSDL::TSDL_Renderer::fill_rect(const ::TSDL::color_rgba& c, const ::TSDL::rect& rect)
+{
+    color_rgba prev_col = render_color();
+    render_color(c); // TODO: check when noexcept signify error
+    int _t = fill_rect(rect);
+    if(_t != 0) return _t;
+    render_color(prev_col); // TODO: check when noexcept signify error
+	return _t;
+}
+
+int TSDL::TSDL_Renderer::fill_rect(const ::TSDL::color_rgba& c, int x, int y, int w, int h)
+{
+    return fill_rect(c, rect(x, y, w, h));
 }
 
 int TSDL::TSDL_Renderer::draw_rect(const rect& rect)

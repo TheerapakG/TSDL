@@ -77,6 +77,9 @@ namespace TSDL
         int fill_rect(const rect& rect);
         int fill_rect(int x, int y, int w, int h);
 
+        int fill_rect(const color_rgba& c, const rect& rect);
+        int fill_rect(const color_rgba& c, int x, int y, int w, int h);
+
         int draw_rect(const rect& rect);
         int draw_rect(int x, int y, int w, int h);
 

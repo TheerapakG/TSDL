@@ -24,11 +24,19 @@ namespace TSDL
             MouseOut,
             LeftDown,
             LeftUp,
+            LeftUp_Inside, // LeftDown originated in this element and LeftUp originated in this element
+            LeftUp_Outside, // LeftDown originated in this element but LeftUp not originated in this element
             RightDown,
             RightUp,
+            RightUp_Inside, // Like Left*
+            RightUp_Outside, // Like Left*
             MiddleDown,
-            MiddleUp,
-            MouseWheel
+            MiddleUp,            
+            MiddleUp_Inside, // Like Left*
+            MiddleUp_Outside, // Like Left*
+            MouseWheel,
+            ElementResized,
+            ButtonActivated
         };
     }
 }
