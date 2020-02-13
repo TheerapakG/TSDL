@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
         TSDL::TSDL_Renderer renderer(window, SDL_RENDERER_TARGETTEXTURE);
         TSDL::elements::Grid grid(renderer, {SCREEN_WIDTH, SCREEN_HEIGHT});
         TSDL::elements::Button button(renderer, {256, 64});
-		grid.add_child(button, {64, 64});
+        grid.add_child(button, {64, 64});
         TSDL::elements::EventloopAdapter elementAdapter(renderer, eventloop, grid);
 
         eventloop.add_event_handler(SDL_QUIT, quit_handler);

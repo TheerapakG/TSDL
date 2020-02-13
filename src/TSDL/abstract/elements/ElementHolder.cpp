@@ -92,5 +92,5 @@ void TSDL::elements::ElementHolder::render(const ::TSDL::point_2d& dist)
     }
     _renderer.update();
 
-	not_update();
+    not_update();
 }

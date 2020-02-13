@@ -7,7 +7,7 @@ namespace
 }
 
 TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size):
-	Element(_renderer),
+    Element(_renderer),
     sized<eventdispatcher<Element>>(_size, std::ref(_renderer))
 {
     Element::add_event_handler(
@@ -69,7 +69,7 @@ TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size):
 }
 
 TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const ListenerMap& listeners, const point_2d& _size):
-	Element(_renderer),
+    Element(_renderer),
     sized<eventdispatcher<Element>>(_size, std::ref(_renderer), listeners)
 {
     Element::add_event_handler(
@@ -94,7 +94,7 @@ TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const ListenerMap& list
 }
 
 TSDL::elements::Button::Button(TSDL_Renderer& _renderer, ListenerMap&& listeners, const point_2d& _size):
-	Element(_renderer),
+    Element(_renderer),
     sized<eventdispatcher<Element>>(_size, std::ref(_renderer), listeners)
 {
     Element::add_event_handler(
@@ -196,5 +196,5 @@ void TSDL::elements::Button::render(const ::TSDL::point_2d& dist)
     }
     // TODO: text
 
-	not_update();
+    not_update();
 }
