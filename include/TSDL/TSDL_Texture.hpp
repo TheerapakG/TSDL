@@ -57,7 +57,7 @@ namespace TSDL
         if the object creation resulted in an error or not
         */
         TSDL_Texture(_SDL_Renderer& renderer, _SDL_Surface surface);
-		TSDL_Texture(_SDL_Renderer& renderer, const point_2d& size, int access = SDL_TEXTUREACCESS_TARGET);
+        TSDL_Texture(_SDL_Renderer& renderer, const point_2d& size, int access = SDL_TEXTUREACCESS_TARGET);
         TSDL_Texture(_SDL_Renderer& renderer, const std::string& file);        
         TSDL_Texture(_SDL_Renderer& renderer, TSDL_Buffer& buffer);
         TSDL_Texture(_SDL_Renderer& renderer, const void* mem, size_t size);

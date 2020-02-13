@@ -8,7 +8,7 @@
 
 namespace TSDL
 {
-	SDL_Event null_event;
+    SDL_Event null_event;
 }
 
 TSDL::TSDL::TSDL(): TSDL::TSDL(44100) {}
