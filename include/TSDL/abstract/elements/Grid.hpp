@@ -20,8 +20,8 @@ namespace TSDL
             std::optional <Subelement> _left_origin, _right_origin, _middle_origin;
 
             public:
-            Grid(TSDL_Renderer& renderer, const point_2d& size); 
-            Grid(TSDL_Renderer& renderer, const point_2d& size, const ListenerMap& listeners);
+            Grid(TSDL_Renderer& renderer); 
+            Grid(TSDL_Renderer& renderer, const ListenerMap& listeners);
 
             using ElementHolder::need_update;
             using ElementHolder::render;

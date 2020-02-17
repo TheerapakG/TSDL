@@ -7,7 +7,7 @@ bool ::TSDL::elements::Subelement::operator==(const ::TSDL::elements::Subelement
     return element == other.element && dimension == other.dimension;
 }
 
-TSDL::elements::ElementHolder::ElementHolder(TSDL_Renderer& renderer, const point_2d& size): 
+TSDL::elements::ElementHolder::ElementHolder(TSDL_Renderer& renderer): 
     Element(renderer) {}
 
 void TSDL::elements::ElementHolder::add_child(Element& subelement, const point_2d& topleft, const point_2d& bottomright)
@@ -17,6 +17,8 @@ void TSDL::elements::ElementHolder::add_child(Element& subelement, const point_2
 
     _subelements_order.push_back(el_all);
     _subelements_info[&subelement] = el_all;
+
+    update();
 }
 
 void TSDL::elements::ElementHolder::add_child(Element& subelement, const point_2d& topleft, const point_2d& bottomright, int order)
@@ -27,6 +29,8 @@ void TSDL::elements::ElementHolder::add_child(Element& subelement, const point_2
     auto it = _subelements_order.begin();
     _subelements_order.insert(it + order, el_all);
     _subelements_info[&subelement] = el_all;
+
+    update();
 }
 
 void TSDL::elements::ElementHolder::reorder_child(Element&& subelement, int order)
@@ -35,6 +39,8 @@ void TSDL::elements::ElementHolder::reorder_child(Element&& subelement, int orde
         std::find(_subelements_order.begin(), _subelements_order.end(), _subelements_info[&subelement]),
         _subelements_order.begin() + order
     );
+
+    update();
 }
 
 void TSDL::elements::ElementHolder::move_child(Element&& subelement, const point_2d& destination)
@@ -42,6 +48,8 @@ void TSDL::elements::ElementHolder::move_child(Element&& subelement, const point
     auto el = std::find(_subelements_order.begin(), _subelements_order.end(), _subelements_info[&subelement]);
     el->dimension = {destination, el->dimension.second + destination - el->dimension.first};
     _subelements_info[&subelement].dimension = el->dimension;
+
+    update();
 }
 
 void TSDL::elements::ElementHolder::remove_child(Element&& subelement)
@@ -50,6 +58,8 @@ void TSDL::elements::ElementHolder::remove_child(Element&& subelement)
     _subelements_order.erase(
         std::find(_subelements_order.begin(), _subelements_order.end(), el_all_node.mapped())
     );
+
+    update();
 }
 
 const std::vector<TSDL::elements::Subelement>& TSDL::elements::ElementHolder::get_child_order()

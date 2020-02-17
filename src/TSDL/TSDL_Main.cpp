@@ -2,6 +2,7 @@
 #include "TSDL/TSDL_Utility.hpp"
 #include <SDL_image.h>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 #include <string>
 #include <stdexcept>
 #include <iostream>
@@ -38,7 +39,7 @@ TSDL::TSDL::TSDL(int frequency)
             null_event.user.data1 = 0;
             null_event.user.data2 = 0;
 
-            std::cout << "initializing SDL_Image..." << std::endl;
+            std::cout << "initializing SDL_image..." << std::endl;
             int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
             if( !( IMG_Init( imgFlags ) & imgFlags ) )
             {
@@ -60,10 +61,23 @@ TSDL::TSDL::TSDL(int frequency)
                 }
                 else
                 {
-                    #ifndef __cpp_exceptions
-                    constructed = true;
-                    #endif
-                    return;
+                    std::cout << "initializing SDL_ttf..." << std::endl;
+                    if(TTF_Init() != 0)
+                    {
+                        std::string e = TTF_GetError();
+                        TTF_Quit();
+                        Mix_Quit();
+                        IMG_Quit();
+                        SDL_Quit();
+                        safe_throw<std::runtime_error>("SDL_ttf could not initialize! SDL_ttf Error: " + e);
+                    }
+                    else
+                    {
+                        #ifndef __cpp_exceptions
+                        constructed = true;
+                        #endif
+                        return;
+                    }
                 }
             }
         }
@@ -72,6 +86,7 @@ TSDL::TSDL::TSDL(int frequency)
 
 TSDL::TSDL::~TSDL()
 {
+    TTF_Quit();
     Mix_Quit();
     IMG_Quit();
     SDL_Quit();

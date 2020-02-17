@@ -6,6 +6,7 @@
 #include <atomic>
 #include <chrono>
 #include <typeinfo>
+#include <filesystem>
 using namespace std::literals::chrono_literals;
 
 //Screen dimension constants
@@ -46,8 +47,33 @@ int main(int argc, char* argv[])
         TSDL::TSDL_Window window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         
         TSDL::TSDL_Renderer renderer(window, SDL_RENDERER_TARGETTEXTURE);
-        TSDL::elements::Grid grid(renderer, {SCREEN_WIDTH, SCREEN_HEIGHT});
+        TSDL::elements::Grid grid(renderer);
         TSDL::elements::Button button(renderer, {256, 64});
+
+        // TODO: TSDL_Font/ HarfBuzz
+        TTF_Font* font = TTF_OpenFont((std::filesystem::current_path()/"fonts/segoeui.ttf").string().c_str(), 36);
+        if(font == NULL)
+        {
+            std::cerr << TTF_GetError();
+            return -1;
+        }
+
+        TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface("Button", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+
+        TSDL::elements::TextureElement buttontextelement(
+            renderer, 
+            buttontext->size(),
+            std::shared_ptr <TSDL::TSDL_Texture> ( 
+                new TSDL::TSDL_Texture(
+                    static_cast<TSDL::_SDL_Renderer>(renderer),
+                    static_cast<TSDL::_SDL_Surface>(*buttontext)
+                )
+            )
+        );
+
+        delete buttontext;
+
+        button.texture(buttontextelement);
         grid.add_child(button, {64, 64});
         TSDL::elements::EventloopAdapter elementAdapter(renderer, eventloop, grid);
 

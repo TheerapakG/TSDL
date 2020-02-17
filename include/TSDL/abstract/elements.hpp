@@ -5,3 +5,4 @@
 #include "elements/EventloopAdapter.hpp"
 #include "elements/Grid.hpp"
 #include "elements/Sized.hpp"
+#include "elements/TextureElement.hpp"

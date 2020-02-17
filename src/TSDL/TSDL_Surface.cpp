@@ -160,6 +160,11 @@ const SDL_PixelFormat* TSDL::TSDL_Surface::format() const
     return _internal_ptr->format;
 }
 
+::TSDL::point_2d TSDL::TSDL_Surface::size() const
+{
+    return {_internal_ptr->w, _internal_ptr->h};
+}
+
 int TSDL::TSDL_Surface::copy_from(_SDL_Surface src, const rect& srcrect, rect& dstrect)
 {
     int _t = SDL_BlitSurface(src, &srcrect, _internal_ptr, &dstrect);

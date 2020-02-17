@@ -20,6 +20,7 @@ namespace TSDL
         
         class Element
         {
+            // TODO: after_render queue for setting element as re-rendered callback and also other callback
             private:
             TSDL_Renderer& _renderer;
             std::atomic<bool> _update = true;
