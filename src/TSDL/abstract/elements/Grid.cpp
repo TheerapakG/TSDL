@@ -1,10 +1,10 @@
 #include "TSDL/abstract/elements/Grid.hpp"
 #include "TSDL/TSDL_Meta.hpp"
 
-TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const point_2d& size): Grid(renderer, size, ListenerMap()) {}
+TSDL::elements::Grid::Grid(TSDL_Renderer& renderer): Grid(renderer, ListenerMap()) {}
 
-TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const point_2d& size , const ListenerMap& listeners): 
-    Element(renderer), ElementHolder(renderer, size), eventdispatcher<Element>(renderer, listeners)
+TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners): 
+    Element(renderer), ElementHolder(renderer), eventdispatcher<Element>(renderer, listeners)
 {
     Element::add_event_handler(
         ::TSDL::events::EventType::MouseMotion, 

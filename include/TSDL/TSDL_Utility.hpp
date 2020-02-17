@@ -65,6 +65,9 @@ namespace TSDL
         point_2d operator-() const;
         point_2d operator-(const point_2d& other) const;
 
+        point_2d operator*(const int other) const;
+        point_2d operator/(const int other) const;
+
         point_2d& operator+=(const point_2d& other);
         point_2d& operator-=(const point_2d& other);
 
@@ -113,5 +116,7 @@ namespace TSDL
 }
 
 bool operator==(const TSDL::point_2d& lhs, const TSDL::point_2d& rhs);
+
+TSDL::point_2d operator*(const int lhs, const TSDL::point_2d& rhs);
 
 #endif

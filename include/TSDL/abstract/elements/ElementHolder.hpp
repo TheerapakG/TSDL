@@ -30,7 +30,7 @@ namespace TSDL
             std::map <Element*, Subelement> _subelements_info;
 
             public:
-            ElementHolder(TSDL_Renderer& renderer, const point_2d& size);
+            ElementHolder(TSDL_Renderer& renderer);
 
             void add_child(Element& subelement, const point_2d& topleft, const point_2d& bottomright);
             void add_child(Element& subelement, const point_2d& topleft, const point_2d& bottomright, int order);

@@ -34,30 +34,45 @@ TSDL::point_2d TSDL::point_2d::operator+() const
 
 TSDL::point_2d TSDL::point_2d::operator+(const point_2d& other) const
 {
-    return TSDL::point_2d(this->x + other.x, this->y + other.y);
+    return TSDL::point_2d(x + other.x, y + other.y);
 }
 
 TSDL::point_2d TSDL::point_2d::operator-() const
 {
-    return TSDL::point_2d(-(this->x), -(this->y));
+    return TSDL::point_2d(-x, -y);
 }
 
 TSDL::point_2d TSDL::point_2d::operator-(const point_2d& other) const
 {
-    return TSDL::point_2d(this->x + other.x, this->y + other.y);
+    return TSDL::point_2d(x - other.x, y - other.y);
+}
+
+TSDL::point_2d TSDL::point_2d::operator*(const int other) const
+{
+    return TSDL::point_2d(x * other, y * other);
+}
+
+TSDL::point_2d operator*(const int lhs, const TSDL::point_2d& rhs)
+{
+    return TSDL::point_2d(lhs * rhs.x, lhs * rhs.y);
+}
+
+TSDL::point_2d TSDL::point_2d::operator/(const int other) const
+{
+    return TSDL::point_2d(x / other, y / other);
 }
 
 TSDL::point_2d& TSDL::point_2d::operator+=(const point_2d& other)
 {
-    this->x += other.x;
-    this->y += other.y;
+    x += other.x;
+    y += other.y;
     return *this;
 }
 
 TSDL::point_2d& TSDL::point_2d::operator-=(const point_2d& other)
 {
-    this->x -= other.x;
-    this->y -= other.y;
+    x -= other.x;
+    y -= other.y;
     return *this;
 }
 

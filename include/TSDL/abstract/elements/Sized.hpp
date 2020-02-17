@@ -18,7 +18,7 @@ namespace TSDL
             Sized(const point_2d& size);
 
             virtual void size(const point_2d& size);
-            const point_2d& size();
+            const point_2d& size() const;
         };
 
         template <class T>
@@ -26,7 +26,7 @@ namespace TSDL
         {
             public:
             template <typename ...Args>
-            sized(const point_2d& size, Args... args): T(args...), Sized(size) {}
+            sized(TSDL_Renderer& renderer, const point_2d& size, Args... args): T(renderer, args...), Sized(size) {}
 
             using Sized::size;
 

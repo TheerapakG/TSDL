@@ -6,7 +6,7 @@ void TSDL::elements::Sized::size(const point_2d& size)
 {
     _size = size;
 }
-const TSDL::point_2d& TSDL::elements::Sized::size()
+const TSDL::point_2d& TSDL::elements::Sized::size() const
 {
     return _size;
 }

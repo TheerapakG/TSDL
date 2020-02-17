@@ -1,6 +1,9 @@
 #include "TSDL/abstract/elements/Button.hpp"
 #include "TSDL/TSDL_Meta.hpp"
 
+#include <algorithm>
+#include <cmath>
+
 namespace
 {
     using namespace ::TSDL::events;
@@ -8,7 +11,7 @@ namespace
 
 TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size):
     Element(_renderer),
-    sized<eventdispatcher<Element>>(_size, std::ref(_renderer))
+    sized<eventdispatcher<Element>>(std::ref(_renderer), _size)
 {
     Element::add_event_handler(
         EventType::MouseIn,
@@ -68,9 +71,9 @@ TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size):
     );
 }
 
-TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const ListenerMap& listeners, const point_2d& _size):
+TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, const ListenerMap& listeners):
     Element(_renderer),
-    sized<eventdispatcher<Element>>(_size, std::ref(_renderer), listeners)
+    sized<eventdispatcher<Element>>(std::ref(_renderer), _size, listeners)
 {
     Element::add_event_handler(
         EventType::MouseIn,
@@ -93,9 +96,9 @@ TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const ListenerMap& list
     );
 }
 
-TSDL::elements::Button::Button(TSDL_Renderer& _renderer, ListenerMap&& listeners, const point_2d& _size):
+TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, ListenerMap&& listeners):
     Element(_renderer),
-    sized<eventdispatcher<Element>>(_size, std::ref(_renderer), listeners)
+    sized<eventdispatcher<Element>>(std::ref(_renderer), _size, listeners)
 {
     Element::add_event_handler(
         EventType::MouseIn,
@@ -142,9 +145,9 @@ TSDL::elements::Button& TSDL::elements::Button::text_color(const ::TSDL::color_r
     return *this;
 }
 
-TSDL::elements::Button& TSDL::elements::Button::text(const std::string& text)
+TSDL::elements::Button& TSDL::elements::Button::texture(optional_reference<TextureElement> texture)
 {
-    _text = text;
+    _texture = texture;
     return *this;
 }
 
@@ -168,9 +171,9 @@ TSDL::color_rgba TSDL::elements::Button::text_color()
     return _text_color;
 }
 
-std::string TSDL::elements::Button::text()
+TSDL::elements::TextureElement& TSDL::elements::Button::texture()
 {
-    return _text;
+    return _texture.value();
 }
 
 void TSDL::elements::Button::render(const ::TSDL::point_2d& dist)
@@ -194,7 +197,21 @@ void TSDL::elements::Button::render(const ::TSDL::point_2d& dist)
     default:
         break;
     }
-    // TODO: text
+
+    if(_texture)
+    {
+        TextureElement& _telement = _texture.value().get();
+        const ::TSDL::point_2d texture_final_size = size() - 2 * ::TSDL::point_2d(_padding, _padding);
+        const ::TSDL::point_2d texture_size = _telement.size();
+        double x_ratio = static_cast<double>(texture_final_size.x) / texture_size.x;
+        double y_ratio = static_cast<double>(texture_final_size.y) / texture_size.y;
+        double ratio = std::min(x_ratio, y_ratio);
+        const ::TSDL::point_2d render_size(std::round(ratio * texture_size.x), std::round(ratio * texture_size.y));
+        if(ratio>0)
+        {
+            _telement.render(dist + (size() - render_size)/2, render_size);
+        }
+    }
 
     not_update();
 }

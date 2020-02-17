@@ -109,6 +109,8 @@ namespace TSDL
         */
         const SDL_PixelFormat* format() const;
 
+        point_2d size() const;
+
         /*
         Use this function to perform a fast surface copy to a destination surface.
 

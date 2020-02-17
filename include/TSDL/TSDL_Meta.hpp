@@ -169,6 +169,9 @@ namespace TSDL
     reversion_wrapper<T> reverse (T&& iterable) { return { iterable }; }
 
     template <typename T>
+    using optional_reference = std::optional<std::reference_wrapper<T>>;
+
+    template <typename T>
     std::optional<std::reference_wrapper<T>> make_optional_ref(T&& ref)
     {
         return ref;
