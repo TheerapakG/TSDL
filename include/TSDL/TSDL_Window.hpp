@@ -1,7 +1,7 @@
 #ifndef TSDL_WINDOW_
 #define TSDL_WINDOW_
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Surface.hpp"
 #include "TSDL_Display.hpp"

@@ -1,7 +1,7 @@
 #ifndef TSDL_BUFFER_
 #define TSDL_BUFFER_
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Macro.hpp"
 #include <string>

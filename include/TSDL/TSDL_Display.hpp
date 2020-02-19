@@ -1,7 +1,7 @@
 #ifndef TSDL_DISPLAY_
 #define TSDL_DISPLAY_
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "TSDL_Utility.hpp"
 
 namespace TSDL

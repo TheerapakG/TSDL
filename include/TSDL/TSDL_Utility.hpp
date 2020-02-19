@@ -1,7 +1,7 @@
 #ifndef TSDL_UTILITY_
 #define TSDL_UTILITY_
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <functional>
 #include <tuple>
 #include <stdexcept>
