@@ -1,8 +1,8 @@
 #include "TSDL/TSDL_Texture.hpp"
 #include "TSDL/TSDL_Utility.hpp"
 #include "TSDL/TSDL_Surface.hpp"
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 TSDL_DEFINE_CONSTRUCT(TSDL, Texture)
 

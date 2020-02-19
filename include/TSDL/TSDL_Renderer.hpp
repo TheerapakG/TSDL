@@ -7,7 +7,7 @@ namespace TSDL
 }
 
 #include <optional>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "TSDL_Utility.hpp"
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Macro.hpp"

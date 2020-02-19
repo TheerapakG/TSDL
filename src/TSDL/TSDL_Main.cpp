@@ -1,8 +1,8 @@
 #include "TSDL/TSDL_Main.hpp"
 #include "TSDL/TSDL_Utility.hpp"
-#include <SDL_image.h>
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 #include <string>
 #include <stdexcept>
 #include <iostream>

@@ -1,7 +1,7 @@
 #ifndef TSDL_MAIN_
 #define TSDL_MAIN_
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #ifdef TSDL_EXPOSE_PYBIND11
 #define TSDL_TSDL TSDL

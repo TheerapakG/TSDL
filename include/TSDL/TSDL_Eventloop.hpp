@@ -1,7 +1,7 @@
 #ifndef TSDL_EVENTLOOP_
 #define TSDL_EVENTLOOP_
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <map>
 #include <chrono>
 #include <atomic>

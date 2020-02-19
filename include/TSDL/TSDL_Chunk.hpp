@@ -1,8 +1,8 @@
 #ifndef TSDL_CHUNK_
 #define TSDL_CHUNK_
 
-#include <SDL.h>
-#include <SDL_mixer.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Macro.hpp"
 #include "TSDL_Buffer.hpp"

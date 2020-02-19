@@ -1,7 +1,7 @@
 #ifndef TSDL_KEYBOARDSTATE_
 #define TSDL_KEYBOARDSTATE_
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 namespace TSDL
 {

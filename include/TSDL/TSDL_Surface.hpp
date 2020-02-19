@@ -1,9 +1,9 @@
 #ifndef TSDL_SURFACE_
 #define TSDL_SURFACE_
 
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include "TSDL_Utility.hpp"
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Buffer.hpp"

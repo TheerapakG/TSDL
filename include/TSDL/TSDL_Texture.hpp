@@ -1,7 +1,7 @@
 #ifndef TSDL_TEXTURE_
 #define TSDL_TEXTURE_
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "TSDL_SDLmask.hpp"
 #include "TSDL_Utility.hpp"
 #include "TSDL_Buffer.hpp"
