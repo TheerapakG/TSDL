@@ -89,8 +89,6 @@ void TSDL::TSDL_Window::window_position(const TSDL_Display& display, int x, int 
     SDL_SetWindowPosition(_internal_ptr, x, y);
 }
 
-_TSDL_EXPAND_DECLARE_MASK_TYPE(TSDL, Window)
-
 #ifdef TSDL_EXPOSE_PYBIND11
 
 _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Window)
@@ -105,8 +103,6 @@ void _tsdl_window_py(const py::module& m)
     py::class_<TSDL::TSDL_Window>(m, "_Window")
         .def("window_surface_object", &TSDL::TSDL_Window::window_surface_object)
         .def("update_window_surface", &TSDL::TSDL_Window::update_window_surface);
-    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Window)>(m, "_SDL_Window");
-    py::implicitly_convertible<TSDL::TSDL_Window, TSDL::_TSDL_GET_MASK_TYPE(Window)>();
 }
 
 #endif

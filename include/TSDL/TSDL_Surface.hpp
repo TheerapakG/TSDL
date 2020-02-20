@@ -5,7 +5,6 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include "TSDL_Utility.hpp"
-#include "TSDL_SDLmask.hpp"
 #include "TSDL_Buffer.hpp"
 #include "TSDL_Macro.hpp"
 #include <string>
@@ -27,15 +26,14 @@ namespace _PY
 
 namespace TSDL
 {
-    class _TSDL_GET_MASK_TYPE(Surface);
-    using _SDL_Surface = _TSDL_GET_MASK_TYPE(Surface);
-
     enum class TTF_Rendermethod
     {
         Solid,
         Shaded,
         Blended,
     };
+
+    class TSDL_Font;
 
     class TSDL_Surface
     {
@@ -76,29 +74,29 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, TTF_Rendermethod m);
-        TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgb& c, TTF_Rendermethod m);
+        TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, TTF_Rendermethod m);
+        TSDL_Surface(const std::string& text, TSDL_Font& font, const color_rgb& c, TTF_Rendermethod m);
 
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TTF_Rendermethod m);
-        TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgba& c, TTF_Rendermethod m);
+        TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TTF_Rendermethod m);
+        TSDL_Surface(const std::string& text, TSDL_Font& font, const color_rgba& c, TTF_Rendermethod m);
 
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb);
-        TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgb& fc, const color_rgb& bc);
+        TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb);
+        TSDL_Surface(const std::string& text, TSDL_Font& font, const color_rgb& fc, const color_rgb& bc);
 
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba);
-        TSDL_Surface(const std::string& text, TTF_Font* font, const color_rgba& fc, const color_rgba& bc);
+        TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba);
+        TSDL_Surface(const std::string& text, TSDL_Font& font, const color_rgba& fc, const color_rgba& bc);
 
         ~TSDL_Surface();
 
@@ -119,12 +117,12 @@ namespace TSDL
         Only the position is used in the dstrect (the width and height are ignored).
         Blits with negative dstrect coordinates will be clipped properly.
         */
-        int copy_from(_SDL_Surface src, const rect& srcrect, rect& dstrect);
+        int copy_from(TSDL_Surface& src, const rect& srcrect, rect& dstrect);
 
         /*
         Use this function to perform a scaled surface copy to a destination surface.
         */
-        int scale_from(_SDL_Surface src, const rect& srcrect, rect& dstrect);
+        int scale_from(TSDL_Surface& src, const rect& srcrect, rect& dstrect);
 
         int fill(Uint32 color);
         int fill_rect(const rect& rect, Uint32 color);
@@ -151,8 +149,6 @@ namespace TSDL
 
         void convert_surface(SDL_PixelFormat* fmt, Uint32 flags);
     };
-
-    _TSDL_EXPAND_DEFINE_MASK_TYPE(Surface)
 }
 
 #ifdef TSDL_EXPOSE_PYBIND11

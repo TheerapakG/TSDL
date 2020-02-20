@@ -48,6 +48,29 @@ namespace TSDL
     std::exception& get_exc();
 #endif
 
+    template <typename T>
+    T or_enum(T _self, T _other)
+    {
+        return static_cast<T>(_self|_other);
+    }
+
+    template <typename T>
+    T and_enum(T _self, T _other)
+    {
+        return static_cast<T>(_self&_other);
+    }
+
+    enum class Orientation
+    {
+        HORIZONTAL = 0b1,
+        X = 0b1,
+        VERTICAL = 0b10,
+        Y = 0b10
+    };
+
+    Orientation operator|(Orientation lhs, Orientation rhs);
+    Orientation operator&(Orientation lhs, Orientation rhs);
+
     template <typename ...Ts>
     using tuple = std::tuple<Ts...>;
 

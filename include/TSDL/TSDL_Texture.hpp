@@ -2,7 +2,6 @@
 #define TSDL_TEXTURE_
 
 #include <SDL2/SDL.h>
-#include "TSDL_SDLmask.hpp"
 #include "TSDL_Utility.hpp"
 #include "TSDL_Buffer.hpp"
 #include "TSDL_Macro.hpp"
@@ -10,11 +9,9 @@
 
 namespace TSDL
 {
-    class _TSDL_GET_MASK_TYPE(Surface);
-    using _SDL_Surface = _TSDL_GET_MASK_TYPE(Surface);
+    class TSDL_Surface;
 
-    class _TSDL_GET_MASK_TYPE(Renderer);
-    using _SDL_Renderer = _TSDL_GET_MASK_TYPE(Renderer);
+    class TSDL_Renderer;
 
     class TSDL_Texture;
 }
@@ -25,12 +22,12 @@ namespace _PY
 {
     _PY_EXPAND_DECLARE_CONTEXTMANAGER(Texture)
     _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Texture)
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface>, 
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, const std::string>, 
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::TSDL_Buffer>, 
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface, Uint8, Uint8, Uint8>,
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, const std::string, Uint8, Uint8, Uint8>, 
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::_SDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Surface>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, const std::string>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Buffer>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Surface, Uint8, Uint8, Uint8>,
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, const std::string, Uint8, Uint8, Uint8>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>
     _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 }
 #else
@@ -52,15 +49,18 @@ namespace TSDL
 
         TSDL_DECLARE_CONSTRUCT(Texture)
 
+        TSDL_Texture(SDL_Texture* ptr);
+        TSDL_Texture(SDL_Texture* ptr, bool handle_destroy);
+
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Texture(_SDL_Renderer& renderer, _SDL_Surface surface);
-        TSDL_Texture(_SDL_Renderer& renderer, const point_2d& size, int access = SDL_TEXTUREACCESS_TARGET);
-        TSDL_Texture(_SDL_Renderer& renderer, const std::string& file);        
-        TSDL_Texture(_SDL_Renderer& renderer, TSDL_Buffer& buffer);
-        TSDL_Texture(_SDL_Renderer& renderer, const void* mem, size_t size);
+        TSDL_Texture(TSDL_Renderer& renderer, TSDL_Surface& surface);
+        TSDL_Texture(TSDL_Renderer& renderer, const point_2d& size, int access = SDL_TEXTUREACCESS_TARGET);
+        TSDL_Texture(TSDL_Renderer& renderer, const std::string& file);        
+        TSDL_Texture(TSDL_Renderer& renderer, TSDL_Buffer& buffer);
+        TSDL_Texture(TSDL_Renderer& renderer, const void* mem, size_t size);
 
         /*
         Create texture from file with color r, g, b as transparent color
@@ -68,10 +68,10 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Texture(_SDL_Renderer& renderer, _SDL_Surface surface, Uint8 r, Uint8 g, Uint8 b);
-        TSDL_Texture(_SDL_Renderer& renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b);
-        TSDL_Texture(_SDL_Renderer& renderer, TSDL_Buffer& buffer, Uint8 r, Uint8 g, Uint8 b);
-        TSDL_Texture(_SDL_Renderer& renderer, const void* mem, size_t size, Uint8 r, Uint8 g, Uint8 b);
+        TSDL_Texture(TSDL_Renderer& renderer, TSDL_Surface& surface, Uint8 r, Uint8 g, Uint8 b);
+        TSDL_Texture(TSDL_Renderer& renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b);
+        TSDL_Texture(TSDL_Renderer& renderer, TSDL_Buffer& buffer, Uint8 r, Uint8 g, Uint8 b);
+        TSDL_Texture(TSDL_Renderer& renderer, const void* mem, size_t size, Uint8 r, Uint8 g, Uint8 b);
 
         ~TSDL_Texture();
 
@@ -94,8 +94,6 @@ namespace TSDL
         int color_multiplier(const color_rgb& c);
         color_rgb color_multiplier();
     };
-
-    _TSDL_EXPAND_DEFINE_MASK_TYPE(Texture)
 }
 
 #include "TSDL/TSDL_Renderer.hpp"

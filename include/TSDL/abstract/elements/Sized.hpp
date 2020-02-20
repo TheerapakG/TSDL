@@ -1,7 +1,7 @@
 #ifndef TSDL_ELEMENTS_SIZED_
 #define TSDL_ELEMENTS_SIZED_
 
-#include "TSDL/abstract/elements/Element.hpp"
+#include "TSDL/abstract/elements/EventDispatcher.hpp"
 #include "TSDL/TSDL_Main.hpp"
 #include "TSDL/TSDL_Utility.hpp"
 
@@ -30,10 +30,22 @@ namespace TSDL
 
             using Sized::size;
 
-            virtual void size(const point_2d& size) final
+            template <typename U = T>
+            typename std::enable_if_t<!std::is_base_of_v<EventDispatcher, U>> _size(const point_2d& size)
+            {
+                Sized::size(size);
+            }
+
+            template <typename U = T>
+            typename std::enable_if_t<std::is_base_of_v<EventDispatcher, U>> _size(const point_2d& size)
             {
                 Sized::size(size);
                 T::dispatch_event(Caller(*this, {0, 0}), ::TSDL::events::EventType::ElementResized, ::TSDL::null_event);
+            }
+
+            virtual void size(const point_2d& size) final
+            {
+                _size(size);
             }
         };
     }

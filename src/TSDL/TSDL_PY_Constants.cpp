@@ -1,10 +1,6 @@
 #include "TSDL/TSDL_PY_Constants.hpp"
 
-template <typename T>
-T or_enum(T _self, T _other)
-{
-    return static_cast<T>(_self|_other);
-}
+#include "TSDL/TSDL_Utility.hpp"
 
 #ifdef TSDL_EXPOSE_PYBIND11
 void _tsdl_py_constant_py(const py::module& m)
@@ -33,7 +29,7 @@ void _tsdl_py_constant_py(const py::module& m)
         .value("SDL_WINDOW_TOOLTIP", SDL_WindowFlags::SDL_WINDOW_TOOLTIP)
         .value("SDL_WINDOW_POPUP_MENU", SDL_WindowFlags::SDL_WINDOW_POPUP_MENU)
         .value("SDL_WINDOW_VULKAN", SDL_WindowFlags::SDL_WINDOW_VULKAN)
-        .def("__or__", &or_enum<SDL_WindowFlags>);
+        .def("__or__", &::TSDL::or_enum<SDL_WindowFlags>);
     
     py::enum_<SDL_BlendMode>(m, "SDL_BlendMode")
         .value("SDL_BLENDMODE_NONE", SDL_BlendMode::SDL_BLENDMODE_NONE)
@@ -46,13 +42,13 @@ void _tsdl_py_constant_py(const py::module& m)
         .value("SDL_RENDERER_ACCELERATED", SDL_RendererFlags::SDL_RENDERER_ACCELERATED)
         .value("SDL_RENDERER_PRESENTVSYNC", SDL_RendererFlags::SDL_RENDERER_PRESENTVSYNC)
         .value("SDL_RENDERER_TARGETTEXTURE", SDL_RendererFlags::SDL_RENDERER_TARGETTEXTURE)
-        .def("__or__", &or_enum<SDL_RendererFlags>);
+        .def("__or__", &::TSDL::or_enum<SDL_RendererFlags>);
     
     py::enum_<SDL_RendererFlip>(m, "SDL_RendererFlip")
         .value("SDL_FLIP_NONE", SDL_RendererFlip::SDL_FLIP_NONE)
         .value("SDL_FLIP_HORIZONTAL", SDL_RendererFlip::SDL_FLIP_HORIZONTAL)
         .value("SDL_FLIP_VERTICAL", SDL_RendererFlip::SDL_FLIP_VERTICAL)
-        .def("__or__", &or_enum<SDL_RendererFlip>);
+        .def("__or__", &::TSDL::or_enum<SDL_RendererFlip>);
     
     py::enum_<SDL_EventType>(m, "SDL_EventType")
         .value("SDL_FIRSTEVENT", SDL_EventType::SDL_FIRSTEVENT)

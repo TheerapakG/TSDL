@@ -3,21 +3,18 @@
 
 namespace TSDL
 {
+    class TSDL_Texture;
     class TSDL_Renderer;
 }
 
 #include <optional>
 #include <SDL2/SDL.h>
 #include "TSDL_Utility.hpp"
-#include "TSDL_SDLmask.hpp"
 #include "TSDL_Macro.hpp"
 #include "TSDL_Window.hpp"
 
 namespace TSDL
 {
-    class _TSDL_GET_MASK_TYPE(Texture);
-    using _SDL_Texture = _TSDL_GET_MASK_TYPE(Texture);
-
     class TSDL_Renderer
     {
         private:
@@ -40,8 +37,8 @@ namespace TSDL
 
         operator SDL_Renderer*() const;
 
-        std::optional<_SDL_Texture> target();
-        int target(std::optional<std::reference_wrapper<_SDL_Texture>> texture);
+        std::optional<TSDL_Texture> target();
+        int target(std::optional<std::reference_wrapper<TSDL_Texture>> texture);
 
         /*
         Size of the rendering target
@@ -59,7 +56,7 @@ namespace TSDL
         int clear(const color_rgba& c);
 
         int copy_from(
-            _SDL_Texture texture, 
+            TSDL_Texture& texture, 
             std::optional<const std::reference_wrapper<rect>> srcrect, 
             std::optional<const std::reference_wrapper<rect>> dstrect
         );
@@ -67,7 +64,7 @@ namespace TSDL
         * like copy_from(texture, srcrect, dstrct) but after copy, optionally rotating it by angle around the given 
         * center and also optionally flipping it.
         */
-        int copy_from(_SDL_Texture texture, 
+        int copy_from(TSDL_Texture& texture, 
                       std::optional<const std::reference_wrapper<rect>> srcrect, 
                       std::optional<const std::reference_wrapper<rect>> dstrect, 
                       const double angle, 
@@ -89,8 +86,6 @@ namespace TSDL
 
         int update();
     };
-
-    _TSDL_EXPAND_DEFINE_MASK_TYPE(Renderer)
 }
 
 #include "TSDL_Texture.hpp"

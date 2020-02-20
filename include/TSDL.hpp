@@ -14,6 +14,7 @@
     #include "TSDL/TSDL_Window.hpp"
     #include "TSDL/TSDL_Chunk.hpp"
     #include "TSDL/TSDL_Music.hpp"
+    #include "TSDL/TSDL_Font.hpp"
 
     #include "TSDL/abstract/elements.hpp"
 

@@ -3,7 +3,6 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
-#include "TSDL_SDLmask.hpp"
 #include "TSDL_Macro.hpp"
 #include "TSDL_Buffer.hpp"
 #include <string>
@@ -54,17 +53,14 @@ namespace TSDL
         operator Mix_Chunk*() const;
     };
 
-    _TSDL_EXPAND_DEFINE_MASK_TYPE(Chunk)
-    using _SDL_Chunk = _TSDL_GET_MASK_TYPE(Chunk);
-
     /*
     These functions control chunk playback
     If limit, provide it in milliseconds
     */
-    inline int play(const _SDL_Chunk& chunk, int loops);
-    inline int play(const _SDL_Chunk& chunk, int loops, int limit);
-    inline int play(int channel, const _SDL_Chunk& chunk, int loops);
-    int play(int channel, const _SDL_Chunk& chunk, int loops, int limit);
+    inline int play(const TSDL_Chunk& chunk, int loops);
+    inline int play(const TSDL_Chunk& chunk, int loops, int limit);
+    inline int play(int channel, const TSDL_Chunk& chunk, int loops);
+    int play(int channel, const TSDL_Chunk& chunk, int loops, int limit);
 }
 
 #ifdef TSDL_EXPOSE_PYBIND11
