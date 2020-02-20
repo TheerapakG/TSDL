@@ -4,7 +4,12 @@
 #include <SDL2/SDL_ttf.h>
 #include "TSDL_Macro.hpp"
 #include "TSDL_Buffer.hpp"
+#include <vector>
 #include <string>
+
+#ifdef TSDL_USE_FONTCONFIG
+#include <fontconfig/fontconfig.h>
+#endif
 
 #ifdef TSDL_EXPOSE_PYBIND11
 #include "TSDL_PY_TypeErase.hpp"
@@ -56,6 +61,10 @@ namespace TSDL
 
         operator TTF_Font*() const;
     };
+
+    #ifdef TSDL_USE_FONTCONFIG
+    std::vector<std::string> get_all_font_filename();
+    #endif
 }
 
 #ifdef TSDL_EXPOSE_PYBIND11
