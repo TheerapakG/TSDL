@@ -3,6 +3,10 @@
 
 #include <SDL2/SDL.h>
 
+#ifdef TSDL_USE_FONTCONFIG
+#include <fontconfig/fontconfig.h>
+#endif
+
 #ifdef TSDL_EXPOSE_PYBIND11
 #define TSDL_TSDL TSDL
 #include "TSDL_PY_TypeErase.hpp"

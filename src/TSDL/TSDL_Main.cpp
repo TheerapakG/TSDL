@@ -6,6 +6,7 @@
 #include <string>
 #include <stdexcept>
 #include <iostream>
+#include <filesystem>
 
 namespace TSDL
 {
@@ -16,6 +17,8 @@ TSDL::TSDL::TSDL(): TSDL::TSDL(44100) {}
 
 TSDL::TSDL::TSDL(int frequency)
 {
+    std::filesystem::create_directory(std::filesystem::current_path()/"cache");
+    
     std::cout << "initializing SDL..." << std::endl;
     if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
     {
@@ -73,6 +76,46 @@ TSDL::TSDL::TSDL(int frequency)
                     }
                     else
                     {
+                        #ifdef TSDL_USE_FONTCONFIG
+                        std::cout << "initializing Fontconfig..." << std::endl;
+                        if(!FcInit())
+                        {
+                            FcFini();
+                            TTF_Quit();
+                            Mix_Quit();
+                            IMG_Quit();
+                            SDL_Quit();
+                            safe_throw<std::runtime_error>("Fontconfig could not initialize!");
+                        }
+
+                        auto local_fontconf_p = std::filesystem::current_path()/"fonts.conf";
+                        if(exists(local_fontconf_p))
+                        {
+                            std::cout << "Setting Fontconfig..." << std::endl;
+                            FcConfig* config = FcConfigCreate();
+                            if(!FcConfigParseAndLoad(config, (const FcChar8*)((local_fontconf_p).string().c_str()), true)) //eww
+                            {
+                                FcFini();
+                                TTF_Quit();
+                                Mix_Quit();
+                                IMG_Quit();
+                                SDL_Quit();
+                                safe_throw<std::runtime_error>("Could not parse fontconfig file!");
+                            }
+                            FcConfig* last_config = FcConfigGetCurrent();
+                            if(!FcConfigSetCurrent(config))
+                            {
+                                FcFini();
+                                TTF_Quit();
+                                Mix_Quit();
+                                IMG_Quit();
+                                SDL_Quit();
+                                safe_throw<std::runtime_error>("Could not set font config!");
+                            }
+                            FcConfigDestroy(last_config);
+                        }
+                        #endif
+
                         #ifndef __cpp_exceptions
                         constructed = true;
                         #endif
@@ -86,6 +129,10 @@ TSDL::TSDL::TSDL(int frequency)
 
 TSDL::TSDL::~TSDL()
 {
+    #ifdef TSDL_USE_FONTCONFIG
+    FcConfigDestroy(FcConfigGetCurrent());
+    FcFini();
+    #endif
     TTF_Quit();
     Mix_Quit();
     IMG_Quit();
