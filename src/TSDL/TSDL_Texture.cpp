@@ -6,7 +6,11 @@
 
 TSDL_DEFINE_CONSTRUCT(TSDL, Texture)
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, TSDL::_SDL_Surface surface)
+TSDL::TSDL_Texture::TSDL_Texture(SDL_Texture* ptr): TSDL_Texture(ptr, false) {}
+
+TSDL::TSDL_Texture::TSDL_Texture(SDL_Texture* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
+
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, TSDL::TSDL_Surface& surface)
 {
     SDL_Texture* _t_internal_ptr = SDL_CreateTextureFromSurface(renderer, surface);
     if(_t_internal_ptr == NULL)
@@ -17,7 +21,7 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, TSDL::_SDL_Surfa
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, const TSDL::point_2d& size, int access)
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const TSDL::point_2d& size, int access)
 {
     SDL_Texture* _t_internal_ptr = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, access, size.x, size.y);
     if (_t_internal_ptr == NULL)
@@ -28,37 +32,36 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, const TSDL::poin
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, const std::string& file): 
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const std::string& file): 
     TSDL_Texture(renderer, TSDL::TSDL_Surface(file)) {}
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, TSDL_Buffer& buffer): 
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, TSDL_Buffer& buffer): 
     TSDL_Texture(renderer, TSDL::TSDL_Surface(buffer)) {}
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, const void* mem, size_t size): 
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const void* mem, size_t size): 
     TSDL_Texture(renderer, TSDL::TSDL_Surface(mem, size)) {}
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, TSDL::_SDL_Surface surface, Uint8 r, Uint8 g, Uint8 b)
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, TSDL::TSDL_Surface& surface, Uint8 r, Uint8 g, Uint8 b)
 {
-    TSDL::TSDL_Surface _t_surface(surface);
-    bool _surface_has_key = _t_surface.has_color_key();
-    Uint32 _after_key = _t_surface.map_rgb(r, g, b);
-    Uint32 _before_key = _surface_has_key? _t_surface.color_key_Uint32():_after_key;
+    bool _surface_has_key = surface.has_color_key();
+    Uint32 _after_key = surface.map_rgb(r, g, b);
+    Uint32 _before_key = _surface_has_key? surface.color_key_Uint32():_after_key;
 
-    int _t = _t_surface.color_key(true, _after_key);
+    int _t = surface.color_key(true, _after_key);
     if(_t != 0)
     {
         TSDL::safe_throw<std::runtime_error>("Could not set texture surface color key! SDL Error: " + std::string(SDL_GetError()));
         return;
     }
 
-    SDL_Texture* _t_internal_ptr = SDL_CreateTextureFromSurface(renderer, _t_surface);
+    SDL_Texture* _t_internal_ptr = SDL_CreateTextureFromSurface(renderer, surface);
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
         return;
     }
 
-    _t = _t_surface.color_key(_surface_has_key, _before_key);
+    _t = surface.color_key(_surface_has_key, _before_key);
     if(_t != 0)
     {
         TSDL::safe_throw<std::runtime_error>("Could not set texture surface color key! SDL Error: " + std::string(SDL_GetError()));
@@ -68,13 +71,13 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, TSDL::_SDL_Surfa
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b): 
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b): 
     TSDL_Texture(renderer, TSDL::TSDL_Surface(file), r, g, b) {}
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, TSDL_Buffer& buffer, Uint8 r, Uint8 g, Uint8 b): 
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, TSDL_Buffer& buffer, Uint8 r, Uint8 g, Uint8 b): 
     TSDL_Texture(renderer, TSDL::TSDL_Surface(buffer), r, g, b) {}
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::_SDL_Renderer& renderer, const void* mem, size_t size, Uint8 r, Uint8 g, Uint8 b): 
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const void* mem, size_t size, Uint8 r, Uint8 g, Uint8 b): 
     TSDL_Texture(renderer, TSDL::TSDL_Surface(mem, size), r, g, b) {}
 
 TSDL::TSDL_Texture::~TSDL_Texture()
@@ -157,8 +160,6 @@ TSDL::color_rgb TSDL::TSDL_Texture::color_multiplier()
     return ret;
 }
 
-_TSDL_EXPAND_DECLARE_MASK_TYPE(TSDL, Texture)
-
 #ifdef TSDL_EXPOSE_PYBIND11
 
 _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Texture)
@@ -166,12 +167,12 @@ _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Texture)
 void _tsdl_texture_py(const py::module& m)
 {
     py::class_<_PY::_PY_GET_TYPEERASE(Texture)>(m, "Texture")
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::_SDL_Renderer, const std::string>())
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::_SDL_Renderer, const std::string>())
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::_SDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>())
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::_SDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>())
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface>())
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::_SDL_Renderer, TSDL::_SDL_Surface, Uint8, Uint8, Uint8>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, const std::string>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, const std::string>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Surface>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Surface, Uint8, Uint8, Uint8>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Texture, enter_ctx), py::return_value_policy::reference)
         .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Texture, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Texture, exit_ctx));
@@ -180,8 +181,6 @@ void _tsdl_texture_py(const py::module& m)
             py::overload_cast<const TSDL::color_rgb&>(&TSDL::TSDL_Texture::color_multiplier),
             py::overload_cast<>(&TSDL::TSDL_Texture::color_multiplier)                                                                                                    \
         );
-    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Texture)>(m, "_SDL_Texture");
-    py::implicitly_convertible<TSDL::TSDL_Texture, TSDL::_TSDL_GET_MASK_TYPE(Texture)>();
 }
 
 #endif

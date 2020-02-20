@@ -67,8 +67,6 @@ TSDL::TSDL_Buffer::operator SDL_RWops*() const
     return _internal_ptr;
 }
 
-_TSDL_EXPAND_DECLARE_MASK_TYPE(TSDL, Buffer)
-
 #ifdef TSDL_EXPOSE_PYBIND11
 
 _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Buffer)
@@ -81,8 +79,6 @@ void _tsdl_buffer_py(const py::module& m)
         .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Buffer, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Buffer, exit_ctx));
     py::class_<TSDL::TSDL_Buffer>(m, "_Buffer");
-    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Buffer)>(m, "_SDL_Buffer");
-    py::implicitly_convertible<TSDL::TSDL_Buffer, TSDL::_TSDL_GET_MASK_TYPE(Buffer)>();
 }
 
 #endif

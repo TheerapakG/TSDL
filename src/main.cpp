@@ -1,4 +1,4 @@
-#include "TSDL.hpp"
+﻿#include "TSDL.hpp"
 #ifndef TSDL_EXPOSE_PYBIND11
 #ifdef TSDL_EXAMPLE_CPP
 #include <iostream>
@@ -50,23 +50,17 @@ int main(int argc, char* argv[])
         TSDL::elements::Grid grid(renderer);
         TSDL::elements::Button button(renderer, {256, 64});
 
-        // TODO: TSDL_Font/ HarfBuzz
-        TTF_Font* font = TTF_OpenFont((std::filesystem::current_path()/"fonts/segoeui.ttf").string().c_str(), 36);
-        if(font == NULL)
-        {
-            std::cerr << TTF_GetError();
-            return -1;
-        }
+        TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 36);
 
-        TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface("Button", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+        TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Button", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
         TSDL::elements::TextureElement buttontextelement(
             renderer, 
             buttontext->size(),
             std::shared_ptr <TSDL::TSDL_Texture> ( 
                 new TSDL::TSDL_Texture(
-                    static_cast<TSDL::_SDL_Renderer>(renderer),
-                    static_cast<TSDL::_SDL_Surface>(*buttontext)
+                    renderer,
+                    *buttontext
                 )
             )
         );

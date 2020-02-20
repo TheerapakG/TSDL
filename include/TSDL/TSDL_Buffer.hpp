@@ -2,7 +2,6 @@
 #define TSDL_BUFFER_
 
 #include <SDL2/SDL.h>
-#include "TSDL_SDLmask.hpp"
 #include "TSDL_Macro.hpp"
 #include <string>
 
@@ -50,8 +49,6 @@ namespace TSDL
 
         operator SDL_RWops*() const;
     };
-
-    _TSDL_EXPAND_DEFINE_MASK_TYPE(Buffer)
 }
 
 #ifdef TSDL_EXPOSE_PYBIND11

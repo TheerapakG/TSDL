@@ -194,6 +194,9 @@ namespace TSDL
     {
         return std::optional<const std::reference_wrapper<T>>();
     }
+
+    template <typename T>
+    using transformer = std::function<T(const T&)>;
 }
 
 #endif

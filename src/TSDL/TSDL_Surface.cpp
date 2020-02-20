@@ -1,5 +1,6 @@
 #include "TSDL/TSDL_Surface.hpp"
 #include "TSDL/TSDL_Utility.hpp"
+#include "TSDL/TSDL_Font.hpp"
 
 TSDL_DEFINE_CONSTRUCT(TSDL, Surface)
 
@@ -83,13 +84,13 @@ TSDL::TSDL_Surface::TSDL_Surface(const void* mem, size_t size): _destroy(true)
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, TSDL::TTF_Rendermethod m):
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, TSDL::TTF_Rendermethod m):
     TSDL::TSDL_Surface(text, font, r, g, b, 255, m){}
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, const TSDL::color_rgb& c, TSDL::TTF_Rendermethod m):
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, const TSDL::color_rgb& c, TSDL::TTF_Rendermethod m):
     TSDL::TSDL_Surface(text, font, c.r, c.g, c.b, m){}
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TSDL::TTF_Rendermethod m): _destroy(true)
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TSDL::TTF_Rendermethod m): _destroy(true)
 {
     SDL_Surface* _t_internal_ptr = nullptr;
     switch (m)
@@ -121,16 +122,16 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, const TSDL::color_rgba& c, TSDL::TTF_Rendermethod m):
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, const TSDL::color_rgba& c, TSDL::TTF_Rendermethod m):
     TSDL::TSDL_Surface(text, font, c.r, c.g, c.b, c.a, m){}
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb):
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb):
     TSDL::TSDL_Surface(text, font, fr, fg, fb, 255, br, bg, bb, 0){}
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, const TSDL::color_rgb& fc, const TSDL::color_rgb& bc):
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, const TSDL::color_rgb& fc, const TSDL::color_rgb& bc):
     TSDL::TSDL_Surface(text, font, fc.r, fc.g, fc.b, bc.r, bc.g, bc.b){}
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba): 
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba): 
     _destroy(true)
 {
     SDL_Surface* _t_internal_ptr = TTF_RenderUTF8_Shaded(font, text.c_str(), {fr, fg, fb, fa}, {br, bg, bb, ba});
@@ -142,7 +143,7 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, Uint8 
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TTF_Font* font, const TSDL::color_rgba& fc, const TSDL::color_rgba& bc):
+TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, const TSDL::color_rgba& fc, const TSDL::color_rgba& bc):
     TSDL::TSDL_Surface(text, font, fc.r, fc.g, fc.b, fc.a, bc.r, bc.g, bc.b, bc.a){}
 
 TSDL::TSDL_Surface::~TSDL_Surface()
@@ -165,7 +166,7 @@ const SDL_PixelFormat* TSDL::TSDL_Surface::format() const
     return {_internal_ptr->w, _internal_ptr->h};
 }
 
-int TSDL::TSDL_Surface::copy_from(_SDL_Surface src, const rect& srcrect, rect& dstrect)
+int TSDL::TSDL_Surface::copy_from(TSDL_Surface& src, const rect& srcrect, rect& dstrect)
 {
     int _t = SDL_BlitSurface(src, &srcrect, _internal_ptr, &dstrect);
     if(_t != 0)
@@ -175,7 +176,7 @@ int TSDL::TSDL_Surface::copy_from(_SDL_Surface src, const rect& srcrect, rect& d
     return _t;
 }
 
-int TSDL::TSDL_Surface::scale_from(_SDL_Surface src, const rect& srcrect, rect& dstrect)
+int TSDL::TSDL_Surface::scale_from(TSDL_Surface& src, const rect& srcrect, rect& dstrect)
 {
     int _t = SDL_BlitScaled(src, &srcrect, _internal_ptr, &dstrect);
     if(_t != 0)
@@ -308,8 +309,6 @@ void TSDL::TSDL_Surface::convert_surface(SDL_PixelFormat* fmt, Uint32 flags)
     _destroy = true;
 }
 
-_TSDL_EXPAND_DECLARE_MASK_TYPE(TSDL, Surface)
-
 #ifdef TSDL_EXPOSE_PYBIND11
 
 _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Surface)
@@ -350,8 +349,6 @@ void _tsdl_surface_py(const py::module& m)
         .def("map_rgb", py::overload_cast<Uint8, Uint8, Uint8>(&TSDL::TSDL_Surface::map_rgb, py::const_))
         .def("converted_surface", &TSDL::TSDL_Surface::converted_surface)
         .def("convert_surface", &TSDL::TSDL_Surface::convert_surface);
-    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Surface)>(m, "_SDL_Surface");
-    py::implicitly_convertible<TSDL::TSDL_Surface, TSDL::_TSDL_GET_MASK_TYPE(Surface)>();
 }
 
 #endif

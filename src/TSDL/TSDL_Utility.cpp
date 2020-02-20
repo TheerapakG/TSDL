@@ -21,6 +21,16 @@ void TSDL::clear_exc()
 }
 #endif
 
+TSDL::Orientation TSDL::operator|(TSDL::Orientation lhs, TSDL::Orientation rhs)
+{
+    return TSDL::or_enum(lhs, rhs);
+}
+
+TSDL::Orientation TSDL::operator&(TSDL::Orientation lhs, TSDL::Orientation rhs)
+{
+    return TSDL::and_enum(lhs, rhs);
+}
+
 TSDL::point_2d::point_2d(int x, int y): SDL_Point{x, y} {}
 
 TSDL::point_2d::point_2d(SDL_Point& p): SDL_Point(p) {}

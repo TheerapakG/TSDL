@@ -3,7 +3,6 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
-#include "TSDL_SDLmask.hpp"
 #include "TSDL_Macro.hpp"
 #include <string>
 
@@ -50,13 +49,10 @@ namespace TSDL
         operator Mix_Music*() const;
     };
 
-    _TSDL_EXPAND_DEFINE_MASK_TYPE(Music)
-    using _SDL_Music = _TSDL_GET_MASK_TYPE(Music);
-
     /*
     These functions control music playback
     */
-    int play(const _SDL_Music& music, int loops);
+    int play(const TSDL_Music& music, int loops);
     void pause();
     void resume();
     void hault();

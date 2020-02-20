@@ -27,16 +27,16 @@ TSDL::TSDL_Renderer::operator SDL_Renderer*() const
     return _internal_ptr;
 }
 
-std::optional<TSDL::_SDL_Texture> TSDL::TSDL_Renderer::target()
+std::optional<TSDL::TSDL_Texture> TSDL::TSDL_Renderer::target()
 {
     SDL_Texture* _t = SDL_GetRenderTarget(_internal_ptr);
-    if(_t == NULL) return std::optional<TSDL::_SDL_Texture>();
-    else return _t;
+    if(_t == NULL) return std::optional<TSDL::TSDL_Texture>();
+    else return TSDL_Texture(_t);
 }
 
-int TSDL::TSDL_Renderer::target(std::optional<std::reference_wrapper<TSDL::_SDL_Texture>> texture)
+int TSDL::TSDL_Renderer::target(std::optional<std::reference_wrapper<TSDL::TSDL_Texture>> texture)
 {
-    int _t = SDL_SetRenderTarget(_internal_ptr, texture ? texture.value().get(): NULL);
+    int _t = SDL_SetRenderTarget(_internal_ptr, texture ? static_cast<SDL_Texture*>(texture.value().get()): NULL);
     if(_t != 0)
     {
         TSDL::safe_throw<std::runtime_error>("Could not set render target! SDL Error: " + std::string(SDL_GetError()));
@@ -119,7 +119,7 @@ int TSDL::TSDL_Renderer::clear(const color_rgba& c)
 }
 
 int TSDL::TSDL_Renderer::copy_from(
-    TSDL::_SDL_Texture texture, 
+    TSDL::TSDL_Texture& texture, 
     std::optional<const std::reference_wrapper<rect>> srcrect, 
     std::optional<const std::reference_wrapper<rect>> dstrect
 )
@@ -138,7 +138,7 @@ int TSDL::TSDL_Renderer::copy_from(
 }
 
 int TSDL::TSDL_Renderer::copy_from(
-    TSDL::_SDL_Texture texture, 
+    TSDL::TSDL_Texture& texture, 
     std::optional<const std::reference_wrapper<rect>> srcrect, 
     std::optional<const std::reference_wrapper<rect>> dstrect, 
     const double angle, 
@@ -232,5 +232,3 @@ int TSDL::TSDL_Renderer::update()
     SDL_RenderPresent(_internal_ptr);
     return this->clear();
 }
-
-_TSDL_EXPAND_DECLARE_MASK_TYPE(TSDL, Renderer)

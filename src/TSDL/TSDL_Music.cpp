@@ -28,7 +28,7 @@ TSDL::TSDL_Music::operator Mix_Music*() const
     return _internal_ptr;
 }
 
-int TSDL::play(const TSDL::_SDL_Music& music, int loops)
+int TSDL::play(const TSDL::TSDL_Music& music, int loops)
 {
     int _t = Mix_PlayMusic(music, loops);
     if(_t != 0)
@@ -63,8 +63,6 @@ bool TSDL::is_paused()
     return Mix_PausedMusic();
 }
 
-_TSDL_EXPAND_DECLARE_MASK_TYPE(TSDL, Music)
-
 #ifdef TSDL_EXPOSE_PYBIND11
 
 _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Music)
@@ -77,8 +75,6 @@ void _tsdl_music_py(const py::module& m)
         .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Music, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Music, exit_ctx));
     py::class_<TSDL::TSDL_Music>(m, "_Music");
-    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Music)>(m, "_SDL_Music");
-    py::implicitly_convertible<TSDL::TSDL_Music, TSDL::_TSDL_GET_MASK_TYPE(Music)>();
 }
 
 #endif

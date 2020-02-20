@@ -2,7 +2,6 @@
 #define TSDL_WINDOW_
 
 #include <SDL2/SDL.h>
-#include "TSDL_SDLmask.hpp"
 #include "TSDL_Surface.hpp"
 #include "TSDL_Display.hpp"
 #include "TSDL_Macro.hpp"
@@ -60,8 +59,6 @@ namespace TSDL
         void window_position(int x, int y);
         void window_position(const TSDL_Display& display, int x, int y);
     };
-
-    _TSDL_EXPAND_DEFINE_MASK_TYPE(Window)
 }
 
 #ifdef TSDL_EXPOSE_PYBIND11

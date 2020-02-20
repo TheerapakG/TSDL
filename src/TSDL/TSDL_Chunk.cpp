@@ -52,22 +52,22 @@ TSDL::TSDL_Chunk::operator Mix_Chunk*() const
     return _internal_ptr;
 }
 
-int TSDL::play(const TSDL::_SDL_Chunk& chunk, int loops)
+int TSDL::play(const TSDL::TSDL_Chunk& chunk, int loops)
 {
     return TSDL::play(-1, chunk, loops, -1);
 }
 
-int TSDL::play(int channel, const TSDL::_SDL_Chunk& chunk, int loops)
+int TSDL::play(int channel, const TSDL::TSDL_Chunk& chunk, int loops)
 {
     return TSDL::play(channel, chunk, loops, -1);
 }
 
-int TSDL::play(const TSDL::_SDL_Chunk& chunk, int loops, int limit)
+int TSDL::play(const TSDL::TSDL_Chunk& chunk, int loops, int limit)
 {
     return TSDL::play(-1, chunk, loops, limit);
 }
 
-int TSDL::play(int channel, const TSDL::_SDL_Chunk& chunk, int loops, int limit)
+int TSDL::play(int channel, const TSDL::TSDL_Chunk& chunk, int loops, int limit)
 {
     int _t = Mix_PlayChannelTimed(channel, chunk, loops, limit);
     if(_t != 0)
@@ -76,8 +76,6 @@ int TSDL::play(int channel, const TSDL::_SDL_Chunk& chunk, int loops, int limit)
     }
     return _t;
 }
-
-_TSDL_EXPAND_DECLARE_MASK_TYPE(TSDL, Chunk)
 
 #ifdef TSDL_EXPOSE_PYBIND11
 
@@ -91,8 +89,6 @@ void _tsdl_chunk_py(const py::module& m)
         .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Chunk, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Chunk, exit_ctx));
     py::class_<TSDL::TSDL_Chunk>(m, "_Chunk");
-    py::class_<TSDL::_TSDL_GET_MASK_TYPE(Chunk)>(m, "_SDL_Chunk");
-    py::implicitly_convertible<TSDL::TSDL_Chunk, TSDL::_TSDL_GET_MASK_TYPE(Chunk)>();
 }
 
 #endif
