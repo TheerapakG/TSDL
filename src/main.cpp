@@ -50,7 +50,13 @@ int main(int argc, char* argv[])
         TSDL::elements::Grid grid(renderer);
         TSDL::elements::Button button(renderer, {256, 64});
 
-        TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 36);
+        #ifdef TSDL_USE_FONTCONFIG
+        std::string font_path = TSDL::get_family_font_filename("sans-serif");
+        std::cout << "using font: " << font_path << " as sans-serif font" << std::endl;
+        TSDL::TSDL_Font font(font_path, 40);
+        #else
+        TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 40);
+        #endif
 
         TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Button", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 

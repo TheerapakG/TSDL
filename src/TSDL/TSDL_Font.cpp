@@ -98,7 +98,7 @@ std::vector<std::string> TSDL::get_all_font_filename()
 
     FcConfig* config = FcConfigGetCurrent();
     FcPattern* pat = FcPatternCreate();
-    FcObjectSet* os = FcObjectSetBuild(FC_FAMILY, FC_STYLE, FC_LANG, FC_FILE, (const char*)(0));
+    FcObjectSet* os = FcObjectSetBuild(FC_FILE, (const char*)(0));
 
     FcFontSet* fs = FcFontList(config, pat, os);
 
@@ -121,6 +121,54 @@ std::vector<std::string> TSDL::get_all_font_filename()
 
     FcFontSetDestroy(fs);
     return ret;
+}
+
+// pattern built from FcPatternBuild, pattern is automatically freed
+std::string _get_pattern_font_filename(FcPattern* pattern)
+{
+    FcPattern* result = NULL;
+
+    FcConfig* config = FcConfigGetCurrent();
+    if(FcConfigSubstitute(config, pattern, FcMatchPattern))
+    {
+        FcDefaultSubstitute(pattern);
+        FcResult matched;
+        result = FcFontMatch(config, pattern, &matched);
+        if(matched != FcResultMatch)
+        {
+            FcPatternDestroy(result);
+            result = NULL;
+        }
+    }
+    
+    FcPatternDestroy(pattern);
+
+    if(!result) return "";
+
+    FcChar8* file;
+    FcResult got = FcPatternGetString(result, FC_FILE, 0, &file);
+    if (got == FcResultMatch)
+    {
+        std::string ret((const char*)(file)); //eww
+        FcPatternDestroy(result);
+        return ret;
+    }
+    FcPatternDestroy(result);
+    return "";
+}
+
+std::string TSDL::get_family_font_filename(const std::string& family)
+{
+    return _get_pattern_font_filename(
+        FcPatternBuild(NULL, FC_FAMILY, FcTypeString, (const FcChar8*)(family.c_str()), (const char *) 0)
+    );
+}
+
+std::string TSDL::get_name_font_filename(const std::string& name)
+{
+    return _get_pattern_font_filename(
+        FcNameParse((const FcChar8*)(name.c_str()))
+    );
 }
 #endif
 
