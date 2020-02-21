@@ -64,6 +64,8 @@ namespace TSDL
 
     #ifdef TSDL_USE_FONTCONFIG
     std::vector<std::string> get_all_font_filename();
+    std::string get_family_font_filename(const std::string& family);
+    std::string get_name_font_filename(const std::string& name);
     #endif
 }
 
