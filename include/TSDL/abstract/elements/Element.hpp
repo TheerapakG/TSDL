@@ -2,6 +2,7 @@
 #define TSDL_ELEMENTS_ELEMENT_
 
 #include <atomic>
+#include <vector>
 #include <map>
 #include <functional>
 #include "TSDL/TSDL_Utility.hpp"
@@ -15,6 +16,7 @@ namespace TSDL
     {
         class Element;
 
+        class ElementHolder;
         class EventDispatcher;
 
         using Caller = std::pair<std::reference_wrapper<::TSDL::elements::EventDispatcher>, point_2d>;
@@ -26,13 +28,19 @@ namespace TSDL
             private:
             TSDL_Renderer& _renderer;
             std::atomic<bool> _update = true;
-            std::map <::TSDL::events::EventType, EventHandler> _evhdlrmap;
+            std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> _holders;
+            std::map <::TSDL::events::EventType, std::vector<EventHandler>> _evhdlrmap;
             
             public:
             Element() = delete;
             Element(TSDL_Renderer& renderer);
 
-            bool operator==(const Element& other);
+            friend class ElementHolder;
+
+            /*
+            Get bounded holder
+            */
+            std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> holder() const;
 
             /*
             Get bounded renderer
@@ -63,6 +71,9 @@ namespace TSDL
             void add_event_handler(const ::TSDL::events::EventType& eventtype, const EventHandler& evhandler);
             void remove_event_handler(const ::TSDL::events::EventType& eventtype);
         };
+
+        bool operator==(const Element& lhs, const Element& rhs);
+        bool operator!=(const Element& lhs, const Element& rhs);
     }
 }
 

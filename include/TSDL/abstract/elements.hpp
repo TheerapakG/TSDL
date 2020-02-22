@@ -1,3 +1,4 @@
+#include "elements/attrs.hpp"
 #include "elements/Button.hpp"
 #include "elements/Element.hpp"
 #include "elements/ElementHolder.hpp"

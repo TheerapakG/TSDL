@@ -20,7 +20,7 @@ namespace TSDL
 
             Sized* _sized = nullptr;
 
-            bool operator == (const Subelement& other);
+            bool operator==(const Subelement& other);
         };
 
         class ElementHolder: virtual public Element
@@ -43,6 +43,10 @@ namespace TSDL
 
                 _subelements_order.push_back(el_all);
                 _subelements_info[&subelement] = el_all;
+
+                subelement._holders.emplace_back(*this);
+
+                update();
             }
 
             template<typename T>
@@ -54,11 +58,17 @@ namespace TSDL
                 auto it = _subelements_order.begin();
                 _subelements_order.insert(it + order, el_all);
                 _subelements_info[&subelement] = el_all;
+
+                subelement._holders.emplace_back(*this);
+
+                update();
             }
 
-            void reorder_child(Element&& subelement, int order);
-            void move_child(Element&& subelement, const point_2d& destination);
-            void remove_child(Element&& subelement);
+            void reorder_child(Element& subelement, int order);
+            void move_child(Element& subelement, const point_2d& destination);
+            void remove_child(Element& subelement);
+
+            Subelement child_info(Element& subelement);
 
             const std::vector<Subelement>& get_child_order();
             std::optional<Subelement> highest_child(const point_2d& point);
@@ -73,6 +83,8 @@ namespace TSDL
             */
             virtual void render(const ::TSDL::point_2d& dist) override;
         };
+
+        bool operator==(const ElementHolder& lhs, const ElementHolder& rhs);
     }
 }
 

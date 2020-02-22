@@ -8,6 +8,7 @@
 #include <optional>
 #include "TSDL/abstract/elements/ElementHolder.hpp"
 #include "TSDL/abstract/elements/EventDispatcher.hpp"
+#include "TSDL/TSDL_Meta.hpp"
 
 namespace TSDL
 {
@@ -16,8 +17,8 @@ namespace TSDL
         class Grid: public eventdispatcher<Element>, public ElementHolder
         {
             private:
-            std::optional <Subelement> _current_mouse_focus;
-            std::optional <Subelement> _left_origin, _right_origin, _middle_origin;
+            optional_reference<Element> _current_mouse_focus;
+            optional_reference<Element> _left_origin, _right_origin, _middle_origin;
 
             public:
             Grid(TSDL_Renderer& renderer); 
