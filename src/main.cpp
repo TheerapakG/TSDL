@@ -8,6 +8,7 @@
 #include <typeinfo>
 #include <filesystem>
 using namespace std::literals::chrono_literals;
+namespace elattrs = TSDL::elements::attrs;
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 1280;
@@ -48,7 +49,11 @@ int main(int argc, char* argv[])
         
         TSDL::TSDL_Renderer renderer(window, SDL_RENDERER_TARGETTEXTURE);
         TSDL::elements::Grid grid(renderer);
-        TSDL::elements::Button button(renderer, {256, 64});
+        elattrs::dragable<TSDL::elements::Button> button(
+            renderer, 
+            [](const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist) -> ::TSDL::point_2d { return start + dist; }, 
+            ::TSDL::point_2d{256, 64}
+        );
 
         #ifdef TSDL_USE_FONTCONFIG
         std::string font_path = TSDL::get_family_font_filename("sans-serif");
@@ -58,7 +63,7 @@ int main(int argc, char* argv[])
         TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 40);
         #endif
 
-        TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Button", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+        TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Drag Me!", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
         TSDL::elements::TextureElement buttontextelement(
             renderer, 

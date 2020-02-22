@@ -3,9 +3,9 @@
 
 TSDL::elements::Element::Element(TSDL_Renderer& renderer): _renderer(renderer) {}
 
-bool TSDL::elements::Element::operator==(const Element& other)
+std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> TSDL::elements::Element::holder() const
 {
-    return this == std::addressof(other);
+    return _holders;
 }
 
 TSDL::TSDL_Renderer& TSDL::elements::Element::renderer() const
@@ -30,7 +30,7 @@ bool TSDL::elements::Element::need_update() const
 
 void TSDL::elements::Element::add_event_handler(const TSDL::events::EventType& eventtype, const EventHandler& evhandler)
 {
-    _evhdlrmap[eventtype] = evhandler;
+    _evhdlrmap[eventtype].emplace_back(evhandler);
 }
 
 void TSDL::elements::Element::remove_event_handler(const TSDL::events::EventType& eventtype)
@@ -40,7 +40,7 @@ void TSDL::elements::Element::remove_event_handler(const TSDL::events::EventType
 
 bool TSDL::elements::Element::dispatch_event(const Caller& caller, const TSDL::events::EventType& eventtype, const SDL_Event& event)
 {
-    EventHandler h;
+    std::vector<EventHandler> h;
 
     try
     {
@@ -51,5 +51,19 @@ bool TSDL::elements::Element::dispatch_event(const Caller& caller, const TSDL::e
         return false;
     }
 
-    return h(caller, event);
+    bool _ret = false;
+
+    for(auto& hi: h) _ret |= hi(caller, event);
+
+    return _ret;
+}
+
+bool TSDL::elements::operator==(const TSDL::elements::Element& lhs, const TSDL::elements::Element& rhs)
+{
+    return std::addressof(lhs) == std::addressof(rhs);
+}
+
+bool TSDL::elements::operator!=(const TSDL::elements::Element& lhs, const TSDL::elements::Element& rhs)
+{
+    return std::addressof(lhs) != std::addressof(rhs);
 }
