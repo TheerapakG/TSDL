@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 
         delete buttontext;
 
-        button.texture(buttontextelement);
+        button.front(buttontextelement);
         grid.add_child(button, {64, 64});
         TSDL::elements::EventloopAdapter elementAdapter(renderer, eventloop, grid);
 

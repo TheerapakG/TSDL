@@ -3,8 +3,10 @@
 
 #include "TSDL/abstract/elements/TextureElement.hpp"
 #include "TSDL/abstract/elements/EventDispatcher.hpp"
+#include "TSDL/abstract/elements/Rectangle.hpp"
 
 #include "TSDL/TSDL_Meta.hpp"
+#include <memory>
 
 namespace TSDL
 {
@@ -20,11 +22,10 @@ namespace TSDL
         class Button: public sized<eventdispatcher<Element>>
         {
             private:
-            color_rgba _color = {211, 211, 211, 128};
-            color_rgba _hover_color = {192, 192, 192, 128};
-            color_rgba _clicked_color = {128, 128, 128, 255};
-            color_rgba _text_color = {255, 255, 255, 255};
-            optional_reference<TextureElement> _texture;
+            std::shared_ptr<RenderSizedElement> _normal = std::make_shared<Rectangle>(renderer(), point_2d{0, 0}, color_rgba{211, 211, 211, 128});
+            std::shared_ptr<RenderSizedElement> _hover = std::make_shared<Rectangle>(renderer(), point_2d{0, 0}, color_rgba{192, 192, 192, 128});
+            std::shared_ptr<RenderSizedElement> _clicked = std::make_shared<Rectangle>(renderer(), point_2d{0, 0}, color_rgba{128, 128, 128, 128});
+            optional_reference<sized<RenderSizedElement>> _front;
             int _padding = 8;
 
             ButtonState state = ButtonState::NORMAL;
@@ -34,17 +35,15 @@ namespace TSDL
             Button(TSDL_Renderer& renderer, const point_2d& size, const ListenerMap& listeners);
             Button(TSDL_Renderer& renderer, const point_2d& size, ListenerMap&& listeners);
 
-            Button& color(const color_rgba& color);
-            Button& hover_color(const color_rgba& color);
-            Button& clicked_color(const color_rgba& color);
-            Button& text_color(const color_rgba& color);
-            Button& texture(optional_reference<TextureElement> texture);
+            Button& normal(const std::shared_ptr<RenderSizedElement>& element);
+            Button& hover(const std::shared_ptr<RenderSizedElement>& element);
+            Button& clicked(const std::shared_ptr<RenderSizedElement>& element);
+            Button& front(optional_reference<sized<RenderSizedElement>> front);
 
-            color_rgba color();
-            color_rgba hover_color();
-            color_rgba clicked_color();
-            color_rgba text_color();
-            TextureElement& texture();
+            std::shared_ptr<RenderSizedElement> normal();
+            std::shared_ptr<RenderSizedElement> hover();
+            std::shared_ptr<RenderSizedElement> clicked();
+            sized<RenderSizedElement>& front();
 
             /*
             Re-render this element

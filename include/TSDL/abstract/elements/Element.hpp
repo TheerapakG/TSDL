@@ -74,6 +74,17 @@ namespace TSDL
 
         bool operator==(const Element& lhs, const Element& rhs);
         bool operator!=(const Element& lhs, const Element& rhs);
+
+        class RenderSizedElement: virtual public Element
+        {
+            public:
+            using Element::Element;
+
+            /*
+            Forces this element to be rendered with specified size
+            */
+            virtual void render(const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) = 0;
+        };
     }
 }
 

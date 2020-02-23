@@ -1,21 +1,22 @@
-#ifndef TSDL_ELEMENTS_TEXTUREELEMENT_
-#define TSDL_ELEMENTS_TEXTUREELEMENT_
+#ifndef TSDL_ELEMENTS_RECTANGLE_
+#define TSDL_ELEMENTS_RECTANGLE_
 
 #include "TSDL/abstract/elements/Sized.hpp"
-#include <memory>
+
+#include "TSDL/TSDL_Meta.hpp"
 
 namespace TSDL
 {
     namespace elements
     {
-        class TextureElement: public sized<RenderSizedElement>
+        class Rectangle: public sized<RenderSizedElement>
         {
             private:
-            std::shared_ptr<TSDL_Texture> _texture;
+            color_rgba _color;
 
             public:
-            TextureElement(const TextureElement& other);
-            TextureElement(TSDL_Renderer& renderer, const point_2d& size, std::shared_ptr<TSDL_Texture> texture);
+            Rectangle(const Rectangle& other);
+            Rectangle(TSDL_Renderer& renderer, const point_2d& size, const color_rgba& color = {0, 0, 0, 255});
 
             /*
             Re-render this element

@@ -6,10 +6,12 @@
 
 namespace
 {
+    using namespace ::TSDL;
     using namespace ::TSDL::events;
+    using namespace ::TSDL::elements;
 }
 
-TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size):
+Button::Button(TSDL_Renderer& _renderer, const point_2d& _size):
     Element(_renderer),
     sized<eventdispatcher<Element>>(std::ref(_renderer), _size)
 {
@@ -71,7 +73,7 @@ TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size):
     );
 }
 
-TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, const ListenerMap& listeners):
+Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, const ListenerMap& listeners):
     Element(_renderer),
     sized<eventdispatcher<Element>>(std::ref(_renderer), _size, listeners)
 {
@@ -96,7 +98,7 @@ TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, 
     );
 }
 
-TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, ListenerMap&& listeners):
+Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, ListenerMap&& listeners):
     Element(_renderer),
     sized<eventdispatcher<Element>>(std::ref(_renderer), _size, listeners)
 {
@@ -121,86 +123,75 @@ TSDL::elements::Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, 
     );
 }
 
-TSDL::elements::Button& TSDL::elements::Button::color(const ::TSDL::color_rgba& color)
+Button& Button::normal(const std::shared_ptr<RenderSizedElement>& element)
 {
-    _color = color;
+    _normal = element;
     return *this;
 }
 
-TSDL::elements::Button& TSDL::elements::Button::hover_color(const ::TSDL::color_rgba& color)
+Button& Button::hover(const std::shared_ptr<RenderSizedElement>& element)
 {
-    _hover_color = color;
+    _hover = element;
     return *this;
 }
 
-TSDL::elements::Button& TSDL::elements::Button::clicked_color(const ::TSDL::color_rgba& color)
+Button& Button::clicked(const std::shared_ptr<RenderSizedElement>& element)
 {
-    _clicked_color = color;
+    _clicked = element;
     return *this;
 }
 
-TSDL::elements::Button& TSDL::elements::Button::text_color(const ::TSDL::color_rgba& color)
+Button& Button::front(optional_reference<sized<RenderSizedElement>> front)
 {
-    _text_color = color;
+    _front = front;
     return *this;
 }
 
-TSDL::elements::Button& TSDL::elements::Button::texture(optional_reference<TextureElement> texture)
+std::shared_ptr<RenderSizedElement> Button::normal()
 {
-    _texture = texture;
-    return *this;
+    return _normal;
 }
 
-TSDL::color_rgba TSDL::elements::Button::color()
+std::shared_ptr<RenderSizedElement> Button::hover()
 {
-    return _color;
+    return _hover;
 }
 
-TSDL::color_rgba TSDL::elements::Button::hover_color()
+std::shared_ptr<RenderSizedElement> Button::clicked()
 {
-    return _hover_color;
+    return _clicked;
 }
 
-TSDL::color_rgba TSDL::elements::Button::clicked_color()
+sized<RenderSizedElement>& Button::front()
 {
-    return _clicked_color;
+    return _front.value();
 }
 
-TSDL::color_rgba TSDL::elements::Button::text_color()
-{
-    return _text_color;
-}
-
-TSDL::elements::TextureElement& TSDL::elements::Button::texture()
-{
-    return _texture.value();
-}
-
-void TSDL::elements::Button::render(const ::TSDL::point_2d& dist)
+void Button::render(const ::TSDL::point_2d& dist)
 {
     // TODO: renderer RAII
     auto& _renderer = renderer();
     switch (state)
     {
     case ButtonState::NORMAL:
-        _renderer.fill_rect(_color, {dist, dist+size()});
+        _normal->render(dist, size());
         break;
 
     case ButtonState::HOVER:
-        _renderer.fill_rect(_hover_color, {dist, dist+size()});
+        _hover->render(dist, size());
         break;
 
     case ButtonState::CLICKED:
-        _renderer.fill_rect(_clicked_color, {dist, dist+size()});
+        _clicked->render(dist, size());
         break;
     
     default:
         break;
     }
 
-    if(_texture)
+    if(_front)
     {
-        TextureElement& _telement = _texture.value().get();
+        sized<RenderSizedElement>& _telement = _front.value().get();
         const ::TSDL::point_2d texture_final_size = size() - 2 * ::TSDL::point_2d(_padding, _padding);
         const ::TSDL::point_2d texture_size = _telement.size();
         double x_ratio = static_cast<double>(texture_final_size.x) / texture_size.x;
