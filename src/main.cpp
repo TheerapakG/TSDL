@@ -63,6 +63,9 @@ int main(int argc, char* argv[])
         TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 40);
         #endif
 
+        TSDL::elements::FilledEllipse ellipse(renderer, {512, 256});
+        grid.add_child(ellipse, {256, 256});
+
         TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Drag Me!", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
         TSDL::elements::TextureElement buttontextelement(
@@ -80,6 +83,7 @@ int main(int argc, char* argv[])
 
         button.front(buttontextelement);
         grid.add_child(button, {64, 64});
+
         TSDL::elements::EventloopAdapter elementAdapter(renderer, eventloop, grid);
 
         eventloop.add_event_handler(SDL_QUIT, quit_handler);

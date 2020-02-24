@@ -80,6 +80,11 @@ int TSDL::TSDL_Renderer::render_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
     {
         TSDL::safe_throw<std::runtime_error>("Could not set renderer color! SDL Error: " + std::string(SDL_GetError()));
     }
+    _t = SDL_SetRenderDrawBlendMode(_internal_ptr, a==0xFF?SDL_BLENDMODE_NONE:SDL_BLENDMODE_BLEND);
+    if(_t != 0)
+    {
+        TSDL::safe_throw<std::runtime_error>("Could not set renderer blend mode! SDL Error: " + std::string(SDL_GetError()));
+    }
     return _t;
 }
 
