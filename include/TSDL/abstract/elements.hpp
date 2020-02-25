@@ -6,5 +6,7 @@
 #include "elements/EventloopAdapter.hpp"
 #include "elements/FilledEllipse.hpp"
 #include "elements/Grid.hpp"
+#include "elements/Rectangle.hpp"
+#include "elements/RoundedRectangle.hpp"
 #include "elements/Sized.hpp"
 #include "elements/TextureElement.hpp"
