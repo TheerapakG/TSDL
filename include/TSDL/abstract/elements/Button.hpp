@@ -19,21 +19,21 @@ namespace TSDL
             CLICKED
         };
 
-        class Button: public sized<eventdispatcher<Element>>
+        class Button: public sized<eventdispatcher<DependentElement>>
         {
             private:
-            std::shared_ptr<RenderSizedElement> _normal = std::make_shared<Rectangle>(renderer(), point_2d{0, 0}, color_rgba{211, 211, 211, 128});
-            std::shared_ptr<RenderSizedElement> _hover = std::make_shared<Rectangle>(renderer(), point_2d{0, 0}, color_rgba{192, 192, 192, 128});
-            std::shared_ptr<RenderSizedElement> _clicked = std::make_shared<Rectangle>(renderer(), point_2d{0, 0}, color_rgba{128, 128, 128, 128});
+            std::shared_ptr<RenderSizedElement> _normal = std::make_shared<Rectangle>(eventloop(), point_2d{0, 0}, color_rgba{211, 211, 211, 128});
+            std::shared_ptr<RenderSizedElement> _hover = std::make_shared<Rectangle>(eventloop(), point_2d{0, 0}, color_rgba{192, 192, 192, 128});
+            std::shared_ptr<RenderSizedElement> _clicked = std::make_shared<Rectangle>(eventloop(), point_2d{0, 0}, color_rgba{128, 128, 128, 128});
             optional_reference<sized<RenderSizedElement>> _front;
             int _padding = 8;
 
             ButtonState state = ButtonState::NORMAL;
 
             public:
-            Button(TSDL_Renderer& renderer, const point_2d& size);
-            Button(TSDL_Renderer& renderer, const point_2d& size, const ListenerMap& listeners);
-            Button(TSDL_Renderer& renderer, const point_2d& size, ListenerMap&& listeners);
+            Button(EventloopAdapter& evloop, const point_2d& size);
+            Button(EventloopAdapter& evloop, const point_2d& size, const ListenerMap& listeners);
+            Button(EventloopAdapter& evloop, const point_2d& size, ListenerMap&& listeners);
 
             Button& normal(const std::shared_ptr<RenderSizedElement>& element);
             Button& hover(const std::shared_ptr<RenderSizedElement>& element);
@@ -44,6 +44,11 @@ namespace TSDL
             std::shared_ptr<RenderSizedElement> hover();
             std::shared_ptr<RenderSizedElement> clicked();
             sized<RenderSizedElement>& front();
+
+            /*
+            Query if parent need to update this element on the next cycle
+            */
+            virtual bool need_update() const override;
 
             /*
             Re-render this element

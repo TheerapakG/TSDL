@@ -22,11 +22,11 @@ namespace TSDL
         };
 
         template <class T>
-        class sized: public std::enable_if_t<std::is_base_of_v<Element, T>, T>, public Sized
+        class sized: public std::enable_if_t<std::is_base_of_v<DependentElement, T>, T>, public Sized
         {
             public:
             template <typename ...Args>
-            sized(TSDL_Renderer& renderer, const point_2d& size, Args... args): T(renderer, args...), Sized(size) {}
+            sized(EventloopAdapter& evloop, const point_2d& size, Args... args): T(evloop, args...), Sized(size) {}
 
             using Sized::size;
 

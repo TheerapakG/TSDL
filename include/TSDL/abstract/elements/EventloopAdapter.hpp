@@ -4,10 +4,12 @@
 #include <vector>
 #include <tuple>
 #include <map>
+#include <queue>
 #include <functional>
 #include <optional>
 #include "TSDL/abstract/elements/EventDispatcher.hpp"
 
+#include "TSDL/TSDL_Meta.hpp"
 #include "TSDL/TSDL_Eventloop.hpp"
 #include "TSDL/TSDL_Renderer.hpp"
 
@@ -19,12 +21,13 @@ namespace TSDL
         {
             private:
             TSDL_Eventloop& _evloop;
-            Element& _src;
+            optional_reference<DependentElement> _src;
             std::set <::TSDL::EventHandler*> _handlers;
+            std::queue<std::reference_wrapper<DependentElement>> _not_update_el;
             
             public:
             EventloopAdapter() = delete;
-            EventloopAdapter(TSDL_Renderer& renderer, TSDL_Eventloop& evloop, Element& src);
+            EventloopAdapter(TSDL_Renderer& renderer, TSDL_Eventloop& evloop);
 
             ~EventloopAdapter();
 
@@ -33,7 +36,19 @@ namespace TSDL
             */
             virtual void render(const ::TSDL::point_2d& dist) override;
 
-            Element& src() const;
+            /*
+            Call not_update on the specified element after render finished
+            */
+            void register_not_update(DependentElement& element);
+
+            /*
+            set source
+            */
+            void src(DependentElement& src);
+            // set source to none
+            void src(std::nullopt_t);
+
+            DependentElement& src() const;
         };
     }
 }

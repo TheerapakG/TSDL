@@ -184,6 +184,15 @@ namespace TSDL
     }
 
     template <typename T>
+    T& get_ref(const optional_reference<T>& stdref)
+    {
+        return stdref.value().get();
+    }
+
+    template <typename T>
+    using optional_const_reference = std::optional<const std::reference_wrapper<T>>;
+
+    template <typename T>
     std::optional<const std::reference_wrapper<T>> make_optional_const_ref(T&& ref)
     {
         return ref;
@@ -193,6 +202,12 @@ namespace TSDL
     std::optional<const std::reference_wrapper<T>> make_optional_const_ref()
     {
         return std::optional<const std::reference_wrapper<T>>();
+    }
+
+    template <typename T>
+    T& get_ref(const optional_const_reference<T>& stdref)
+    {
+        return stdref.value().get();
     }
 
     template <typename T>

@@ -15,7 +15,7 @@ namespace TSDL
     {
         struct Subelement
         {
-            Element* element = nullptr;
+            DependentElement* element = nullptr;
             std::pair<point_2d, point_2d> dimension;
 
             Sized* _sized = nullptr;
@@ -23,17 +23,17 @@ namespace TSDL
             bool operator==(const Subelement& other);
         };
 
-        class ElementHolder: virtual public Element
+        class ElementHolder: public DependentElement
         {
             private:
             std::vector <Subelement> _subelements_order;
-            std::map <Element*, Subelement> _subelements_info;
+            std::map <DependentElement*, Subelement> _subelements_info;
 
             public:
-            ElementHolder(TSDL_Renderer& renderer);
+            ElementHolder(EventloopAdapter& evloop);
 
-            void add_child(Element& subelement, const point_2d& topleft, const point_2d& bottomright);
-            void add_child(Element& subelement, const point_2d& topleft, const point_2d& bottomright, int order);
+            void add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright);
+            void add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright, int order);
 
             template<typename T>
             void add_child(sized<T>& subelement, const point_2d& topleft)
@@ -64,11 +64,11 @@ namespace TSDL
                 update();
             }
 
-            void reorder_child(Element& subelement, int order);
-            void move_child(Element& subelement, const point_2d& destination);
-            void remove_child(Element& subelement);
+            void reorder_child(DependentElement& subelement, int order);
+            void move_child(DependentElement& subelement, const point_2d& destination);
+            void remove_child(DependentElement& subelement);
 
-            Subelement child_info(Element& subelement);
+            Subelement child_info(DependentElement& subelement);
 
             const std::vector<Subelement>& get_child_order();
             std::optional<Subelement> highest_child(const point_2d& point);

@@ -29,7 +29,7 @@ namespace TSDL
             };
 
             template <class T>
-            class dragable: public std::enable_if_t<std::is_base_of_v<Element, T>, T>, public Dragable
+            class dragable: public std::enable_if_t<std::is_base_of_v<DependentElement, T>, T>, public Dragable
             {
                 private:
                 bool _focused = false;
@@ -38,10 +38,10 @@ namespace TSDL
                 public:
                 template <typename ...Args>
                 dragable(
-                    TSDL_Renderer& renderer, 
+                    EventloopAdapter& evloop, 
                     DragablePosTransformer pos_transform, 
                     Args... args
-                ): Element(renderer), T(renderer, args...), Dragable(pos_transform) 
+                ): Element(evloop.renderer()), T(evloop, args...), Dragable(pos_transform) 
                 {
                     T::add_event_handler(
                         ::TSDL::events::EventType::LeftDown,
@@ -86,11 +86,11 @@ namespace TSDL
 
                 template <typename ...Args>
                 dragable(
-                    TSDL_Renderer& renderer, 
+                    EventloopAdapter& evloop, 
                     ::TSDL::point_2d origin, 
                     DragablePosTransformer pos_transform, 
                     Args... args
-                ): Element(renderer), T(renderer, args...), Dragable(pos_transform, origin) 
+                ): Element(evloop.renderer()), T(evloop, args...), Dragable(pos_transform, origin)
                 {
                     T::add_event_handler(
                         ::TSDL::events::EventType::LeftDown,

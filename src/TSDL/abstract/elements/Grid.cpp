@@ -1,9 +1,10 @@
 #include "TSDL/abstract/elements/Grid.hpp"
+#include "TSDL/abstract/elements/EventloopAdapter.hpp"
 
-TSDL::elements::Grid::Grid(TSDL_Renderer& renderer): Grid(renderer, ListenerMap()) {}
+TSDL::elements::Grid::Grid(EventloopAdapter& evloop): Grid(evloop, ListenerMap()) {}
 
-TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners): 
-    Element(renderer), ElementHolder(renderer), eventdispatcher<Element>(renderer, listeners)
+TSDL::elements::Grid::Grid(EventloopAdapter& evloop, const ListenerMap& listeners): 
+    Element(evloop.renderer()), eventdispatcher<ElementHolder>(evloop, listeners)
 {
     Element::add_event_handler(
         ::TSDL::events::EventType::MouseMotion, 
@@ -18,7 +19,7 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
 
                 if(sized != nullptr) bottomright = topleft + sized->size();
 
-                Element* element = element_ptr;
+                DependentElement* element = element_ptr;
 
                 if(topleft.x < _dist.x && _dist.x < bottomright.x &&
                     topleft.y < _dist.y && _dist.y < bottomright.y)
@@ -51,7 +52,7 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
                         }
                         else
                         {
-                            Element& _actual_focus = _current_mouse_focus.value();
+                            DependentElement& _actual_focus = _current_mouse_focus.value();
                             _actual_focus.dispatch_event(Caller(*this, _dist - child_info(_actual_focus).dimension.first), ::TSDL::events::EventType::MouseOut, event);
                             _current_mouse_focus = *element;
                             element->dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseIn, event);
@@ -61,7 +62,7 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
             }
             if(_current_mouse_focus.has_value())
             {
-                Element& _actual_focus = _current_mouse_focus.value();
+                DependentElement& _actual_focus = _current_mouse_focus.value();
                 _actual_focus.dispatch_event(Caller(*this, _dist - child_info(_actual_focus).dimension.first), ::TSDL::events::EventType::MouseOut, event);
                 _current_mouse_focus.reset();
             }
@@ -76,7 +77,7 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
             {
                 _left_origin = _current_mouse_focus;
                 point_2d _dist = caller.second;
-                Element& _actual_focus = _current_mouse_focus.value();
+                DependentElement& _actual_focus = _current_mouse_focus.value();
                 _actual_focus.dispatch_event(Caller(*this, _dist - child_info(_actual_focus).dimension.first), ::TSDL::events::EventType::LeftDown, event);
             }
             return false;
@@ -89,11 +90,11 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
             if(_current_mouse_focus.has_value())
             {
                 point_2d _dist = caller.second;
-                Element& _actual_focus = _current_mouse_focus.value();
+                DependentElement& _actual_focus = _current_mouse_focus.value();
                 _actual_focus.dispatch_event(Caller(*this, _dist - child_info(_actual_focus).dimension.first), ::TSDL::events::EventType::LeftUp, event);
                 if(_left_origin.has_value())
                 {
-                    Element& _actual_origin = _left_origin.value();
+                    DependentElement& _actual_origin = _left_origin.value();
                     if(_actual_origin == _actual_focus)
                     {
                         _actual_origin.dispatch_event(Caller(*this, _dist - child_info(_actual_origin).dimension.first), ::TSDL::events::EventType::LeftUp_Inside, event);
@@ -108,7 +109,7 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
             else if(_left_origin.has_value())
             {
                 point_2d _dist = caller.second;
-                Element& _actual_origin = _left_origin.value();
+                DependentElement& _actual_origin = _left_origin.value();
                 _actual_origin.dispatch_event(Caller(*this, _dist - child_info(_actual_origin).dimension.first), ::TSDL::events::EventType::LeftUp_Outside, event);
                 _left_origin.reset();
             }
@@ -123,7 +124,7 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
             {
                 _right_origin = _current_mouse_focus;
                 point_2d _dist = caller.second;
-                Element& _actual_focus = _current_mouse_focus.value();
+                DependentElement& _actual_focus = _current_mouse_focus.value();
                 _actual_focus.dispatch_event(Caller(*this, _dist - child_info(_actual_focus).dimension.first), ::TSDL::events::EventType::RightDown, event);
             }
             return false;
@@ -136,11 +137,11 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
             if(_current_mouse_focus.has_value())
             {
                 point_2d _dist = caller.second;
-                Element& _actual_focus = _current_mouse_focus.value();
+                DependentElement& _actual_focus = _current_mouse_focus.value();
                 _actual_focus.dispatch_event(Caller(*this, _dist - child_info(_actual_focus).dimension.first), ::TSDL::events::EventType::RightUp, event);
                 if(_right_origin.has_value())
                 {
-                    Element& _actual_origin = _right_origin.value();
+                    DependentElement& _actual_origin = _right_origin.value();
                     if(_actual_origin == _actual_focus)
                     {
                         _actual_origin.dispatch_event(Caller(*this, _dist - child_info(_actual_origin).dimension.first), ::TSDL::events::EventType::RightUp_Inside, event);
@@ -155,7 +156,7 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
             else if(_right_origin.has_value())
             {
                 point_2d _dist = caller.second;
-                Element& _actual_origin = _right_origin.value();
+                DependentElement& _actual_origin = _right_origin.value();
                 _actual_origin.dispatch_event(Caller(*this, _dist - child_info(_actual_origin).dimension.first), ::TSDL::events::EventType::RightUp_Outside, event);
                 _right_origin.reset();
             }
@@ -170,7 +171,7 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
             {
                 _middle_origin = _current_mouse_focus;
                 point_2d _dist = caller.second;
-                Element& _actual_focus = _current_mouse_focus.value();
+                DependentElement& _actual_focus = _current_mouse_focus.value();
                 _actual_focus.dispatch_event(Caller(*this, _dist - child_info(_actual_focus).dimension.first), ::TSDL::events::EventType::MiddleDown, event);
             }
             return false;
@@ -183,11 +184,11 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
             if(_current_mouse_focus.has_value())
             {
                 point_2d _dist = caller.second;
-                Element& _actual_focus = _current_mouse_focus.value();
+                DependentElement& _actual_focus = _current_mouse_focus.value();
                 _actual_focus.dispatch_event(Caller(*this, _dist - child_info(_actual_focus).dimension.first), ::TSDL::events::EventType::MiddleUp, event);
                 if(_middle_origin.has_value())
                 {
-                    Element& _actual_origin = _middle_origin.value();
+                    DependentElement& _actual_origin = _middle_origin.value();
                     if(_actual_origin == _actual_focus)
                     {
                         _actual_origin.dispatch_event(Caller(*this, _dist - child_info(_actual_origin).dimension.first), ::TSDL::events::EventType::MiddleUp_Inside, event);
@@ -202,7 +203,7 @@ TSDL::elements::Grid::Grid(TSDL_Renderer& renderer, const ListenerMap& listeners
             else if(_middle_origin.has_value())
             {
                 point_2d _dist = caller.second;
-                Element& _actual_origin = _middle_origin.value();
+                DependentElement& _actual_origin = _middle_origin.value();
                 _actual_origin.dispatch_event(Caller(*this, _dist - child_info(_actual_origin).dimension.first), ::TSDL::events::EventType::MiddleUp_Outside, event);
                 _middle_origin.reset();
             }

@@ -45,12 +45,19 @@ int main(int argc, char* argv[])
         //Initialize SDL
         TSDL::TSDL tsdl;
 
+        eventloop.add_event_handler(SDL_QUIT, quit_handler);
+
         TSDL::TSDL_Window window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         
         TSDL::TSDL_Renderer renderer(window, SDL_RENDERER_TARGETTEXTURE);
-        TSDL::elements::Grid grid(renderer);
+
+        TSDL::elements::EventloopAdapter evAdapter(renderer, eventloop);
+
+        TSDL::elements::Grid grid(evAdapter);
+        evAdapter.src(grid);
+
         elattrs::dragable<TSDL::elements::Button> button(
-            renderer, 
+            evAdapter, 
             [](const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist) -> ::TSDL::point_2d { return start + dist; }, 
             ::TSDL::point_2d{256, 64}
         );
@@ -63,13 +70,13 @@ int main(int argc, char* argv[])
         TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 40);
         #endif
 
-        TSDL::elements::FilledEllipse ellipse(renderer, {512, 256});
+        TSDL::elements::FilledEllipse ellipse(evAdapter, {512, 256});
         grid.add_child(ellipse, {256, 256});
 
         TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Drag Me!", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
         TSDL::elements::TextureElement buttontextelement(
-            renderer, 
+            evAdapter, 
             buttontext->size(),
             std::shared_ptr <TSDL::TSDL_Texture> ( 
                 new TSDL::TSDL_Texture(
@@ -83,10 +90,6 @@ int main(int argc, char* argv[])
 
         button.front(buttontextelement);
         grid.add_child(button, {64, 64});
-
-        TSDL::elements::EventloopAdapter elementAdapter(renderer, eventloop, grid);
-
-        eventloop.add_event_handler(SDL_QUIT, quit_handler);
 
         std::thread t(say_fps);
         eventloop.run();
