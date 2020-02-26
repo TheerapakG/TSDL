@@ -1,4 +1,5 @@
 #include "TSDL/abstract/elements/Button.hpp"
+#include "TSDL/abstract/elements/EventloopAdapter.hpp"
 #include "TSDL/TSDL_Meta.hpp"
 
 #include <algorithm>
@@ -11,9 +12,8 @@ namespace
     using namespace ::TSDL::elements;
 }
 
-Button::Button(TSDL_Renderer& _renderer, const point_2d& _size):
-    Element(_renderer),
-    sized<eventdispatcher<Element>>(std::ref(_renderer), _size)
+Button::Button(EventloopAdapter& evloop, const point_2d& _size):
+    Element(evloop.renderer()), sized<eventdispatcher<DependentElement>>(evloop, _size)
 {
     Element::add_event_handler(
         EventType::MouseIn,
@@ -73,9 +73,8 @@ Button::Button(TSDL_Renderer& _renderer, const point_2d& _size):
     );
 }
 
-Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, const ListenerMap& listeners):
-    Element(_renderer),
-    sized<eventdispatcher<Element>>(std::ref(_renderer), _size, listeners)
+Button::Button(EventloopAdapter& evloop, const point_2d& _size, const ListenerMap& listeners):
+    Element(evloop.renderer()), sized<eventdispatcher<DependentElement>>(evloop, _size, listeners)
 {
     Element::add_event_handler(
         EventType::MouseIn,
@@ -98,9 +97,8 @@ Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, const ListenerMa
     );
 }
 
-Button::Button(TSDL_Renderer& _renderer, const point_2d& _size, ListenerMap&& listeners):
-    Element(_renderer),
-    sized<eventdispatcher<Element>>(std::ref(_renderer), _size, listeners)
+Button::Button(EventloopAdapter& evloop, const point_2d& _size, ListenerMap&& listeners):
+    Element(evloop.renderer()), sized<eventdispatcher<DependentElement>>(evloop, _size, listeners)
 {
     Element::add_event_handler(
         EventType::MouseIn,
@@ -165,6 +163,28 @@ std::shared_ptr<RenderSizedElement> Button::clicked()
 sized<RenderSizedElement>& Button::front()
 {
     return _front.value();
+}
+
+bool Button::need_update() const
+{
+    switch (state)
+    {
+    case ButtonState::NORMAL:
+        if(_normal->need_update()) return true;
+        break;
+
+    case ButtonState::HOVER:
+        if(_hover->need_update()) return true;
+        break;
+
+    case ButtonState::CLICKED:
+        if(_clicked->need_update()) return true;
+        break;
+    
+    default:
+        break;
+    }
+    return sized<eventdispatcher<DependentElement>>::need_update();
 }
 
 void Button::render(const ::TSDL::point_2d& dist)

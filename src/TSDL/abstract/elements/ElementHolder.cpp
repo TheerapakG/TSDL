@@ -1,4 +1,5 @@
 #include "TSDL/abstract/elements/ElementHolder.hpp"
+#include "TSDL/abstract/elements/EventloopAdapter.hpp"
 #include "TSDL/TSDL_Meta.hpp"
 #include <algorithm>
 
@@ -7,10 +8,10 @@ bool ::TSDL::elements::Subelement::operator==(const ::TSDL::elements::Subelement
     return element == other.element && dimension == other.dimension;
 }
 
-TSDL::elements::ElementHolder::ElementHolder(TSDL_Renderer& renderer): 
-    Element(renderer) {}
+TSDL::elements::ElementHolder::ElementHolder(EventloopAdapter& evloop): 
+    Element(evloop.renderer()), DependentElement(evloop) {}
 
-void TSDL::elements::ElementHolder::add_child(Element& subelement, const point_2d& topleft, const point_2d& bottomright)
+void TSDL::elements::ElementHolder::add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright)
 {
     std::pair el_loc(topleft, bottomright);
     Subelement el_all{&subelement, el_loc};
@@ -23,7 +24,7 @@ void TSDL::elements::ElementHolder::add_child(Element& subelement, const point_2
     update();
 }
 
-void TSDL::elements::ElementHolder::add_child(Element& subelement, const point_2d& topleft, const point_2d& bottomright, int order)
+void TSDL::elements::ElementHolder::add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright, int order)
 {
     std::pair el_loc(topleft, bottomright);
     Subelement el_all{&subelement, el_loc};
@@ -37,7 +38,7 @@ void TSDL::elements::ElementHolder::add_child(Element& subelement, const point_2
     update();
 }
 
-void TSDL::elements::ElementHolder::reorder_child(Element& subelement, int order)
+void TSDL::elements::ElementHolder::reorder_child(DependentElement& subelement, int order)
 {
     std::swap(
         std::find(_subelements_order.begin(), _subelements_order.end(), _subelements_info[&subelement]),
@@ -47,7 +48,7 @@ void TSDL::elements::ElementHolder::reorder_child(Element& subelement, int order
     update();
 }
 
-void TSDL::elements::ElementHolder::move_child(Element& subelement, const point_2d& destination)
+void TSDL::elements::ElementHolder::move_child(DependentElement& subelement, const point_2d& destination)
 {
     auto el = std::find(_subelements_order.begin(), _subelements_order.end(), _subelements_info[&subelement]);
     el->dimension = {destination, el->dimension.second + destination - el->dimension.first};
@@ -56,7 +57,7 @@ void TSDL::elements::ElementHolder::move_child(Element& subelement, const point_
     update();
 }
 
-void TSDL::elements::ElementHolder::remove_child(Element& subelement)
+void TSDL::elements::ElementHolder::remove_child(DependentElement& subelement)
 {
     auto el_all_node = _subelements_info.extract(&subelement);
     _subelements_order.erase(
@@ -70,7 +71,7 @@ void TSDL::elements::ElementHolder::remove_child(Element& subelement)
     update();
 }
 
-TSDL::elements::Subelement TSDL::elements::ElementHolder::child_info(::TSDL::elements::Element& subelement)
+TSDL::elements::Subelement TSDL::elements::ElementHolder::child_info(::TSDL::elements::DependentElement& subelement)
 {
     return _subelements_info.at(&subelement);
 }
@@ -94,7 +95,7 @@ std::optional<TSDL::elements::Subelement> TSDL::elements::ElementHolder::highest
 
 bool TSDL::elements::ElementHolder::need_update() const
 {
-    return Element::need_update() ||
+    return DependentElement::need_update() ||
         std::any_of(
             _subelements_order.cbegin(), 
             _subelements_order.cend(), 

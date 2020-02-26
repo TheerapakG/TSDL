@@ -7,13 +7,9 @@ using namespace std::placeholders;
 
 namespace
 {
-    void _render(const TSDL::elements::EventloopAdapter* adapter)
+    void _render(TSDL::elements::EventloopAdapter* adapter)
     {
-        TSDL::TSDL_Renderer& renderer = adapter->renderer();
-        TSDL::elements::Element& src = adapter->src();
-
-        if (!src.need_update()) return;
-        src.render({0, 0});
+        adapter->render({0, 0});
     }
 
     void _handle_window_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
@@ -157,8 +153,8 @@ namespace
     }
 }
 
-TSDL::elements::EventloopAdapter::EventloopAdapter(TSDL_Renderer& renderer, TSDL_Eventloop& evloop, Element& src):
-    Element(renderer), eventdispatcher<Element>(renderer), _evloop(evloop), _src(src)
+TSDL::elements::EventloopAdapter::EventloopAdapter(TSDL_Renderer& renderer, TSDL_Eventloop& evloop):
+    eventdispatcher<Element>(renderer), _evloop(evloop)
 {
     if(_evloop.render_function()) 
     {
@@ -201,12 +197,35 @@ TSDL::elements::EventloopAdapter::~EventloopAdapter()
     _evloop.remove_event_handler(SDL_MOUSEBUTTONUP);
 }
 
+// TODO: remove
 void TSDL::elements::EventloopAdapter::render(const ::TSDL::point_2d& dist)
 {
-    _src.render({0, 0});
+    DependentElement& _c_src = get_ref(_src);
+    if (!_c_src.need_update()) return;
+    _c_src.render(dist);
+    while(!_not_update_el.empty())
+    {
+        _not_update_el.front().get()._update = false;
+        _not_update_el.pop();
+    }
 }
 
-TSDL::elements::Element& TSDL::elements::EventloopAdapter::src() const
+void TSDL::elements::EventloopAdapter::register_not_update(DependentElement& element)
 {
-    return _src;
+    _not_update_el.emplace(element);
+}
+
+void TSDL::elements::EventloopAdapter::src(DependentElement& src)
+{
+    _src.emplace(src);
+}
+
+void TSDL::elements::EventloopAdapter::src(std::nullopt_t)
+{
+    _src.reset();
+}
+
+TSDL::elements::DependentElement& TSDL::elements::EventloopAdapter::src() const
+{
+    return get_ref(_src);
 }

@@ -1,4 +1,5 @@
 #include "TSDL/abstract/elements/Element.hpp"
+#include "TSDL/abstract/elements/EventloopAdapter.hpp"
 #include <memory>
 
 TSDL::elements::Element::Element(TSDL_Renderer& renderer): _renderer(renderer) {}
@@ -11,21 +12,6 @@ std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> TSDL::eleme
 TSDL::TSDL_Renderer& TSDL::elements::Element::renderer() const
 {
     return _renderer;
-}
-
-void TSDL::elements::Element::update()
-{
-    _update = true;
-}
-
-void TSDL::elements::Element::not_update()
-{
-    _update = false;
-}
-
-bool TSDL::elements::Element::need_update() const
-{
-    return _update;
 }
 
 void TSDL::elements::Element::add_event_handler(const TSDL::events::EventType& eventtype, const EventHandler& evhandler)
@@ -66,4 +52,27 @@ bool TSDL::elements::operator==(const TSDL::elements::Element& lhs, const TSDL::
 bool TSDL::elements::operator!=(const TSDL::elements::Element& lhs, const TSDL::elements::Element& rhs)
 {
     return std::addressof(lhs) != std::addressof(rhs);
+}
+
+TSDL::elements::DependentElement::DependentElement(EventloopAdapter& evloop):
+    Element(evloop.renderer()), _evloop(evloop) {}
+
+TSDL::elements::EventloopAdapter& TSDL::elements::DependentElement::eventloop() const
+{
+    return _evloop;
+}
+
+void TSDL::elements::DependentElement::update()
+{
+    _update = true;
+}
+
+void TSDL::elements::DependentElement::not_update()
+{
+    _evloop.register_not_update(*this);
+}
+
+bool TSDL::elements::DependentElement::need_update() const
+{
+    return _update;
 }

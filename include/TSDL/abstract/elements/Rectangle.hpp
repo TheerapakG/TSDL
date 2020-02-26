@@ -16,7 +16,7 @@ namespace TSDL
 
             public:
             Rectangle(const Rectangle& other);
-            Rectangle(TSDL_Renderer& renderer, const point_2d& size, const color_rgba& color = {0, 0, 0, 255});
+            Rectangle(EventloopAdapter& evloop, const point_2d& size, const color_rgba& color = {0, 0, 0, 255});
 
             /*
             Re-render this element

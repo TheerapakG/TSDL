@@ -18,16 +18,19 @@ namespace TSDL
 
         class ElementHolder;
         class EventDispatcher;
+        class EventloopAdapter;
 
         using Caller = std::pair<std::reference_wrapper<::TSDL::elements::EventDispatcher>, point_2d>;
         using EventHandler = std::function<bool(const Caller&, const SDL_Event&)>;
-        
+
+        /*
+        All types inherited from Element shall inherit Element virtually
+        */        
         class Element
         {
             // TODO: after_render queue for setting element as re-rendered callback and also other callback
             private:
             TSDL_Renderer& _renderer;
-            std::atomic<bool> _update = true;
             std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> _holders;
             std::map <::TSDL::events::EventType, std::vector<EventHandler>> _evhdlrmap;
             
@@ -48,21 +51,6 @@ namespace TSDL
             TSDL_Renderer& renderer() const;
 
             /*
-            Make parent update this element on the next cycle
-            */
-            void update();
-
-            /*
-            Reverse what update() did
-            */
-            void not_update();
-
-            /*
-            Query if parent need to update this element on the next cycle
-            */
-            virtual bool need_update() const;
-
-            /*
             Re-render this element
             */
             virtual void render(const ::TSDL::point_2d& dist) = 0;
@@ -75,10 +63,42 @@ namespace TSDL
         bool operator==(const Element& lhs, const Element& rhs);
         bool operator!=(const Element& lhs, const Element& rhs);
 
-        class RenderSizedElement: virtual public Element
+        class DependentElement: virtual public Element
+        {
+            private:
+            EventloopAdapter& _evloop;
+            std::atomic<bool> _update = true;
+
+            public:
+            DependentElement(EventloopAdapter& evloop);
+
+            friend class EventloopAdapter;
+
+            /*
+            Get bounded eventloop
+            */
+            EventloopAdapter& eventloop() const;
+
+            /*
+            Make parent update this element on the next cycle
+            */
+            void update();
+
+            /*
+            Reverse what update() did after this cycle finished but before the next cycle begins
+            */
+            void not_update();
+
+            /*
+            Query if parent need to update this element on the next cycle
+            */
+            virtual bool need_update() const;
+        };
+
+        class RenderSizedElement: public DependentElement
         {
             public:
-            using Element::Element;
+            using DependentElement::DependentElement;
 
             /*
             Forces this element to be rendered with specified size
