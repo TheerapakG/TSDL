@@ -3,10 +3,10 @@
 #include "TSDL/TSDL_Meta.hpp"
 
 TSDL::elements::RoundedRectangle::RoundedRectangle(const RoundedRectangle& other):
-    sized<RenderSizedElement>(other.eventloop(), other.renderer(), other.size()), _color(other._color), _r(other._r) {}
+    attrs::sizable<RenderSizedElement>(other.eventloop(), other.renderer(), other.size()), _color(other._color), _r(other._r) {}
 
 TSDL::elements::RoundedRectangle::RoundedRectangle(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ::TSDL::point_2d& size, int r, const ::TSDL::color_rgba& color):
-    sized<RenderSizedElement>(evloop, renderer, size), _color(color), _r(r) {}
+    attrs::sizable<RenderSizedElement>(evloop, renderer, size), _color(color), _r(r) {}
 
 void TSDL::elements::RoundedRectangle::render(const ::TSDL::point_2d& dist)
 {

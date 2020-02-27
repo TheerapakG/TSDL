@@ -16,11 +16,15 @@ namespace TSDL
     {
         class Element;
 
-        class EventDispatcher;
         class EventloopAdapter;
         class ElementHolder;
 
-        using Caller = std::pair<std::reference_wrapper<::TSDL::elements::EventDispatcher>, point_2d>;
+        namespace attrs
+        {
+            class EventDispatcher;
+        }
+
+        using Caller = std::pair<std::reference_wrapper<::TSDL::elements::attrs::EventDispatcher>, point_2d>;
         using EventHandler = std::function<bool(const Caller&, const SDL_Event&)>;
 
         /*

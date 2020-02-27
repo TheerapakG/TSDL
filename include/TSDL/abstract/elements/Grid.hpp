@@ -7,14 +7,14 @@
 #include <functional>
 #include <optional>
 #include "TSDL/abstract/elements/ElementHolder.hpp"
-#include "TSDL/abstract/elements/EventDispatcher.hpp"
+#include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
 #include "TSDL/TSDL_Meta.hpp"
 
 namespace TSDL
 {
     namespace elements
     {
-        class Grid: public eventdispatcher<ElementHolder>
+        class Grid: public attrs::eventdispatcher<ElementHolder>
         {
             private:
             optional_reference<DependentElement> _current_mouse_focus;
@@ -22,7 +22,7 @@ namespace TSDL
 
             public:
             Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer); 
-            Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ListenerMap& listeners);
+            Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const attrs::ListenerMap& listeners);
         };
     }
 }

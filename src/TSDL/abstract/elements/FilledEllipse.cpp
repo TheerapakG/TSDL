@@ -3,10 +3,10 @@
 #include "TSDL/TSDL_Meta.hpp"
 
 TSDL::elements::FilledEllipse::FilledEllipse(const FilledEllipse& other):
-    sized<RenderSizedElement>(other.eventloop(), other.renderer(), other.size()), _color(other._color) {}
+    attrs::sizable<RenderSizedElement>(other.eventloop(), other.renderer(), other.size()), _color(other._color) {}
 
 TSDL::elements::FilledEllipse::FilledEllipse(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ::TSDL::point_2d& size, const ::TSDL::color_rgba& color):
-    sized<RenderSizedElement>(evloop, renderer, size), _color(color) {}
+    attrs::sizable<RenderSizedElement>(evloop, renderer, size), _color(color) {}
 
 void TSDL::elements::FilledEllipse::render(const ::TSDL::point_2d& dist)
 {

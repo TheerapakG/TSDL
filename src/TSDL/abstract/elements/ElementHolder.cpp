@@ -110,7 +110,7 @@ void TSDL::elements::ElementHolder::render(const ::TSDL::point_2d& dist)
     _renderer.clear({0xFF, 0xFF, 0xFF, 0xFF});
     for(Subelement& subelement: _subelements_order)
     {
-        auto& [el_ptr, dim, sized] = subelement;
+        auto& [el_ptr, dim, sizable] = subelement;
         auto el = el_ptr;
         el->render(dim.first);
     }
