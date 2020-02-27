@@ -32,29 +32,21 @@ namespace TSDL
         {
             public:
             template <typename ...Args>
-            eventdispatcher(TSDL_Renderer& renderer, Args... args): T(renderer, args...), EventDispatcher(ListenerMap()) {}
+            eventdispatcher(Args... args): T(args...), EventDispatcher(ListenerMap()) {}
 			template <typename ...Args>
-            eventdispatcher(TSDL_Renderer& renderer, const ListenerMap& listeners, Args... args):
-                T(renderer, args...), EventDispatcher(listeners) {}
+            eventdispatcher(const ListenerMap& listeners, Args... args):
+                T(args...), EventDispatcher(listeners) {}
 			template <typename ...Args>
-            eventdispatcher(TSDL_Renderer& renderer, ListenerMap&& listeners, Args... args):
-                T(renderer, args...), EventDispatcher(listeners) {}
-            template <typename U = std::enable_if_t<std::is_same_v<Element, T>>, typename ...Args>
-            eventdispatcher(EventloopAdapter& evloop, Args... args): T(evloop, args...), EventDispatcher(ListenerMap()) {}
-            template <typename U = std::enable_if_t<std::is_same_v<Element, T>>, typename ...Args>
-            eventdispatcher(EventloopAdapter& evloop, const ListenerMap& listeners, Args... args):
-                T(evloop, args...), EventDispatcher(listeners) {}
-            template <typename U = std::enable_if_t<std::is_same_v<Element, T>>, typename ...Args>
-            eventdispatcher(EventloopAdapter& evloop, ListenerMap&& listeners, Args... args):
-                T(evloop, args...), EventDispatcher(listeners) {}
-            template <typename U = std::enable_if_t<!std::is_same_v<Element, T>, EventloopAdapter>, typename ...Args>
-            eventdispatcher(U& evloop, Args... args) : Element(evloop.renderer()), T(evloop, args...), EventDispatcher(ListenerMap()) {}
-            template <typename U = std::enable_if_t<!std::is_same_v<Element, T>, EventloopAdapter>, typename ...Args>
-            eventdispatcher(U& evloop, const ListenerMap& listeners, Args... args) :
-                Element(evloop.renderer()), T(evloop, args...), EventDispatcher(listeners) {}
-            template <typename U = std::enable_if_t<!std::is_same_v<Element, T>, EventloopAdapter>, typename ...Args>
-            eventdispatcher(U& evloop, ListenerMap&& listeners, Args... args) :
-                Element(evloop.renderer()), T(evloop, args...), EventDispatcher(listeners) {}
+            eventdispatcher(ListenerMap&& listeners, Args... args):
+                T(args...), EventDispatcher(listeners) {}
+            template <typename ...Args>
+            eventdispatcher(EventloopAdapter& evloop, TSDL_Renderer& renderer, Args... args): T(evloop, renderer, args...), EventDispatcher(ListenerMap()) {}
+            template <typename ...Args>
+            eventdispatcher(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ListenerMap& listeners, Args... args):
+                T(evloop, renderer, args...), EventDispatcher(listeners) {}
+            template <typename ...Args>
+            eventdispatcher(EventloopAdapter& evloop, TSDL_Renderer& renderer, ListenerMap&& listeners, Args... args):
+                T(evloop, renderer, args...), EventDispatcher(listeners) {}
 
             virtual bool dispatch_event(
                 const Caller& caller, const ::TSDL::events::EventType& eventtype, const SDL_Event& event) override

@@ -7,11 +7,6 @@ using namespace std::placeholders;
 
 namespace
 {
-    void _render(TSDL::elements::EventloopAdapter* adapter)
-    {
-        adapter->render({0, 0});
-    }
-
     void _handle_window_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
         switch (event.window.event)
@@ -153,15 +148,26 @@ namespace
     }
 }
 
-TSDL::elements::EventloopAdapter::EventloopAdapter(TSDL_Renderer& renderer, TSDL_Eventloop& evloop):
-    eventdispatcher<Element>(renderer), _evloop(evloop)
+TSDL::elements::EventloopAdapter::EventloopAdapter(TSDL_Eventloop& evloop): _evloop(evloop)
 {
     if(_evloop.render_function()) 
     {
         TSDL::safe_throw<std::runtime_error>("Could not bind render adapter to an eventloop that already have render function");
         return;
     }
-    _evloop.render_function(std::bind(_render, this));
+    _evloop.render_function(
+        [this]() -> void
+        {
+            DependentElement& _c_src = get_ref(_src);
+            if (!_c_src.need_update()) return;
+            _c_src.render({0, 0});
+            while(!_not_update_el.empty())
+            {
+                _not_update_el.front().get()._update = false;
+                _not_update_el.pop();
+            }
+        }
+    );
     _evloop.add_event_handler(
         SDL_WINDOWEVENT, std::bind(_handle_window_event, this, _1)
     );
@@ -195,19 +201,6 @@ TSDL::elements::EventloopAdapter::~EventloopAdapter()
     _evloop.remove_event_handler(SDL_MOUSEMOTION);
     _evloop.remove_event_handler(SDL_MOUSEBUTTONDOWN);
     _evloop.remove_event_handler(SDL_MOUSEBUTTONUP);
-}
-
-// TODO: remove
-void TSDL::elements::EventloopAdapter::render(const ::TSDL::point_2d& dist)
-{
-    DependentElement& _c_src = get_ref(_src);
-    if (!_c_src.need_update()) return;
-    _c_src.render(dist);
-    while(!_not_update_el.empty())
-    {
-        _not_update_el.front().get()._update = false;
-        _not_update_el.pop();
-    }
 }
 
 void TSDL::elements::EventloopAdapter::register_not_update(DependentElement& element)

@@ -16,9 +16,9 @@ namespace TSDL
     {
         class Element;
 
-        class ElementHolder;
         class EventDispatcher;
         class EventloopAdapter;
+        class ElementHolder;
 
         using Caller = std::pair<std::reference_wrapper<::TSDL::elements::EventDispatcher>, point_2d>;
         using EventHandler = std::function<bool(const Caller&, const SDL_Event&)>;
@@ -30,30 +30,11 @@ namespace TSDL
         {
             // TODO: after_render queue for setting element as re-rendered callback and also other callback
             private:
-            TSDL_Renderer& _renderer;
-            std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> _holders;
             std::map <::TSDL::events::EventType, std::vector<EventHandler>> _evhdlrmap;
             
             public:
-            Element() = delete;
-            Element(TSDL_Renderer& renderer);
-
-            friend class ElementHolder;
-
-            /*
-            Get bounded holder
-            */
-            std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> holder() const;
-
-            /*
-            Get bounded renderer
-            */
-            TSDL_Renderer& renderer() const;
-
-            /*
-            Re-render this element
-            */
-            virtual void render(const ::TSDL::point_2d& dist) = 0;
+            Element() = default;
+            Element(const Element&) = delete;
 
             virtual bool dispatch_event(const Caller& caller, const ::TSDL::events::EventType& eventtype, const SDL_Event& event);            
             void add_event_handler(const ::TSDL::events::EventType& eventtype, const EventHandler& evhandler);
@@ -66,13 +47,26 @@ namespace TSDL
         class DependentElement: virtual public Element
         {
             private:
+            TSDL_Renderer& _renderer;
             EventloopAdapter& _evloop;
             std::atomic<bool> _update = true;
+            std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> _holders;
 
             public:
-            DependentElement(EventloopAdapter& evloop);
+            DependentElement(EventloopAdapter& evloop, TSDL_Renderer& renderer);
 
             friend class EventloopAdapter;
+            friend class ElementHolder;
+
+            /*
+            Get bounded holder
+            */
+            std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> holder() const;
+
+            /*
+            Get bounded renderer
+            */
+            TSDL_Renderer& renderer() const;
 
             /*
             Get bounded eventloop
@@ -93,6 +87,11 @@ namespace TSDL
             Query if parent need to update this element on the next cycle
             */
             virtual bool need_update() const;
+
+            /*
+            Re-render this element
+            */
+            virtual void render(const ::TSDL::point_2d& dist) = 0;
         };
 
         class RenderSizedElement: public DependentElement

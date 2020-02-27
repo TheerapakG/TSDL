@@ -30,7 +30,7 @@ namespace TSDL
             std::map <DependentElement*, Subelement> _subelements_info;
 
             public:
-            ElementHolder(EventloopAdapter& evloop);
+            ElementHolder(EventloopAdapter& evloop, TSDL_Renderer& renderer);
 
             void add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright);
             void add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright, int order);

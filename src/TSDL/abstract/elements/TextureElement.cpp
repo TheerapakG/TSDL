@@ -3,10 +3,10 @@
 #include "TSDL/TSDL_Meta.hpp"
 
 TSDL::elements::TextureElement::TextureElement(const TextureElement& other):
-    Element(other.renderer()), sized<RenderSizedElement>(other.eventloop(), other.size()), _texture(other._texture) {}
+    sized<RenderSizedElement>(other.eventloop(), other.renderer(), other.size()), _texture(other._texture) {}
 
-TSDL::elements::TextureElement::TextureElement(EventloopAdapter& evloop, const ::TSDL::point_2d& size, std::shared_ptr<::TSDL::TSDL_Texture> texture):
-    Element(evloop.renderer()), sized<RenderSizedElement>(evloop, size), _texture(texture) {}
+TSDL::elements::TextureElement::TextureElement(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ::TSDL::point_2d& size, std::shared_ptr<::TSDL::TSDL_Texture> texture):
+    sized<RenderSizedElement>(evloop, renderer, size), _texture(texture) {}
 
 void TSDL::elements::TextureElement::render(const ::TSDL::point_2d& dist)
 {

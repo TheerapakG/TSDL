@@ -27,14 +27,9 @@ namespace TSDL
             
             public:
             EventloopAdapter() = delete;
-            EventloopAdapter(TSDL_Renderer& renderer, TSDL_Eventloop& evloop);
+            EventloopAdapter(TSDL_Eventloop& evloop);
 
             ~EventloopAdapter();
-
-            /*
-            Re-render this element
-            */
-            virtual void render(const ::TSDL::point_2d& dist) override;
 
             /*
             Call not_update on the specified element after render finished

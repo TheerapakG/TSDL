@@ -21,8 +21,8 @@ namespace TSDL
             optional_reference<DependentElement> _left_origin, _right_origin, _middle_origin;
 
             public:
-            Grid(EventloopAdapter& evloop); 
-            Grid(EventloopAdapter& evloop, const ListenerMap& listeners);
+            Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer); 
+            Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ListenerMap& listeners);
         };
     }
 }
