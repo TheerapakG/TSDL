@@ -8,8 +8,8 @@ bool ::TSDL::elements::Subelement::operator==(const ::TSDL::elements::Subelement
     return element == other.element && dimension == other.dimension;
 }
 
-TSDL::elements::ElementHolder::ElementHolder(EventloopAdapter& evloop): 
-    Element(evloop.renderer()), DependentElement(evloop) {}
+TSDL::elements::ElementHolder::ElementHolder(EventloopAdapter& evloop, TSDL_Renderer& renderer): 
+    DependentElement(evloop, renderer) {}
 
 void TSDL::elements::ElementHolder::add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright)
 {

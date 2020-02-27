@@ -17,7 +17,7 @@ namespace TSDL
 
             public:
             RoundedRectangle(const RoundedRectangle& other);
-            RoundedRectangle(EventloopAdapter& evloop, const point_2d& size, int r, const color_rgba& color = {0, 0, 0, 255});
+            RoundedRectangle(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int r, const color_rgba& color = {0, 0, 0, 255});
 
             /*
             Re-render this element

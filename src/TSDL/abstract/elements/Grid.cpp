@@ -1,10 +1,10 @@
 #include "TSDL/abstract/elements/Grid.hpp"
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
 
-TSDL::elements::Grid::Grid(EventloopAdapter& evloop): Grid(evloop, ListenerMap()) {}
+TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer): Grid(evloop, renderer, ListenerMap()) {}
 
-TSDL::elements::Grid::Grid(EventloopAdapter& evloop, const ListenerMap& listeners): 
-    Element(evloop.renderer()), eventdispatcher<ElementHolder>(evloop, listeners)
+TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ListenerMap& listeners): 
+    eventdispatcher<ElementHolder>(evloop, renderer, listeners)
 {
     Element::add_event_handler(
         ::TSDL::events::EventType::MouseMotion, 

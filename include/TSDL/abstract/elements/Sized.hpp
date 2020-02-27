@@ -26,7 +26,7 @@ namespace TSDL
         {
             public:
             template <typename ...Args>
-            sized(EventloopAdapter& evloop, const point_2d& size, Args... args): T(evloop, args...), Sized(size) {}
+            sized(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, Args... args): T(evloop, renderer, args...), Sized(size) {}
 
             using Sized::size;
 

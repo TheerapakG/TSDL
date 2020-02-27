@@ -12,8 +12,8 @@ namespace
     using namespace ::TSDL::elements;
 }
 
-Button::Button(EventloopAdapter& evloop, const point_2d& _size):
-    Element(evloop.renderer()), sized<eventdispatcher<DependentElement>>(evloop, _size)
+Button::Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& _size):
+    sized<eventdispatcher<DependentElement>>(evloop, renderer, _size)
 {
     Element::add_event_handler(
         EventType::MouseIn,
@@ -73,8 +73,8 @@ Button::Button(EventloopAdapter& evloop, const point_2d& _size):
     );
 }
 
-Button::Button(EventloopAdapter& evloop, const point_2d& _size, const ListenerMap& listeners):
-    Element(evloop.renderer()), sized<eventdispatcher<DependentElement>>(evloop, _size, listeners)
+Button::Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& _size, const ListenerMap& listeners):
+    sized<eventdispatcher<DependentElement>>(evloop, renderer, _size, listeners)
 {
     Element::add_event_handler(
         EventType::MouseIn,
@@ -97,8 +97,8 @@ Button::Button(EventloopAdapter& evloop, const point_2d& _size, const ListenerMa
     );
 }
 
-Button::Button(EventloopAdapter& evloop, const point_2d& _size, ListenerMap&& listeners):
-    Element(evloop.renderer()), sized<eventdispatcher<DependentElement>>(evloop, _size, listeners)
+Button::Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& _size, ListenerMap&& listeners):
+    sized<eventdispatcher<DependentElement>>(evloop, renderer, _size, listeners)
 {
     Element::add_event_handler(
         EventType::MouseIn,

@@ -39,9 +39,10 @@ namespace TSDL
                 template <typename ...Args>
                 dragable(
                     EventloopAdapter& evloop, 
+                    TSDL_Renderer& renderer, 
                     DragablePosTransformer pos_transform, 
                     Args... args
-                ): Element(evloop.renderer()), T(evloop, args...), Dragable(pos_transform) 
+                ): T(evloop, renderer, args...), Dragable(pos_transform) 
                 {
                     T::add_event_handler(
                         ::TSDL::events::EventType::LeftDown,
@@ -86,11 +87,12 @@ namespace TSDL
 
                 template <typename ...Args>
                 dragable(
-                    EventloopAdapter& evloop, 
+                    EventloopAdapter& evloop,
+                    TSDL_Renderer& renderer,  
                     ::TSDL::point_2d origin, 
                     DragablePosTransformer pos_transform, 
                     Args... args
-                ): Element(evloop.renderer()), T(evloop, args...), Dragable(pos_transform, origin)
+                ): T(evloop, renderer, args...), Dragable(pos_transform, origin)
                 {
                     T::add_event_handler(
                         ::TSDL::events::EventType::LeftDown,

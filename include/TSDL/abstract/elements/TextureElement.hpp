@@ -15,7 +15,7 @@ namespace TSDL
 
             public:
             TextureElement(const TextureElement& other);
-            TextureElement(EventloopAdapter& evloop, const point_2d& size, std::shared_ptr<TSDL_Texture> texture);
+            TextureElement(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, std::shared_ptr<TSDL_Texture> texture);
 
             /*
             Re-render this element

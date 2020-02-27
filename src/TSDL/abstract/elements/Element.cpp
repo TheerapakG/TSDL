@@ -2,28 +2,6 @@
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
 #include <memory>
 
-TSDL::elements::Element::Element(TSDL_Renderer& renderer): _renderer(renderer) {}
-
-std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> TSDL::elements::Element::holder() const
-{
-    return _holders;
-}
-
-TSDL::TSDL_Renderer& TSDL::elements::Element::renderer() const
-{
-    return _renderer;
-}
-
-void TSDL::elements::Element::add_event_handler(const TSDL::events::EventType& eventtype, const EventHandler& evhandler)
-{
-    _evhdlrmap[eventtype].emplace_back(evhandler);
-}
-
-void TSDL::elements::Element::remove_event_handler(const TSDL::events::EventType& eventtype)
-{
-    _evhdlrmap.erase(eventtype);
-}
-
 bool TSDL::elements::Element::dispatch_event(const Caller& caller, const TSDL::events::EventType& eventtype, const SDL_Event& event)
 {
     std::vector<EventHandler> h;
@@ -44,6 +22,16 @@ bool TSDL::elements::Element::dispatch_event(const Caller& caller, const TSDL::e
     return _ret;
 }
 
+void TSDL::elements::Element::add_event_handler(const TSDL::events::EventType& eventtype, const EventHandler& evhandler)
+{
+    _evhdlrmap[eventtype].emplace_back(evhandler);
+}
+
+void TSDL::elements::Element::remove_event_handler(const TSDL::events::EventType& eventtype)
+{
+    _evhdlrmap.erase(eventtype);
+}
+
 bool TSDL::elements::operator==(const TSDL::elements::Element& lhs, const TSDL::elements::Element& rhs)
 {
     return std::addressof(lhs) == std::addressof(rhs);
@@ -54,8 +42,18 @@ bool TSDL::elements::operator!=(const TSDL::elements::Element& lhs, const TSDL::
     return std::addressof(lhs) != std::addressof(rhs);
 }
 
-TSDL::elements::DependentElement::DependentElement(EventloopAdapter& evloop):
-    Element(evloop.renderer()), _evloop(evloop) {}
+TSDL::elements::DependentElement::DependentElement(EventloopAdapter& evloop, TSDL_Renderer& renderer):
+    _evloop(evloop), _renderer(renderer) {}
+
+std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> TSDL::elements::DependentElement::holder() const
+{
+    return _holders;
+}
+
+TSDL::TSDL_Renderer& TSDL::elements::DependentElement::renderer() const
+{
+    return _renderer;
+}
 
 TSDL::elements::EventloopAdapter& TSDL::elements::DependentElement::eventloop() const
 {
