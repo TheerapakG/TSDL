@@ -6,7 +6,7 @@
 #include <map>
 #include <functional>
 #include <optional>
-#include "TSDL/abstract/elements/Sized.hpp"
+#include "TSDL/abstract/elements/attrs/Sizable.hpp"
 #include "TSDL/abstract/elements/Element.hpp"
 
 namespace TSDL
@@ -18,7 +18,7 @@ namespace TSDL
             DependentElement* element = nullptr;
             std::pair<point_2d, point_2d> dimension;
 
-            Sized* _sized = nullptr;
+            attrs::Sizable* _sizable = nullptr;
 
             bool operator==(const Subelement& other);
         };
@@ -36,7 +36,7 @@ namespace TSDL
             void add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright, int order);
 
             template<typename T>
-            void add_child(sized<T>& subelement, const point_2d& topleft)
+            void add_child(attrs::sizable<T>& subelement, const point_2d& topleft)
             {
 				std::pair<point_2d, point_2d> el_loc(topleft, {0, 0});
                 Subelement el_all{&subelement, el_loc, &subelement};
@@ -50,7 +50,7 @@ namespace TSDL
             }
 
             template<typename T>
-            void add_child(sized<T>& subelement, const point_2d& topleft, int order)
+            void add_child(attrs::sizable<T>& subelement, const point_2d& topleft, int order)
             {
                 std::pair<point_2d, point_2d> el_loc(topleft, {0, 0});
                 Subelement el_all{&subelement, el_loc, &subelement};

@@ -7,7 +7,7 @@
 #include <queue>
 #include <functional>
 #include <optional>
-#include "TSDL/abstract/elements/EventDispatcher.hpp"
+#include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
 
 #include "TSDL/TSDL_Meta.hpp"
 #include "TSDL/TSDL_Eventloop.hpp"
@@ -17,7 +17,7 @@ namespace TSDL
 {
     namespace elements
     {
-        class EventloopAdapter: public eventdispatcher<Element>
+        class EventloopAdapter: public attrs::eventdispatcher<Element>
         {
             private:
             TSDL_Eventloop& _evloop;

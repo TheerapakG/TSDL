@@ -1,10 +1,10 @@
 #include "TSDL/abstract/elements/Grid.hpp"
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
 
-TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer): Grid(evloop, renderer, ListenerMap()) {}
+TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer): Grid(evloop, renderer, attrs::ListenerMap()) {}
 
-TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ListenerMap& listeners): 
-    eventdispatcher<ElementHolder>(evloop, renderer, listeners)
+TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const attrs::ListenerMap& listeners): 
+    attrs::eventdispatcher<ElementHolder>(evloop, renderer, listeners)
 {
     Element::add_event_handler(
         ::TSDL::events::EventType::MouseMotion, 
@@ -14,10 +14,10 @@ TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, co
 
             for(const Subelement& subelement: ::TSDL::reverse(get_child_order()))
             {
-                auto& [element_ptr, dim, sized] = subelement;
+                auto& [element_ptr, dim, sizable] = subelement;
                 auto [topleft, bottomright] = dim;
 
-                if(sized != nullptr) bottomright = topleft + sized->size();
+                if(sizable != nullptr) bottomright = topleft + sizable->size();
 
                 DependentElement* element = element_ptr;
 

@@ -1,7 +1,7 @@
 #ifndef TSDL_ELEMENTS_FILLEDELLIPSE_
 #define TSDL_ELEMENTS_FILLEDELLIPSE_
 
-#include "TSDL/abstract/elements/Sized.hpp"
+#include "TSDL/abstract/elements/attrs/Sizable.hpp"
 
 #include "TSDL/TSDL_Meta.hpp"
 
@@ -9,7 +9,7 @@ namespace TSDL
 {
     namespace elements
     {
-        class FilledEllipse: public sized<RenderSizedElement>
+        class FilledEllipse: public attrs::sizable<RenderSizedElement>
         {
             private:
             color_rgba _color;

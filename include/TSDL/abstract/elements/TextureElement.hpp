@@ -1,14 +1,14 @@
 #ifndef TSDL_ELEMENTS_TEXTUREELEMENT_
 #define TSDL_ELEMENTS_TEXTUREELEMENT_
 
-#include "TSDL/abstract/elements/Sized.hpp"
+#include "TSDL/abstract/elements/attrs/Sizable.hpp"
 #include <memory>
 
 namespace TSDL
 {
     namespace elements
     {
-        class TextureElement: public sized<RenderSizedElement>
+        class TextureElement: public attrs::sizable<RenderSizedElement>
         {
             private:
             std::shared_ptr<TSDL_Texture> _texture;
