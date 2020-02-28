@@ -235,5 +235,11 @@ int TSDL::TSDL_Renderer::draw_point(int x, int y)
 int TSDL::TSDL_Renderer::update()
 {
     SDL_RenderPresent(_internal_ptr);
-    return this->clear();
+    return clear();
+}
+
+int TSDL::TSDL_Renderer::update(const color_rgba& c)
+{
+    SDL_RenderPresent(_internal_ptr);
+    return clear(c);
 }

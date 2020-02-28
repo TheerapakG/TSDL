@@ -85,6 +85,7 @@ namespace TSDL
         int draw_point(int x, int y);
 
         int update();
+        int update(const color_rgba& c);
     };
 }
 

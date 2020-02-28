@@ -113,12 +113,12 @@ std::optional<TSDL::elements::Subelement> TSDL::elements::ElementHolder::highest
     return std::optional<::TSDL::elements::Subelement>();
 }
 
-void TSDL::elements::ElementHolder::render_position(const point_2d& position)
+void TSDL::elements::ElementHolder::render_position(const rect& position)
 {
     _render_position = position;
 }
 
-::TSDL::point_2d TSDL::elements::ElementHolder::render_position()
+::TSDL::rect TSDL::elements::ElementHolder::render_position()
 {
     return _render_position;
 }
@@ -135,29 +135,26 @@ bool TSDL::elements::ElementHolder::need_update() const
 
 void TSDL::elements::ElementHolder::render(const ::TSDL::point_2d& dist)
 {
-    ::TSDL::TSDL_Renderer& _renderer = renderer();
-    ::TSDL::point_2d size = _renderer.render_size();
+    ::TSDL::point_2d r_topleft = _render_position.topleft();
+    ::TSDL::point_2d r_bottomright = _render_position.bottomright();
 
-    _renderer.clear({0xFF, 0xFF, 0xFF, 0xFF});
     for(Subelement& subelement: _subelements_order)
     {
         auto& [el_ptr, dim, sizable] = subelement;
         auto el = el_ptr;
         
-        ::TSDL::point_2d topleft = dist+_render_position+dim.first;
-        ::TSDL::point_2d bottomright = dist+_render_position;
+        ::TSDL::point_2d topleft = dim.first;
+        ::TSDL::point_2d bottomright = {0, 0};
         if(sizable == nullptr) bottomright += dim.second;
         else bottomright += dim.first + sizable->size();
 
-        if( (bottomright.x > 0 || bottomright.y > 0) && 
-            (topleft.x < size.x || topleft.y < size.y)
+        if( (bottomright.x > r_topleft.x || bottomright.y > r_topleft.y) && 
+            (topleft.x < r_bottomright.x || topleft.y < r_bottomright.y)
         )
         {
-            el->render(dist+_render_position+dim.first);
+            el->render(dist+topleft-r_topleft);
         }
     }
-    _renderer.update();
-
     not_update();
 }
 

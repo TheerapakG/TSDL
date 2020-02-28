@@ -26,18 +26,36 @@ TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, co
                     {
                         if(_left_origin.has_value())
                         {
-                            Element& _actual_origin = _left_origin.value();
-                            if(*element != _actual_origin) _actual_origin.dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseMotion, event);
+                            DependentElement& _actual_origin = _left_origin.value();
+                            if(*element != _actual_origin)
+                            {
+                                _actual_origin.dispatch_event(
+                                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                                    ::TSDL::events::EventType::MouseMotion, event
+                                );
+                            }
                         }
                         if(_middle_origin.has_value())
                         {
-                            Element& _actual_origin = _left_origin.value();
-                            if(*element != _actual_origin) _actual_origin.dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseMotion, event);
+                            DependentElement& _actual_origin = _left_origin.value();
+                            if(*element != _actual_origin)
+                            {
+                                _actual_origin.dispatch_event(
+                                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                                    ::TSDL::events::EventType::MouseMotion, event
+                                );
+                            }
                         }
                         if(_right_origin.has_value())
                         {
-                            Element& _actual_origin = _left_origin.value();
-                            if(*element != _actual_origin) element->dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseMotion, event);
+                            DependentElement& _actual_origin = _left_origin.value();
+                            if(*element != _actual_origin)
+                            {
+                                _actual_origin.dispatch_event(
+                                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                                    ::TSDL::events::EventType::MouseMotion, event
+                                );
+                            }
                         }
 
                         if(!_current_mouse_focus.has_value())
@@ -60,6 +78,32 @@ TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, co
                         return false;
                     }
             }
+
+            if(_left_origin.has_value())
+            {
+                DependentElement& _actual_origin = _left_origin.value();
+                _actual_origin.dispatch_event(
+                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                    ::TSDL::events::EventType::MouseMotion, event
+                );
+            }
+            if(_middle_origin.has_value())
+            {
+                DependentElement& _actual_origin = _left_origin.value();
+                _actual_origin.dispatch_event(
+                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                    ::TSDL::events::EventType::MouseMotion, event
+                );
+            }
+            if(_right_origin.has_value())
+            {
+                DependentElement& _actual_origin = _left_origin.value();
+                _actual_origin.dispatch_event(
+                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                    ::TSDL::events::EventType::MouseMotion, event
+                );
+            }
+
             if(_current_mouse_focus.has_value())
             {
                 DependentElement& _actual_focus = _current_mouse_focus.value();
