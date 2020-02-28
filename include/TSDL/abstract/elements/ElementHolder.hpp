@@ -28,6 +28,7 @@ namespace TSDL
             private:
             std::vector <Subelement> _subelements_order;
             std::map <DependentElement*, Subelement> _subelements_info;
+            point_2d _render_position = {0, 0};
 
             public:
             ElementHolder(EventloopAdapter& evloop, TSDL_Renderer& renderer);
@@ -69,9 +70,13 @@ namespace TSDL
             void remove_child(DependentElement& subelement);
 
             Subelement child_info(DependentElement& subelement);
+            rect bound();
 
             const std::vector<Subelement>& get_child_order();
             std::optional<Subelement> highest_child(const point_2d& point);
+
+            void render_position(const point_2d& position);
+            point_2d render_position();
 
             /*
             Query if parent need to update this element on the next cycle

@@ -1,5 +1,5 @@
-#ifndef TSDL_ELEMENTS_SIZABLE_
-#define TSDL_ELEMENTS_SIZABLE_
+#ifndef TSDL_ELEMENTS_ATTRS_SIZABLE_
+#define TSDL_ELEMENTS_ATTRS_SIZABLE_
 
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
 #include "TSDL/TSDL_Main.hpp"
