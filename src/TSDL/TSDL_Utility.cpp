@@ -118,6 +118,16 @@ TSDL::rect::rect(const point_2d& topleft, const point_2d& bottomright): SDL_Rect
     }
 ) {}
 
+TSDL::point_2d TSDL::rect::topleft()
+{
+    return {x, y};
+}
+
+TSDL::point_2d TSDL::rect::bottomright()
+{
+    return {x+w, y+h};
+}
+
 TSDL::rect::operator TSDL::_rect()
 {
     return std::make_tuple(TSDL::point_2d(x, y), TSDL::point_2d(w, h));

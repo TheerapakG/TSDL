@@ -78,7 +78,7 @@ TSDL::TSDL::TSDL(int frequency)
                     {
                         #ifdef TSDL_USE_FONTCONFIG
                         std::cout << "initializing Fontconfig..." << std::endl;
-                        if(!FcInit())
+                        if(!FcInitLoadConfig())
                         {
                             FcFini();
                             TTF_Quit();

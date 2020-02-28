@@ -160,7 +160,9 @@ TSDL::elements::EventloopAdapter::EventloopAdapter(TSDL_Eventloop& evloop): _evl
         {
             DependentElement& _c_src = get_ref(_src);
             if (!_c_src.need_update()) return;
+            _c_src.renderer().clear({ 255, 255, 255, 255 });
             _c_src.render({0, 0});
+            _c_src.renderer().update();
             while(!_not_update_el.empty())
             {
                 _not_update_el.front().get()._update = false;
