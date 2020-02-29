@@ -1,5 +1,5 @@
-#ifndef TSDL_ELEMENTS_RECTANGLE_
-#define TSDL_ELEMENTS_RECTANGLE_
+#ifndef TSDL_ELEMENTS_FILLEDRECTANGLE_
+#define TSDL_ELEMENTS_FILLEDRECTANGLE_
 
 #include "TSDL/abstract/elements/attrs/Sizable.hpp"
 
@@ -9,14 +9,14 @@ namespace TSDL
 {
     namespace elements
     {
-        class Rectangle: public attrs::sizable<RenderSizedElement>
+        class FilledRectangle: public attrs::sizable<RenderSizedElement>
         {
             private:
             color_rgba _color;
 
             public:
-            Rectangle(const Rectangle& other);
-            Rectangle(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, const color_rgba& color = {0, 0, 0, 255});
+            FilledRectangle(const FilledRectangle& other);
+            FilledRectangle(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, const color_rgba& color = {0, 0, 0, 255});
 
             /*
             Re-render this element

@@ -3,7 +3,7 @@
 
 #include "TSDL/abstract/elements/TextureElement.hpp"
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
-#include "TSDL/abstract/elements/Rectangle.hpp"
+#include "TSDL/abstract/elements/FilledRectangle.hpp"
 
 #include "TSDL/TSDL_Meta.hpp"
 #include <memory>
@@ -22,9 +22,9 @@ namespace TSDL
         class Button: public attrs::sizable<attrs::eventdispatcher<DependentElement>>
         {
             private:
-            std::shared_ptr<RenderSizedElement> _normal = std::make_shared<Rectangle>(eventloop(), renderer(), point_2d{0, 0}, color_rgba{211, 211, 211, 128});
-            std::shared_ptr<RenderSizedElement> _hover = std::make_shared<Rectangle>(eventloop(), renderer(), point_2d{0, 0}, color_rgba{192, 192, 192, 128});
-            std::shared_ptr<RenderSizedElement> _clicked = std::make_shared<Rectangle>(eventloop(), renderer(), point_2d{0, 0}, color_rgba{128, 128, 128, 128});
+            std::shared_ptr<RenderSizedElement> _normal = std::make_shared<FilledRectangle>(eventloop(), renderer(), point_2d{0, 0}, color_rgba{128, 128, 128, 128});
+            std::shared_ptr<RenderSizedElement> _hover = std::make_shared<FilledRectangle>(eventloop(), renderer(), point_2d{0, 0}, color_rgba{192, 192, 192, 128});
+            std::shared_ptr<RenderSizedElement> _clicked = std::make_shared<FilledRectangle>(eventloop(), renderer(), point_2d{0, 0}, color_rgba{211, 211, 211, 128});
             optional_reference<attrs::sizable<RenderSizedElement>> _front;
             int _padding = 8;
 
