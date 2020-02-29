@@ -56,6 +56,9 @@ int main(int argc, char* argv[])
         TSDL::elements::Grid grid(evAdapter, renderer);
         evAdapter.src(grid);
 
+        TSDL::elements::FilledRectangle bg(evAdapter, renderer, {SCREEN_WIDTH, SCREEN_HEIGHT});
+        grid.add_child(bg, {0, 0});
+
         elattrs::dragable<TSDL::elements::Button> button(
             evAdapter, renderer,
             [](const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist) -> ::TSDL::point_2d { return start + dist; }, 
@@ -70,7 +73,7 @@ int main(int argc, char* argv[])
         TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 40);
         #endif
 
-        TSDL::elements::FilledEllipse ellipse(evAdapter, renderer, {512, 256});
+        TSDL::elements::FilledEllipse ellipse(evAdapter, renderer, {512, 256}, {128, 128, 128, 255});
         grid.add_child(ellipse, {256, 256});
 
         TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Drag Me!", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
@@ -90,6 +93,9 @@ int main(int argc, char* argv[])
 
         button.front(buttontextelement);
         grid.add_child(button, {64, 64});
+
+        TSDL::elements::BaseHorizontalScrollbar scrollbar(evAdapter, renderer, 2*SCREEN_WIDTH, {SCREEN_WIDTH, 16});
+        grid.add_child(scrollbar, {0, SCREEN_HEIGHT-16});
 
         std::thread t(say_fps);
         eventloop.run();
