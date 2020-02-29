@@ -57,7 +57,16 @@ namespace TSDL
                     );
 
                     T::add_event_handler(
-                        ::TSDL::events::EventType::LeftUp,
+                        ::TSDL::events::EventType::LeftUp_Inside,
+                        [this](const Caller&, const SDL_Event&) -> bool
+                        {
+                            _focused = false;
+                            return true;
+                        }
+                    );
+
+                    T::add_event_handler(
+                        ::TSDL::events::EventType::LeftUp_Outside,
                         [this](const Caller&, const SDL_Event&) -> bool
                         {
                             _focused = false;

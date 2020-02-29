@@ -23,6 +23,7 @@ namespace TSDL
             public:
             Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer); 
             Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const attrs::ListenerMap& listeners);
+            Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, attrs::ListenerMap&& listeners);
         };
     }
 }
