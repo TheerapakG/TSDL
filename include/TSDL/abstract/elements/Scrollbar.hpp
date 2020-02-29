@@ -2,6 +2,7 @@
 #define TSDL_ELEMENTS_SCROLLBAR_
 
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
+#include "TSDL/abstract/elements/attrs/Gridded.hpp"
 #include "TSDL/abstract/elements/attrs/Dragable.hpp"
 #include "TSDL/abstract/elements/Grid.hpp"
 #include "TSDL/abstract/elements/Button.hpp"
@@ -15,16 +16,13 @@ namespace TSDL::elements
     {
         using namespace std::placeholders;
 
-        //TODO: attrs::gridded
-        class BaseHorizontalScrollbar: public attrs::sizable<attrs::eventdispatcher<DependentElement>>
+        class BaseHorizontalScrollbar: public attrs::gridded<attrs::sizable<attrs::eventdispatcher<DependentElement>>>
         {
             int _content_length;
 
             virtual int _bar_length();
 
             point_2d _bar_movement_calc(const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist);
-
-            Grid _grid{eventloop(), renderer()};
 
             attrs::dragable<Button> _bar{
                 eventloop(), renderer(),

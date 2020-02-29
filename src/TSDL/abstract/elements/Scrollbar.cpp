@@ -20,203 +20,35 @@ namespace TSDL::elements
 
     BaseHorizontalScrollbar::BaseHorizontalScrollbar(
         EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size):
-        attrs::sizable<attrs::eventdispatcher<DependentElement>>(evloop, renderer, size), 
+        attrs::gridded<attrs::sizable<attrs::eventdispatcher<DependentElement>>>(evloop, renderer, size), 
         _content_length(content_length)
     {
-        Element::add_event_handler(
-            ::TSDL::events::EventType::MouseMotion,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MouseMotion, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::LeftDown,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftDown, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::LeftUp,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftUp, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::RightDown,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightDown, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::RightUp,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightUp, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::MiddleDown,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleDown, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::MiddleUp,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleUp, event);
-            }
-        );
-
-        _grid.add_child(_bar, {0, 0});
+        grid().add_child(_bar, {0, 0});
     }
 
     BaseHorizontalScrollbar::BaseHorizontalScrollbar(
         EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size, const attrs::ListenerMap& listeners):
-        attrs::sizable<attrs::eventdispatcher<DependentElement>>(evloop, renderer, size, listeners), 
+        attrs::gridded<attrs::sizable<attrs::eventdispatcher<DependentElement>>>(evloop, renderer, size, listeners), 
         _content_length(content_length)
     {
-        Element::add_event_handler(
-            ::TSDL::events::EventType::MouseMotion,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MouseMotion, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::LeftDown,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftDown, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::LeftUp,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftUp, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::RightDown,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightDown, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::RightUp,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightUp, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::MiddleDown,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleDown, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::MiddleUp,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleUp, event);
-            }
-        );
-
-        _grid.add_child(_bar, {0, 0});
+        grid().add_child(_bar, {0, 0});
     }
 
     BaseHorizontalScrollbar::BaseHorizontalScrollbar(
         EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size, attrs::ListenerMap&& listeners):
-        attrs::sizable<attrs::eventdispatcher<DependentElement>>(evloop, renderer, size, listeners), 
+        attrs::gridded<attrs::sizable<attrs::eventdispatcher<DependentElement>>>(evloop, renderer, size, listeners), 
         _content_length(content_length)
     {
-        Element::add_event_handler(
-            ::TSDL::events::EventType::MouseMotion,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MouseMotion, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::LeftDown,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftDown, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::LeftUp,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftUp, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::RightDown,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightDown, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::RightUp,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightUp, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::MiddleDown,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleDown, event);
-            }
-        );
-
-        Element::add_event_handler(
-            ::TSDL::events::EventType::MiddleUp,
-            [this](const Caller& caller, const SDL_Event& event) -> bool
-            { 
-                return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleUp, event);
-            }
-        );
-
-        _grid.add_child(_bar, {0, 0});
+        grid().add_child(_bar, {0, 0});
     }
 
     bool BaseHorizontalScrollbar::need_update() const
     {
-        return _grid.need_update();
+        return grid().need_update();
     }
 
     void BaseHorizontalScrollbar::render(const ::TSDL::point_2d& dist)
     {
-        _grid.render(dist);
+        grid().render(dist);
     }
 }
