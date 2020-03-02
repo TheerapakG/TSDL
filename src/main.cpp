@@ -53,11 +53,14 @@ int main(int argc, char* argv[])
 
         TSDL::elements::EventloopAdapter evAdapter(eventloop);
 
-        TSDL::elements::Grid grid(evAdapter, renderer);
-        evAdapter.src(grid);
+        TSDL::elements::Grid mgrid(evAdapter, renderer);
+        evAdapter.src(mgrid);
 
         TSDL::elements::FilledRectangle bg(evAdapter, renderer, {SCREEN_WIDTH, SCREEN_HEIGHT});
-        grid.add_child(bg, {0, 0});
+        mgrid.add_child(bg, {0, 0});
+
+        TSDL::elements::Grid grid(evAdapter, renderer);
+        mgrid.add_child(grid, {0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
 
         elattrs::dragable<TSDL::elements::Button> button(
             evAdapter, renderer,
@@ -95,7 +98,17 @@ int main(int argc, char* argv[])
         grid.add_child(button, {64, 64});
 
         TSDL::elements::BaseHorizontalScrollbar scrollbar(evAdapter, renderer, 2*SCREEN_WIDTH, {SCREEN_WIDTH, 16});
-        grid.add_child(scrollbar, {0, SCREEN_HEIGHT-16});
+        scrollbar.dispatch_event_direct(TSDL::events::EventType::Dragged, grid);
+        grid.add_event_handler(
+            TSDL::events::EventType::Dragged, 
+            [&grid, &scrollbar](const TSDL::elements::Caller&, const SDL_Event&) -> bool
+            {
+                TSDL::point_2d region_x = scrollbar.represented_section();
+                grid.render_position({region_x.x, 0, region_x.y, 720});
+                return true;
+            }
+        );
+        mgrid.add_child(scrollbar, {0, SCREEN_HEIGHT-16});
 
         std::thread t(say_fps);
         eventloop.run();

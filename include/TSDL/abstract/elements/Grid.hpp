@@ -20,6 +20,8 @@ namespace TSDL
             optional_reference<DependentElement> _current_mouse_focus;
             optional_reference<DependentElement> _left_origin, _right_origin, _middle_origin;
 
+            void _init();
+
             public:
             Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer); 
             Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const attrs::ListenerMap& listeners);

@@ -24,7 +24,7 @@ namespace TSDL
                 public:
                 Dragable(DragablePosTransformer pos_transform, ::TSDL::point_2d origin = {0, 0});
 
-                ::TSDL::point_2d pos();
+                ::TSDL::point_2d pos() const;
                 void pos(const ::TSDL::point_2d& prev_pos, const ::TSDL::point_2d& dist);
             };
 
@@ -88,6 +88,7 @@ namespace TSDL
                                     _hold.move_child(*this, _this_pos - _last_pos + _hold.child_info(*this).dimension.first);
                                 }
                                 _last_pos = _this_pos;
+                                dispatch_event(Caller(*this, {0, 0}), ::TSDL::events::EventType::Dragged, event);
                             }
                             return true;
                         }
@@ -138,6 +139,7 @@ namespace TSDL
                                     _hold.move_child(*this, _this_pos - _last_pos + _hold.child_info(*this).dimension.first);
                                 }
                                 _last_pos = _this_pos;
+                                dispatch_event(Caller(*this, {0, 0}), ::TSDL::events::EventType::Dragged, event);
                             }
                             return true;
                         }

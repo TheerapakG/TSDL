@@ -116,6 +116,7 @@ std::optional<TSDL::elements::Subelement> TSDL::elements::ElementHolder::highest
 void TSDL::elements::ElementHolder::render_position(const rect& position)
 {
     _render_position = position;
+    update();
 }
 
 ::TSDL::rect TSDL::elements::ElementHolder::render_position()

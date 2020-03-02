@@ -3,7 +3,7 @@
 TSDL::elements::attrs::Dragable::Dragable(DragablePosTransformer pos_transform, ::TSDL::point_2d origin):
     _pos_transform_fun(pos_transform), _pos(origin) {}
 
-::TSDL::point_2d TSDL::elements::attrs::Dragable::pos()
+::TSDL::point_2d TSDL::elements::attrs::Dragable::pos() const
 {
     return _pos;
 }
