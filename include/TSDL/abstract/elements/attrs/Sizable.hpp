@@ -42,7 +42,7 @@ namespace TSDL
                 typename std::enable_if_t<std::is_base_of_v<EventDispatcher, U>> _size(const point_2d& size)
                 {
                     Sizable::size(size);
-                    T::dispatch_event(Caller(*this, {0, 0}), ::TSDL::events::EventType::ElementResized, ::TSDL::null_event);
+                    dispatch_event(Caller(*this, {0, 0}), ::TSDL::events::EventType::ElementResized, ::TSDL::null_event);
                 }
 
                 virtual void size(const point_2d& size) final

@@ -36,7 +36,8 @@ namespace TSDL
             MiddleUp_Outside, // Like Left*
             MouseWheel,
             ElementResized,
-            ButtonActivated
+            ButtonActivated,
+            Dragged // Dragable dragged
         };
     }
 }

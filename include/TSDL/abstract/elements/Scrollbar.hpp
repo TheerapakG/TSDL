@@ -20,7 +20,7 @@ namespace TSDL::elements
         {
             int _content_length;
 
-            virtual int _bar_length();
+            virtual int _bar_length() const;
 
             point_2d _bar_movement_calc(const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist);
 
@@ -34,6 +34,8 @@ namespace TSDL::elements
             BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size);
             BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size, const attrs::ListenerMap& listeners);
             BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size, attrs::ListenerMap&& listeners);
+
+            point_2d represented_section() const;
 
             /*
             Query if parent need to update this element on the next cycle

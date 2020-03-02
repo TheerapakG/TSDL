@@ -3,7 +3,7 @@
 
 namespace TSDL::elements
 {
-    int BaseHorizontalScrollbar::_bar_length()
+    int BaseHorizontalScrollbar::_bar_length() const
     {
         int _size_x = size().x;
         return (_size_x*_size_x)/_content_length;
@@ -24,6 +24,14 @@ namespace TSDL::elements
         _content_length(content_length)
     {
         grid().add_child(_bar, {0, 0});
+        // TODO: event forwarder
+        _bar.add_event_handler(
+            ::TSDL::events::EventType::Dragged, 
+            [this](const ::TSDL::elements::Caller&, const SDL_Event& event) -> bool
+            {
+                return dispatch_event(Caller(*this, {0, 0}), ::TSDL::events::EventType::Dragged, event);
+            }
+        );
     }
 
     BaseHorizontalScrollbar::BaseHorizontalScrollbar(
@@ -32,6 +40,14 @@ namespace TSDL::elements
         _content_length(content_length)
     {
         grid().add_child(_bar, {0, 0});
+        // TODO: event forwarder
+        _bar.add_event_handler(
+            ::TSDL::events::EventType::Dragged, 
+            [this](const ::TSDL::elements::Caller&, const SDL_Event& event) -> bool
+            {
+                return dispatch_event(Caller(*this, {0, 0}), ::TSDL::events::EventType::Dragged, event);
+            }
+        );
     }
 
     BaseHorizontalScrollbar::BaseHorizontalScrollbar(
@@ -40,6 +56,21 @@ namespace TSDL::elements
         _content_length(content_length)
     {
         grid().add_child(_bar, {0, 0});
+        // TODO: event forwarder
+        _bar.add_event_handler(
+            ::TSDL::events::EventType::Dragged, 
+            [this](const ::TSDL::elements::Caller&, const SDL_Event& event) -> bool
+            {
+                return dispatch_event(Caller(*this, {0, 0}), ::TSDL::events::EventType::Dragged, event);
+            }
+        );
+    }
+
+    point_2d BaseHorizontalScrollbar::represented_section() const
+    {
+        int _size_x = size().x;
+        int bar_left = _bar.pos().x;
+        return {(bar_left * _content_length)/_size_x, ((bar_left + _bar_length()) * _content_length)/_size_x};
     }
 
     bool BaseHorizontalScrollbar::need_update() const
