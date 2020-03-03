@@ -97,18 +97,22 @@ int main(int argc, char* argv[])
         button.front(buttontextelement);
         grid.add_child(button, {64, 64});
 
-        TSDL::elements::BaseHorizontalScrollbar scrollbar(evAdapter, renderer, 2*SCREEN_WIDTH, {SCREEN_WIDTH, 16});
-        scrollbar.dispatch_event_direct(TSDL::events::EventType::Dragged, grid);
+        TSDL::elements::BaseHorizontalScrollbar hscrollbar(evAdapter, renderer, 2*SCREEN_WIDTH, {SCREEN_WIDTH-16, 16});
+        hscrollbar.dispatch_event_direct(TSDL::events::EventType::Dragged, grid);
+        TSDL::elements::BaseVerticalScrollbar vscrollbar(evAdapter, renderer, 2*SCREEN_HEIGHT, {16, SCREEN_HEIGHT-16});
+        vscrollbar.dispatch_event_direct(TSDL::events::EventType::Dragged, grid);
         grid.add_event_handler(
             TSDL::events::EventType::Dragged, 
-            [&grid, &scrollbar](const TSDL::elements::Caller&, const SDL_Event&) -> bool
+            [&grid, &hscrollbar, &vscrollbar](const TSDL::elements::Caller&, const SDL_Event&) -> bool
             {
-                TSDL::point_2d region_x = scrollbar.represented_section();
-                grid.render_position({region_x.x, 0, region_x.y, 720});
+                TSDL::point_2d region_x = hscrollbar.represented_section();
+                TSDL::point_2d region_y = vscrollbar.represented_section();
+                grid.render_position({region_x.x, region_y.x, region_x.y, region_y.y});
                 return true;
             }
         );
-        mgrid.add_child(scrollbar, {0, SCREEN_HEIGHT-16});
+        mgrid.add_child(hscrollbar, {0, SCREEN_HEIGHT-16});
+        mgrid.add_child(vscrollbar, {SCREEN_WIDTH-16, 0});
 
         std::thread t(say_fps);
         eventloop.run();
