@@ -62,12 +62,6 @@ int main(int argc, char* argv[])
         TSDL::elements::Grid grid(evAdapter, renderer);
         mgrid.add_child(grid, {0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
 
-        elattrs::dragable<TSDL::elements::Button> button(
-            evAdapter, renderer,
-            [](const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist) -> ::TSDL::point_2d { return start + dist; }, 
-            ::TSDL::point_2d{256, 64}
-        );
-
         #ifdef TSDL_USE_FONTCONFIG
         std::string font_path = TSDL::get_family_font_filename("sans-serif");
         std::cout << "using font: " << font_path << " as sans-serif font" << std::endl;
@@ -76,8 +70,28 @@ int main(int argc, char* argv[])
         TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 40);
         #endif
 
-        TSDL::elements::FilledEllipse ellipse(evAdapter, renderer, {512, 256}, {128, 128, 128, 255});
-        grid.add_child(ellipse, {256, 256});
+        TSDL::TSDL_Surface* pathtext = new TSDL::TSDL_Surface("Current path: " + std::filesystem::current_path().string(), font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+
+        TSDL::elements::TextureElement pathtextelement(
+            evAdapter, renderer,
+            pathtext->size(),
+            std::shared_ptr <TSDL::TSDL_Texture> ( 
+                new TSDL::TSDL_Texture(
+                    renderer,
+                    *pathtext
+                )
+            )
+        );
+
+        delete pathtext;
+
+        grid.add_child(pathtextelement, {64, 64});
+
+        elattrs::dragable<TSDL::elements::Button> button(
+            evAdapter, renderer,
+            [](const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist) -> ::TSDL::point_2d { return start + dist; }, 
+            ::TSDL::point_2d{256, 64}
+        );
 
         TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Drag Me!", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
@@ -95,7 +109,7 @@ int main(int argc, char* argv[])
         delete buttontext;
 
         button.front(buttontextelement);
-        grid.add_child(button, {64, 64});
+        grid.add_child(button, {SCREEN_WIDTH-320, 64});
 
         TSDL::elements::BaseHorizontalScrollbar hscrollbar(evAdapter, renderer, 2*SCREEN_WIDTH, {SCREEN_WIDTH-16, 16});
         hscrollbar.dispatch_event_direct(TSDL::events::EventType::Dragged, grid);
