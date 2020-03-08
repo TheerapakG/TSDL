@@ -158,6 +158,11 @@ TSDL::elements::EventloopAdapter::EventloopAdapter(TSDL_Eventloop& evloop): _evl
     _evloop.render_function(
         [this]() -> void
         {
+            while(!_calls.empty())
+            {
+                _calls.front()();
+                _calls.pop();
+            }
             DependentElement& _c_src = get_ref(_src);
             if (!_c_src.need_update()) return;
             _c_src.renderer().clear({ 255, 255, 255, 255 });
@@ -208,6 +213,11 @@ TSDL::elements::EventloopAdapter::~EventloopAdapter()
 void TSDL::elements::EventloopAdapter::register_not_update(DependentElement& element)
 {
     _not_update_el.emplace(element);
+}
+
+void TSDL::elements::EventloopAdapter::register_call_next(std::function<void()> call)
+{
+    _calls.push(call);
 }
 
 void TSDL::elements::EventloopAdapter::src(DependentElement& src)
