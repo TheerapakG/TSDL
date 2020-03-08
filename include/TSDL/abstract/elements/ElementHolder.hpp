@@ -67,7 +67,7 @@ namespace TSDL
 
             void reorder_child(DependentElement& subelement, int order);
             void move_child(DependentElement& subelement, const point_2d& destination);
-            void remove_child(DependentElement& subelement);
+            virtual void remove_child(DependentElement& subelement);
 
             Subelement child_info(DependentElement& subelement);
             rect bound();

@@ -5,6 +5,7 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
+#include <vector>
 #include <typeinfo>
 #include <filesystem>
 using namespace std::literals::chrono_literals;
@@ -31,6 +32,121 @@ void say_fps()
         std::cout << eventloop.fps() << std::endl;
         std::this_thread::sleep_for(1s);
     }
+}
+
+static TSDL::elements::Grid* grid = nullptr;
+TSDL::TSDL_Font* font = nullptr;
+static std::filesystem::path current_path = std::filesystem::current_path();
+
+std::vector <TSDL::elements::DependentElement*> _previous_visual_elements;
+std::vector <TSDL::elements::DependentElement*> _dependent_visual_elements;
+
+void generate_visual_from_path()
+{
+    for(auto el: _previous_visual_elements)
+    {
+        grid->remove_child(*el);
+        delete el;
+    }
+    for(auto el: _dependent_visual_elements) delete el;
+
+    _previous_visual_elements.clear();
+    _dependent_visual_elements.clear();
+
+    TSDL::TSDL_Surface pathtext("Current path: " + current_path.u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+
+    TSDL::elements::TextureElement* pathtextelement = new TSDL::elements::TextureElement(
+        grid->eventloop(), grid->renderer(),
+        pathtext.size(),
+        std::shared_ptr <TSDL::TSDL_Texture> ( 
+            new TSDL::TSDL_Texture(
+                grid->renderer(),
+                pathtext
+            )
+        )
+    );
+
+    grid->add_child(*pathtextelement, {64, 64});
+    _previous_visual_elements.push_back(pathtextelement);
+
+    int y = 64 + pathtext.size().y + 16;
+
+    TSDL::TSDL_Surface buttontext("..", *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+    TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
+        grid->eventloop(), grid->renderer(),
+        buttontext.size(),
+        std::shared_ptr <TSDL::TSDL_Texture> ( 
+            new TSDL::TSDL_Texture(
+                grid->renderer(),
+                buttontext
+            )
+        )
+    );
+
+    TSDL::elements::Button* button = new TSDL::elements::Button(
+        grid->eventloop(), grid->renderer(),
+        {buttontext.size().x + 32, 64}
+    );
+
+    button->front(*buttontextelement);
+    button->add_event_handler(
+        TSDL::events::EventType::ButtonActivated,
+        [](const TSDL::elements::Caller&, const SDL_Event&) -> bool
+        {
+            current_path = current_path.parent_path();
+            grid->eventloop().register_call_next(generate_visual_from_path);
+            return true;
+        }
+    );
+
+    grid->add_child(*button, {64, y});
+    _previous_visual_elements.push_back(button);
+    _dependent_visual_elements.push_back(buttontextelement);
+
+    y += button->size().y;
+
+    for(auto p: std::filesystem::directory_iterator(current_path, std::filesystem::directory_options::skip_permission_denied))
+    {
+        if(!p.is_directory()) continue;
+        auto path = p.path();
+        if(!path.has_stem()) continue;
+        TSDL::TSDL_Surface buttontext(path.stem().u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+
+        TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
+            grid->eventloop(), grid->renderer(),
+            buttontext.size(),
+            std::shared_ptr <TSDL::TSDL_Texture> ( 
+                new TSDL::TSDL_Texture(
+                    grid->renderer(),
+                    buttontext
+                )
+            )
+        );
+
+        TSDL::elements::Button* button = new TSDL::elements::Button(
+            grid->eventloop(), grid->renderer(),
+            {buttontext.size().x + 32, 64}
+        );
+
+        button->front(*buttontextelement);
+        button->add_event_handler(
+            TSDL::events::EventType::ButtonActivated,
+            [path](const TSDL::elements::Caller&, const SDL_Event&) -> bool
+            {
+                current_path = path;
+                grid->eventloop().register_call_next(generate_visual_from_path);
+                return true;
+            }
+        );
+
+        grid->add_child(*button, {64, y});
+        _previous_visual_elements.push_back(button);
+        _dependent_visual_elements.push_back(buttontextelement);
+
+        y += button->size().y;
+    }
+
+    
 }
 
 int main(int argc, char* argv[])
@@ -61,6 +177,7 @@ int main(int argc, char* argv[])
 
         TSDL::elements::Grid grid(evAdapter, renderer);
         mgrid.add_child(grid, {0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
+        ::grid = &grid;
 
         #ifdef TSDL_USE_FONTCONFIG
         std::string font_path = TSDL::get_family_font_filename("sans-serif");
@@ -69,23 +186,9 @@ int main(int argc, char* argv[])
         #else
         TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 40);
         #endif
+        ::font = &font;
 
-        TSDL::TSDL_Surface* pathtext = new TSDL::TSDL_Surface("Current path: " + std::filesystem::current_path().string(), font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
-
-        TSDL::elements::TextureElement pathtextelement(
-            evAdapter, renderer,
-            pathtext->size(),
-            std::shared_ptr <TSDL::TSDL_Texture> ( 
-                new TSDL::TSDL_Texture(
-                    renderer,
-                    *pathtext
-                )
-            )
-        );
-
-        delete pathtext;
-
-        grid.add_child(pathtextelement, {64, 64});
+        generate_visual_from_path();
 
         elattrs::dragable<TSDL::elements::Button> button(
             evAdapter, renderer,

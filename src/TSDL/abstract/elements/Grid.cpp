@@ -308,3 +308,24 @@ TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, at
 {
     _init();
 }
+
+void TSDL::elements::Grid::remove_child(DependentElement& element)
+{
+    if(_current_mouse_focus.has_value())
+    {
+        if(_current_mouse_focus.value()==element) _current_mouse_focus.reset();
+    }
+    if(_left_origin.has_value())
+    {
+        if(_left_origin.value()==element) _left_origin.reset();
+    }
+    if(_middle_origin.has_value())
+    {
+        if(_middle_origin.value()==element) _middle_origin.reset();
+    }
+    if(_right_origin.has_value())
+    {
+        if(_right_origin.value()==element) _right_origin.reset();
+    }
+    attrs::eventdispatcher<ElementHolder>::remove_child(element);
+}

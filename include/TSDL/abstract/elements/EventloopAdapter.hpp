@@ -24,6 +24,7 @@ namespace TSDL
             optional_reference<DependentElement> _src;
             std::set <::TSDL::EventHandler*> _handlers;
             std::queue<std::reference_wrapper<DependentElement>> _not_update_el;
+            std::queue<std::function<void()>> _calls;
             
             public:
             EventloopAdapter() = delete;
@@ -35,6 +36,11 @@ namespace TSDL
             Call not_update on the specified element after render finished
             */
             void register_not_update(DependentElement& element);
+
+            /*
+            Call `call` on next loop iteration
+            */
+            void register_call_next(std::function<void()> call);
 
             /*
             set source
