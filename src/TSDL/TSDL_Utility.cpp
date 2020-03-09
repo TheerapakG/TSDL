@@ -91,7 +91,7 @@ bool operator==(const TSDL::point_2d& lhs, const TSDL::point_2d& rhs)
     return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
-TSDL::point_2d::operator TSDL::_point_2d()
+TSDL::point_2d::operator TSDL::_point_2d() const
 {
     return std::make_tuple(x, y);
 }
@@ -128,7 +128,7 @@ TSDL::point_2d TSDL::rect::bottomright()
     return {x+w, y+h};
 }
 
-TSDL::rect::operator TSDL::_rect()
+TSDL::rect::operator TSDL::_rect() const
 {
     return std::make_tuple(TSDL::point_2d(x, y), TSDL::point_2d(w, h));
 }
