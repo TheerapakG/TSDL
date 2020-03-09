@@ -35,6 +35,8 @@ void say_fps()
 }
 
 static TSDL::elements::Grid* grid = nullptr;
+TSDL::elements::BaseHorizontalScrollbar* hscrollbar = nullptr;
+TSDL::elements::BaseVerticalScrollbar* vscrollbar = nullptr;
 TSDL::TSDL_Font* font = nullptr;
 static std::filesystem::path current_path = std::filesystem::current_path();
 
@@ -145,8 +147,7 @@ void generate_visual_from_path()
 
         y += button->size().y;
     }
-
-    
+    vscrollbar->content_height(std::max(2*SCREEN_HEIGHT, y+16));    
 }
 
 int main(int argc, char* argv[])
@@ -188,8 +189,6 @@ int main(int argc, char* argv[])
         #endif
         ::font = &font;
 
-        generate_visual_from_path();
-
         elattrs::dragable<TSDL::elements::Button> button(
             evAdapter, renderer,
             [](const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist) -> ::TSDL::point_2d { return start + dist; }, 
@@ -216,8 +215,10 @@ int main(int argc, char* argv[])
 
         TSDL::elements::BaseHorizontalScrollbar hscrollbar(evAdapter, renderer, 2*SCREEN_WIDTH, {SCREEN_WIDTH-16, 16});
         hscrollbar.dispatch_event_direct(TSDL::events::EventType::Dragged, grid);
+        ::hscrollbar = &hscrollbar;
         TSDL::elements::BaseVerticalScrollbar vscrollbar(evAdapter, renderer, 2*SCREEN_HEIGHT, {16, SCREEN_HEIGHT-16});
         vscrollbar.dispatch_event_direct(TSDL::events::EventType::Dragged, grid);
+        ::vscrollbar = &vscrollbar;
         grid.add_event_handler(
             TSDL::events::EventType::Dragged, 
             [&grid, &hscrollbar, &vscrollbar](const TSDL::elements::Caller&, const SDL_Event&) -> bool
@@ -230,6 +231,8 @@ int main(int argc, char* argv[])
         );
         mgrid.add_child(hscrollbar, {0, SCREEN_HEIGHT-16});
         mgrid.add_child(vscrollbar, {SCREEN_WIDTH-16, 0});
+
+        generate_visual_from_path();
 
         std::thread t(say_fps);
         eventloop.run();

@@ -76,6 +76,8 @@ TSDL::elements::Subelement TSDL::elements::ElementHolder::child_info(::TSDL::ele
     return _subelements_info.at(&subelement);
 }
 
+#include <iostream>
+
 ::TSDL::rect TSDL::elements::ElementHolder::bound()
 {
     auto begin = _subelements_order.begin(), end = _subelements_order.end();
@@ -84,16 +86,33 @@ TSDL::elements::Subelement TSDL::elements::ElementHolder::child_info(::TSDL::ele
     int min_x = begin->dimension.first.x, min_y = begin->dimension.first.y, 
         max_x = begin->dimension.second.x, max_y = begin->dimension.second.y;
 
-    for(begin++; begin != end; begin++)
+    if(begin->_sizable != nullptr)
     {
-        auto& [topleft, bottomright] = begin->dimension;
-        if(topleft.x < min_x) min_x = topleft.x;
-        if(topleft.y < min_y) min_y = topleft.y;
-        if(bottomright.x > max_x) max_x = bottomright.x;
-        if(bottomright.y > max_y) max_y = bottomright.y;
+        std::tie(max_x, max_y) = static_cast<_point_2d>(begin->_sizable->size());
+        max_x += min_x;
+        max_y += min_y;
     }
 
-    return {min_x, min_y, max_x, max_y};
+    for(begin++; begin != end; begin++)
+    {
+        auto [topleft, bottomright] = begin->dimension;
+        if(topleft.x < min_x) min_x = topleft.x;
+        if(topleft.y < min_y) min_y = topleft.y;
+        if(begin->_sizable != nullptr)
+        {
+            auto [width_x, width_y] = begin->_sizable->size();
+            if(topleft.x + width_x > max_x) max_x = topleft.x + width_x;
+            if(topleft.y + width_y > max_y) max_y = topleft.y + width_y;
+        }
+        else
+        {
+            if(bottomright.x > max_x) max_x = bottomright.x;
+            if(bottomright.y > max_y) max_y = bottomright.y;
+        }
+        std::cout << max_x << " " << max_y << "\n";        
+    }
+
+    return {_point_2d{min_x, min_y}, _point_2d{max_x, max_y}};
 }
 
 const std::vector<TSDL::elements::Subelement>& TSDL::elements::ElementHolder::get_child_order()

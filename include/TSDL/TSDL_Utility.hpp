@@ -94,7 +94,7 @@ namespace TSDL
         point_2d& operator+=(const point_2d& other);
         point_2d& operator-=(const point_2d& other);
 
-        operator _point_2d();
+        operator _point_2d() const;
     };
 
     using _rect = tuple<point_2d, point_2d>;
@@ -110,7 +110,7 @@ namespace TSDL
         point_2d topleft();
         point_2d bottomright();
 
-        operator _rect();
+        operator _rect() const;
     };
 
     using _color_rgb = tuple<Uint8, Uint8, Uint8>;

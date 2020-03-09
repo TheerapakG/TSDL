@@ -6,7 +6,7 @@ namespace TSDL::elements
     int BaseHorizontalScrollbar::_bar_length() const
     {
         int _size_x = size().x;
-        return (_size_x*_size_x)/_content_length;
+        return (_size_x*_size_x)/_content_width;
     }
 
     point_2d BaseHorizontalScrollbar::_bar_movement_calc(const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist)
@@ -32,34 +32,45 @@ namespace TSDL::elements
     }
 
     BaseHorizontalScrollbar::BaseHorizontalScrollbar(
-        EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size):
+        EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size):
         attrs::gridded<attrs::sizable<attrs::eventdispatcher<DependentElement>>>(evloop, renderer, size), 
-        _content_length(content_length)
+        _content_width(content_width)
     {
         _init();
     }
 
     BaseHorizontalScrollbar::BaseHorizontalScrollbar(
-        EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size, const attrs::ListenerMap& listeners):
+        EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size, const attrs::ListenerMap& listeners):
         attrs::gridded<attrs::sizable<attrs::eventdispatcher<DependentElement>>>(evloop, renderer, size, listeners), 
-        _content_length(content_length)
+        _content_width(content_width)
     {
         _init();
     }
 
     BaseHorizontalScrollbar::BaseHorizontalScrollbar(
-        EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size, attrs::ListenerMap&& listeners):
+        EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size, attrs::ListenerMap&& listeners):
         attrs::gridded<attrs::sizable<attrs::eventdispatcher<DependentElement>>>(evloop, renderer, size, listeners), 
-        _content_length(content_length)
+        _content_width(content_width)
     {
         _init();
+    }
+
+    int BaseHorizontalScrollbar::content_width() const
+    {
+        return _content_width;
+    }
+
+    void BaseHorizontalScrollbar::content_width(int width)
+    {
+        _content_width = width;
+        _bar.size({size().x, _bar_length()});
     }
 
     point_2d BaseHorizontalScrollbar::represented_section() const
     {
         int _size_x = size().x;
         int bar_left = _bar.pos().x;
-        return {(bar_left * _content_length)/_size_x, ((bar_left + _bar_length()) * _content_length)/_size_x};
+        return {(bar_left * _content_width)/_size_x, ((bar_left + _bar_length()) * _content_width)/_size_x};
     }
 
     bool BaseHorizontalScrollbar::need_update() const
@@ -72,7 +83,7 @@ namespace TSDL::elements
         grid().render(dist);
     }
 
-    int BaseVerticalScrollbar::_bar_height() const
+    int BaseVerticalScrollbar::_bar_length() const
     {
         int _size_y = size().y;
         return (_size_y*_size_y)/_content_height;
@@ -81,7 +92,7 @@ namespace TSDL::elements
     point_2d BaseVerticalScrollbar::_bar_movement_calc(const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist)
     {
         int _ret_y = start.y + dist.y, _size_y = size().y;
-        int _travel_y = _size_y - _bar_height();
+        int _travel_y = _size_y - _bar_length();
         if (_ret_y < 0) { return {0, 0}; }
         if (_ret_y > _travel_y) { return {0, _travel_y}; }
         return {0, _ret_y};
@@ -124,11 +135,22 @@ namespace TSDL::elements
         _init();
     }
 
+    int BaseVerticalScrollbar::content_height() const
+    {
+        return _content_height;
+    }
+    
+    void BaseVerticalScrollbar::content_height(int height)
+    {
+        _content_height = height;
+        _bar.size({size().x, _bar_length()});
+    }
+
     point_2d BaseVerticalScrollbar::represented_section() const
     {
         int _size_y = size().y;
         int bar_left = _bar.pos().y;
-        return {(bar_left * _content_height)/_size_y, ((bar_left + _bar_height()) * _content_height)/_size_y};
+        return {(bar_left * _content_height)/_size_y, ((bar_left + _bar_length()) * _content_height)/_size_y};
     }
 
     bool BaseVerticalScrollbar::need_update() const

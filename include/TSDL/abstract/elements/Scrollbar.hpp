@@ -18,7 +18,7 @@ namespace TSDL::elements
 
         class BaseHorizontalScrollbar: public attrs::gridded<attrs::sizable<attrs::eventdispatcher<DependentElement>>>
         {
-            int _content_length;
+            int _content_width;
 
             virtual int _bar_length() const;
 
@@ -33,9 +33,12 @@ namespace TSDL::elements
             void _init();
 
             public:
-            BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size);
-            BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size, const attrs::ListenerMap& listeners);
-            BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_length, const point_2d& size, attrs::ListenerMap&& listeners);
+            BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size);
+            BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size, const attrs::ListenerMap& listeners);
+            BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size, attrs::ListenerMap&& listeners);
+
+            int content_width() const;
+            void content_width(int width);
 
             point_2d represented_section() const;
 
@@ -54,14 +57,14 @@ namespace TSDL::elements
         {
             int _content_height;
 
-            virtual int _bar_height() const;
+            virtual int _bar_length() const;
 
             point_2d _bar_movement_calc(const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist);
 
             attrs::dragable<Button> _bar{
                 eventloop(), renderer(),
                 std::bind(std::mem_fn(&BaseVerticalScrollbar::_bar_movement_calc), this, _1, _2),
-                point_2d{size().x, _bar_height()}
+                point_2d{size().x, _bar_length()}
             };
 
             void _init();
@@ -70,6 +73,9 @@ namespace TSDL::elements
             BaseVerticalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_height, const point_2d& size);
             BaseVerticalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_height, const point_2d& size, const attrs::ListenerMap& listeners);
             BaseVerticalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_height, const point_2d& size, attrs::ListenerMap&& listeners);
+
+            int content_height() const;
+            void content_height(int height);
 
             point_2d represented_section() const;
 
