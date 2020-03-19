@@ -93,7 +93,7 @@ bool operator==(const TSDL::point_2d& lhs, const TSDL::point_2d& rhs)
 
 TSDL::point_2d::operator TSDL::_point_2d() const
 {
-    return std::make_tuple(x, y);
+    return TSDL::make_tuple(x, y);
 }
 
 TSDL::rect::rect(int x, int y, int w, int h): SDL_Rect{x, y, w, h} {}
@@ -130,7 +130,7 @@ TSDL::point_2d TSDL::rect::bottomright()
 
 TSDL::rect::operator TSDL::_rect() const
 {
-    return std::make_tuple(TSDL::point_2d(x, y), TSDL::point_2d(w, h));
+    return TSDL::make_tuple(TSDL::point_2d(x, y), TSDL::point_2d(x+w, y+h));
 }
 
 TSDL::color_rgb::color_rgb(Uint8 r, Uint8 g, Uint8 b): SDL_Color{r, g, b, 0xFF} {}
