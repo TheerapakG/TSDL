@@ -72,9 +72,33 @@ namespace TSDL
     Orientation operator&(Orientation lhs, Orientation rhs);
 
     template <typename ...Ts>
-    using tuple = std::tuple<Ts...>;
+    struct get_tuple
+    {
+        using type = std::tuple<Ts...>;
+    };
 
-    using _point_2d = tuple<int, int>;
+    template <typename T1, typename T2>
+    struct get_tuple<T1, T2>
+    {
+        using type = std::pair<T1, T2>;
+    };
+
+    template <typename ...Ts>
+    using get_tuple_t = typename get_tuple<Ts...>::type;
+
+    template <typename ...Ts>
+    std::tuple<Ts...> make_tuple(Ts&&... args)
+    {
+        return std::make_tuple(std::forward<Ts>(args)...);
+    }
+
+    template <typename T1, typename T2>
+    std::pair<T1, T2> make_tuple(T1&& arg1, T2&& arg2)
+    {
+        return std::make_pair(std::forward<T1>(arg1), std::forward<T2>(arg2));
+    }
+
+    using _point_2d = get_tuple_t<int, int>;
     class point_2d: public SDL_Point
     {
         public:
@@ -97,7 +121,7 @@ namespace TSDL
         operator _point_2d() const;
     };
 
-    using _rect = tuple<point_2d, point_2d>;
+    using _rect = get_tuple_t<point_2d, point_2d>;
     class rect: public SDL_Rect
     {
         public:
@@ -113,7 +137,7 @@ namespace TSDL
         operator _rect() const;
     };
 
-    using _color_rgb = tuple<Uint8, Uint8, Uint8>;
+    using _color_rgb = get_tuple_t<Uint8, Uint8, Uint8>;
     class color_rgb: public SDL_Color
     {
         public:
@@ -124,7 +148,7 @@ namespace TSDL
         operator _color_rgb();
     };
 
-    using _color_rgba = tuple<Uint8, Uint8, Uint8, Uint8>;
+    using _color_rgba = get_tuple_t<Uint8, Uint8, Uint8, Uint8>;
     class color_rgba: public SDL_Color
     {
         public:

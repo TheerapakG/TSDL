@@ -147,7 +147,7 @@ void generate_visual_from_path()
 
         y += button->size().y;
     }
-    vscrollbar->content_height(std::max(2*SCREEN_HEIGHT, y+16));    
+    vscrollbar->content_height(std::max(2*SCREEN_HEIGHT, static_cast<TSDL::_rect>(grid->bound()).second.y + 16));    
 }
 
 int main(int argc, char* argv[])
