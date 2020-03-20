@@ -25,16 +25,22 @@ namespace TSDL
 
         class ElementHolder: public DependentElement
         {
+            public:
+            using Subelement_vector = std::vector <Subelement>;
+
             private:
-            std::vector <Subelement> _subelements_order;
+            Subelement_vector _subelements_order;
             std::map <DependentElement*, Subelement> _subelements_info;
             rect _render_position = {{0, 0}, renderer().render_size()};
 
             public:
             ElementHolder(EventloopAdapter& evloop, TSDL_Renderer& renderer);
 
+            virtual void add_child(const Subelement& formed_subelement);
+            virtual Subelement_vector::iterator add_child(const Subelement& formed_subelement, int order);
+
             void add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright);
-            void add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright, int order);
+            Subelement_vector::iterator add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright, int order);
 
             template<typename T>
             void add_child(attrs::sizable<T>& subelement, const point_2d& topleft)
@@ -42,31 +48,20 @@ namespace TSDL
 				std::pair<point_2d, point_2d> el_loc(topleft, {0, 0});
                 Subelement el_all{&subelement, el_loc, &subelement};
 
-                _subelements_order.push_back(el_all);
-                _subelements_info[&subelement] = el_all;
-
-                subelement._holders.emplace_back(*this);
-
-                update();
+                add_child(el_all);
             }
 
             template<typename T>
-            void add_child(attrs::sizable<T>& subelement, const point_2d& topleft, int order)
+            Subelement_vector::iterator add_child(attrs::sizable<T>& subelement, const point_2d& topleft, int order)
             {
                 std::pair<point_2d, point_2d> el_loc(topleft, {0, 0});
                 Subelement el_all{&subelement, el_loc, &subelement};
 
-                auto it = _subelements_order.begin();
-                _subelements_order.insert(it + order, el_all);
-                _subelements_info[&subelement] = el_all;
-
-                subelement._holders.emplace_back(*this);
-
-                update();
+                return add_child(el_all, order);
             }
 
-            void reorder_child(DependentElement& subelement, int order);
-            void move_child(DependentElement& subelement, const point_2d& destination);
+            virtual void reorder_child(DependentElement& subelement, int order);
+            virtual void move_child(DependentElement& subelement, const point_2d& destination);
             virtual void remove_child(DependentElement& subelement);
 
             Subelement child_info(DependentElement& subelement);
