@@ -11,31 +11,43 @@ bool ::TSDL::elements::Subelement::operator==(const ::TSDL::elements::Subelement
 TSDL::elements::ElementHolder::ElementHolder(EventloopAdapter& evloop, TSDL_Renderer& renderer): 
     DependentElement(evloop, renderer) {}
 
+void TSDL::elements::ElementHolder::add_child(const Subelement& formed_subelement)
+{
+    _subelements_order.push_back(formed_subelement);
+    _subelements_info[formed_subelement.element] = formed_subelement;
+
+    formed_subelement.element->_holders.emplace_back(*this);
+
+    update();
+}
+
+TSDL::elements::ElementHolder::Subelement_vector::iterator TSDL::elements::ElementHolder::add_child(const Subelement& formed_subelement, int order)
+{
+    auto it = _subelements_order.begin();
+    auto rit = _subelements_order.insert(it + order, formed_subelement);
+    _subelements_info[formed_subelement.element] = formed_subelement;
+
+    formed_subelement.element->_holders.emplace_back(*this);
+
+    update();
+
+    return rit;
+}
+
 void TSDL::elements::ElementHolder::add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright)
 {
     std::pair el_loc(topleft, bottomright);
     Subelement el_all{&subelement, el_loc};
 
-    _subelements_order.push_back(el_all);
-    _subelements_info[&subelement] = el_all;
-
-    subelement._holders.emplace_back(*this);
-
-    update();
+    add_child(el_all);
 }
 
-void TSDL::elements::ElementHolder::add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright, int order)
+TSDL::elements::ElementHolder::Subelement_vector::iterator TSDL::elements::ElementHolder::add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright, int order)
 {
     std::pair el_loc(topleft, bottomright);
     Subelement el_all{&subelement, el_loc};
 
-    auto it = _subelements_order.begin();
-    _subelements_order.insert(it + order, el_all);
-    _subelements_info[&subelement] = el_all;
-
-    subelement._holders.emplace_back(*this);
-
-    update();
+    return add_child(el_all, order);
 }
 
 void TSDL::elements::ElementHolder::reorder_child(DependentElement& subelement, int order)

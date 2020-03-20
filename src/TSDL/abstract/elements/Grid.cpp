@@ -8,6 +8,36 @@ void TSDL::elements::Grid::_init()
         [this](const Caller& caller, const SDL_Event& event) -> bool
         {
             point_2d _dist = caller.second + render_position().topleft();
+            _mouse_location = _dist;
+            _last_mousemotion_event = event;
+
+            if(_left_origin.has_value())
+            {
+                DependentElement& _actual_origin = _left_origin.value();
+                _actual_origin.dispatch_event(
+                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                    ::TSDL::events::EventType::MouseMotion, event
+                );
+                return false;
+            }
+            if(_middle_origin.has_value())
+            {
+                DependentElement& _actual_origin = _left_origin.value();
+                _actual_origin.dispatch_event(
+                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                    ::TSDL::events::EventType::MouseMotion, event
+                );
+                return false;
+            }
+            if(_right_origin.has_value())
+            {
+                DependentElement& _actual_origin = _left_origin.value();
+                _actual_origin.dispatch_event(
+                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                    ::TSDL::events::EventType::MouseMotion, event
+                );
+                return false;
+            }
 
             for(const Subelement& subelement: ::TSDL::reverse(get_child_order()))
             {
@@ -18,87 +48,28 @@ void TSDL::elements::Grid::_init()
 
                 DependentElement* element = element_ptr;
 
-                if(topleft.x < _dist.x && _dist.x < bottomright.x &&
+                if (topleft.x < _dist.x && _dist.x < bottomright.x &&
                     topleft.y < _dist.y && _dist.y < bottomright.y)
+                {
+                    if(!_current_mouse_focus.has_value())
                     {
-                        if(_left_origin.has_value())
-                        {
-                            DependentElement& _actual_origin = _left_origin.value();
-                            if(*element != _actual_origin)
-                            {
-                                _actual_origin.dispatch_event(
-                                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
-                                    ::TSDL::events::EventType::MouseMotion, event
-                                );
-                            }
-                        }
-                        if(_middle_origin.has_value())
-                        {
-                            DependentElement& _actual_origin = _left_origin.value();
-                            if(*element != _actual_origin)
-                            {
-                                _actual_origin.dispatch_event(
-                                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
-                                    ::TSDL::events::EventType::MouseMotion, event
-                                );
-                            }
-                        }
-                        if(_right_origin.has_value())
-                        {
-                            DependentElement& _actual_origin = _left_origin.value();
-                            if(*element != _actual_origin)
-                            {
-                                _actual_origin.dispatch_event(
-                                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
-                                    ::TSDL::events::EventType::MouseMotion, event
-                                );
-                            }
-                        }
-
-                        if(!_current_mouse_focus.has_value())
-                        {
-                            _current_mouse_focus = *element;
-                            element->dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseIn, event);
-                            element->dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseMotion, event);
-                        }
-                        else if(*element == _current_mouse_focus.value().get())
-                        {
-                            element->dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseMotion, event);
-                        }
-                        else
-                        {
-                            DependentElement& _actual_focus = _current_mouse_focus.value();
-                            _actual_focus.dispatch_event(Caller(*this, _dist - child_info(_actual_focus).dimension.first), ::TSDL::events::EventType::MouseOut, event);
-                            _current_mouse_focus = *element;
-                            element->dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseIn, event);
-                        }
-                        return false;
+                        _current_mouse_focus = *element;
+                        element->dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseIn, event);
+                        element->dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseMotion, event);
                     }
-            }
-
-            if(_left_origin.has_value())
-            {
-                DependentElement& _actual_origin = _left_origin.value();
-                _actual_origin.dispatch_event(
-                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
-                    ::TSDL::events::EventType::MouseMotion, event
-                );
-            }
-            if(_middle_origin.has_value())
-            {
-                DependentElement& _actual_origin = _left_origin.value();
-                _actual_origin.dispatch_event(
-                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
-                    ::TSDL::events::EventType::MouseMotion, event
-                );
-            }
-            if(_right_origin.has_value())
-            {
-                DependentElement& _actual_origin = _left_origin.value();
-                _actual_origin.dispatch_event(
-                    Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
-                    ::TSDL::events::EventType::MouseMotion, event
-                );
+                    else if(*element == _current_mouse_focus.value().get())
+                    {
+                        element->dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseMotion, event);
+                    }
+                    else
+                    {
+                        DependentElement& _actual_focus = _current_mouse_focus.value();
+                        _actual_focus.dispatch_event(Caller(*this, _dist - child_info(_actual_focus).dimension.first), ::TSDL::events::EventType::MouseOut, event);
+                        _current_mouse_focus = *element;
+                        element->dispatch_event(Caller(*this, _dist - topleft), ::TSDL::events::EventType::MouseIn, event);
+                    }
+                    return false;
+                }
             }
 
             if(_current_mouse_focus.has_value())
@@ -307,6 +278,49 @@ TSDL::elements::Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, at
     attrs::eventdispatcher<ElementHolder>(evloop, renderer, listeners)
 {
     _init();
+}
+
+void TSDL::elements::Grid::add_child(const Subelement& formed_subelement)
+{
+    attrs::eventdispatcher<ElementHolder>::add_child(formed_subelement);
+    if (_left_origin.has_value()||_middle_origin.has_value()||_right_origin.has_value()) return;
+
+    auto& [element_ptr, dim, sizable] = formed_subelement;
+    auto [topleft, bottomright] = dim;
+    if(sizable != nullptr) bottomright = topleft + sizable->size();
+
+    if (topleft.x < _mouse_location.x && _mouse_location.x < bottomright.x &&
+        topleft.y < _mouse_location.y && _mouse_location.y < bottomright.y)
+    {
+        _current_mouse_focus = *element_ptr;
+        element_ptr->dispatch_event(
+            Caller(*this, _mouse_location - topleft), 
+            ::TSDL::events::EventType::MouseIn, _last_mousemotion_event
+        );
+    }
+}
+
+TSDL::elements::Grid::Subelement_vector::iterator TSDL::elements::Grid::add_child(const Subelement& formed_subelement, int order)
+{
+    auto it = attrs::eventdispatcher<ElementHolder>::add_child(formed_subelement, order);
+    if(std::next(it)!=get_child_order().end()) return it;
+    if(_left_origin.has_value()||_middle_origin.has_value()||_right_origin.has_value()) return it;
+
+    auto& [element_ptr, dim, sizable] = formed_subelement;
+    auto [topleft, bottomright] = dim;
+    if(sizable != nullptr) bottomright = topleft + sizable->size();
+
+    if (topleft.x < _mouse_location.x && _mouse_location.x < bottomright.x &&
+        topleft.y < _mouse_location.y && _mouse_location.y < bottomright.y)
+    {
+        _current_mouse_focus = *element_ptr;
+        element_ptr->dispatch_event(
+            Caller(*this, _mouse_location - topleft), 
+            ::TSDL::events::EventType::MouseIn, _last_mousemotion_event
+        );
+    }
+
+    return it;
 }
 
 void TSDL::elements::Grid::remove_child(DependentElement& element)
