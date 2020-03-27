@@ -7,63 +7,65 @@ using namespace std::placeholders;
 
 namespace
 {
+    using namespace TSDL;
+
     void _handle_window_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
         switch (event.window.event)
         {
         case SDL_WINDOWEVENT_SHOWN:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::WindowShown, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::WindowShown, event
             );
             break;
         case SDL_WINDOWEVENT_HIDDEN:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::WindowHidden, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::WindowHidden, event
             );
             break;
         case SDL_WINDOWEVENT_EXPOSED:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::WindowExposed, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::WindowExposed, event
             );
             break;
         case SDL_WINDOWEVENT_MOVED:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::WindowMoved, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::WindowMoved, event
             );
             break;
         case SDL_WINDOWEVENT_RESIZED:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::WindowResized, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)),events::EventType::WindowResized, event
             );
             break;
         case SDL_WINDOWEVENT_MINIMIZED:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::WindowMinimized, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::WindowMinimized, event
             );
             break;
         case SDL_WINDOWEVENT_MAXIMIZED:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::WindowMaximized, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::WindowMaximized, event
             );
             break;
         case SDL_WINDOWEVENT_RESTORED:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::WindowRestored, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::WindowRestored, event
             );
             break;
         case SDL_WINDOWEVENT_ENTER:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::MouseIn, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::MouseIn, event
             );
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::MouseOut, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::MouseOut, event
             );
             break;
         case SDL_WINDOWEVENT_CLOSE:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::WindowClose, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::WindowClose, event
             );
             break;
         default:
@@ -73,29 +75,29 @@ namespace
 
     void _handle_keydown_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
-        adapter->src().dispatch_event(
-            TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::KeyDown, event
+        adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+            TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::KeyDown, event
         );
     }
 
     void _handle_keyup_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
-        adapter->src().dispatch_event(
-            TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::KeyUp, event
+        adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+            TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::KeyUp, event
         );
     }
 
     void _handle_textinput_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
-        adapter->src().dispatch_event(
-            TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), TSDL::events::EventType::TextInput, event
+        adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+            TSDL::elements::Caller(*adapter, TSDL::point_2d(0, 0)), events::EventType::TextInput, event
         );
     }
 
     void _handle_mousemotion_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
-        adapter->src().dispatch_event(
-            TSDL::elements::Caller(*adapter, TSDL::point_2d(event.motion.x, event.motion.y)), TSDL::events::EventType::MouseMotion, event
+        adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+            TSDL::elements::Caller(*adapter, TSDL::point_2d(event.motion.x, event.motion.y)), events::EventType::MouseMotion, event
         );
     }
 
@@ -104,18 +106,18 @@ namespace
         switch (event.button.button)
         {
         case SDL_BUTTON_LEFT:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), TSDL::events::EventType::LeftDown, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)),events::EventType::LeftDown, event
             );
             break;
         case SDL_BUTTON_MIDDLE:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), TSDL::events::EventType::MiddleDown, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), events::EventType::MiddleDown, event
             );
             break;
         case SDL_BUTTON_RIGHT:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), TSDL::events::EventType::RightDown, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), events::EventType::RightDown, event
             );
             break;
         default:
@@ -128,18 +130,18 @@ namespace
         switch (event.button.button)
         {
         case SDL_BUTTON_LEFT:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), TSDL::events::EventType::LeftUp, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), events::EventType::LeftUp, event
             );
             break;
         case SDL_BUTTON_MIDDLE:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), TSDL::events::EventType::MiddleUp, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), events::EventType::MiddleUp, event
             );
             break;
         case SDL_BUTTON_RIGHT:
-            adapter->src().dispatch_event(
-                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), TSDL::events::EventType::RightUp, event
+            adapter->template src<TSDL::elements::attrs::EventDispatcher>().dispatch_event(
+                TSDL::elements::Caller(*adapter, TSDL::point_2d(event.button.x, event.button.y)), events::EventType::RightUp, event
             );
             break;
         default:
@@ -163,7 +165,7 @@ TSDL::elements::EventloopAdapter::EventloopAdapter(TSDL_Eventloop& evloop): _evl
                 _calls.front()();
                 _calls.pop();
             }
-            DependentElement& _c_src = get_ref(_src);
+            DependentElement& _c_src = src<DependentElement>();
             if (!_c_src.need_update()) return;
             _c_src.renderer().clear({ 255, 255, 255, 255 });
             _c_src.render({0, 0});
@@ -210,7 +212,7 @@ TSDL::elements::EventloopAdapter::~EventloopAdapter()
     _evloop.remove_event_handler(SDL_MOUSEBUTTONUP);
 }
 
-void TSDL::elements::EventloopAdapter::register_not_update(DependentElement& element)
+void TSDL::elements::EventloopAdapter::register_not_update(TSDL::elements::DependentElement& element)
 {
     _not_update_el.emplace(element);
 }
@@ -220,17 +222,7 @@ void TSDL::elements::EventloopAdapter::register_call_next(std::function<void()> 
     _calls.push(call);
 }
 
-void TSDL::elements::EventloopAdapter::src(DependentElement& src)
-{
-    _src.emplace(src);
-}
-
 void TSDL::elements::EventloopAdapter::src(std::nullopt_t)
 {
     _src.reset();
-}
-
-TSDL::elements::DependentElement& TSDL::elements::EventloopAdapter::src() const
-{
-    return get_ref(_src);
 }

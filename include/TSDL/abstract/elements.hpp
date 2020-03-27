@@ -8,5 +8,6 @@
 #include "elements/Grid.hpp"
 #include "elements/HollowedRectangle.hpp"
 #include "elements/RoundedRectangle.hpp"
+#include "elements/Scene.hpp"
 #include "elements/Scrollbar.hpp"
 #include "elements/TextureElement.hpp"

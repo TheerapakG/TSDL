@@ -7,6 +7,8 @@
 #include <queue>
 #include <functional>
 #include <optional>
+#include <any>
+#include "TSDL/abstract/elements/attrs/EventLookup.hpp"
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
 
 #include "TSDL/TSDL_Meta.hpp"
@@ -21,7 +23,7 @@ namespace TSDL
         {
             private:
             TSDL_Eventloop& _evloop;
-            optional_reference<DependentElement> _src;
+            std::optional<std::any> _src;
             std::set <::TSDL::EventHandler*> _handlers;
             std::queue<std::reference_wrapper<DependentElement>> _not_update_el;
             std::queue<std::function<void()>> _calls;
@@ -45,11 +47,24 @@ namespace TSDL
             /*
             set source
             */
-            void src(DependentElement& src);
+            template <typename T, typename U = std::enable_if_t<
+                _and_v<
+                    std::is_base_of_v<DependentElement, T>,
+                    std::is_base_of_v<attrs::EventLookupable, T>
+                >
+            >>
+            void src(T& src)
+            {
+                _src = &src;
+            }
             // set source to none
             void src(std::nullopt_t);
 
-            DependentElement& src() const;
+            template <typename T>
+            T& src() const
+            {
+                return *std::any_cast<T*>(_src);
+            }
         };
     }
 }

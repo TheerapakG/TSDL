@@ -2,28 +2,37 @@
 #define TSDL_ELEMENTS_ATTRS_GRIDDED_
 
 #include "TSDL/abstract/elements/Element.hpp"
+#include "TSDL/abstract/elements/attrs/EventForwarder.hpp"
 #include "TSDL/abstract/elements/Grid.hpp"
 
 #include "TSDL/TSDL_Meta.hpp"
 
 namespace TSDL::elements::attrs
 {
+    template <class Grid_T, typename U = std::enable_if_t<std::is_base_of_v<Grid, Grid_T>>>
     class Gridded
     {
         private:
-        Grid _grid;
+        Grid_T _grid;
 
         public:
-        Gridded(EventloopAdapter& evloop, TSDL_Renderer& renderer);
-        Gridded(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ListenerMap& listeners);
-        Gridded(EventloopAdapter& evloop, TSDL_Renderer& renderer, ListenerMap&& listeners);
+        Gridded(EventloopAdapter& evloop, TSDL_Renderer& renderer): _grid(evloop, renderer) {}
+        Gridded(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ListenerMap& listeners): _grid(evloop, renderer, listeners) {}
+        Gridded(EventloopAdapter& evloop, TSDL_Renderer& renderer, ListenerMap&& listeners): _grid(evloop, renderer, listeners) {}
 
-        Grid& grid();
-        const Grid& grid() const;
+        Grid_T& grid()
+        {
+            return _grid;
+        }
+
+        const Grid_T& grid() const
+        {
+            return _grid;
+        }
     };
 
-    template <class T>
-    class gridded: public std::enable_if_t<std::is_base_of_v<DependentElement, T>, T>, public Gridded
+    template <class T, class Grid_T>
+    class gridded: public std::enable_if_t<std::is_base_of_v<DependentElement, T>, T>, public Gridded<Grid_T>
     {
         public:
         template <typename ...Args>
@@ -31,98 +40,7 @@ namespace TSDL::elements::attrs
             EventloopAdapter& evloop, 
             TSDL_Renderer& renderer, 
             Args... args
-        ): T(evloop, renderer, args...), Gridded(evloop, renderer) 
-        {
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MouseMotion,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MouseMotion, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::LeftDown,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftDown, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::LeftUp,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftUp, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::LeftUp_Outside,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftUp_Outside, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::RightDown,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightDown, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::RightUp,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightUp, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::RightUp_Outside,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightUp_Outside, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MiddleDown,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleDown, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MiddleUp,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleUp, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MiddleUp_Outside,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleUp_Outside, event);
-                }
-            );
-        }
+        ): T(evloop, renderer, args...), Gridded<Grid_T>(evloop, renderer) {}
 
         template <typename ...Args>
         gridded(
@@ -130,98 +48,7 @@ namespace TSDL::elements::attrs
             TSDL_Renderer& renderer, 
             const ListenerMap& listeners,
             Args... args
-        ): T(evloop, renderer, args...), Gridded(evloop, renderer, listeners)
-        {
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MouseMotion,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MouseMotion, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::LeftDown,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftDown, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::LeftUp,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftUp, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::LeftUp_Outside,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftUp_Outside, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::RightDown,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightDown, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::RightUp,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightUp, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::RightUp_Outside,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightUp_Outside, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MiddleDown,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleDown, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MiddleUp,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleUp, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MiddleUp_Outside,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleUp_Outside, event);
-                }
-            );
-        }
+        ): T(evloop, renderer, args...), Gridded<Grid_T>(evloop, renderer, listeners) {}
 
         template <typename ...Args>
         gridded(
@@ -229,97 +56,22 @@ namespace TSDL::elements::attrs
             TSDL_Renderer& renderer, 
             ListenerMap&& listeners,
             Args... args
-        ): T(evloop, renderer, args...), Gridded(evloop, renderer, listeners)
+        ): T(evloop, renderer, args...), Gridded<Grid_T>(evloop, renderer, listeners) {}
+
+        /*
+        Query if parent need to update this element on the next cycle
+        */
+        virtual bool need_update() const override
         {
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MouseMotion,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MouseMotion, event);
-                }
-            );
+            return grid().need_update();
+        }
 
-            Element::add_event_handler(
-                ::TSDL::events::EventType::LeftDown,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftDown, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::LeftUp,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftUp, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::LeftUp_Outside,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::LeftUp_Outside, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::RightDown,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightDown, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::RightUp,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightUp, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::RightUp_Outside,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::RightUp_Outside, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MiddleDown,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleDown, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MiddleUp,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleUp, event);
-                }
-            );
-
-            Element::add_event_handler(
-                ::TSDL::events::EventType::MiddleUp_Outside,
-                [this](const Caller& caller, const SDL_Event& event) -> bool
-                { 
-                    Grid& _grid = grid();
-                    return _grid.dispatch_event(Caller(_grid, caller.second), ::TSDL::events::EventType::MiddleUp_Outside, event);
-                }
-            );
+        /*
+        Re-render this element
+        */
+        virtual void render(const ::TSDL::point_2d& dist) override
+        {
+            grid().render(dist);
         }
     };
 }
