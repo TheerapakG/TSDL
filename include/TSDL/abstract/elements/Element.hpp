@@ -26,6 +26,8 @@ namespace TSDL
 
         using Caller = std::pair<std::reference_wrapper<::TSDL::elements::attrs::EventDispatcher>, point_2d>;
         using EventHandler = std::function<bool(const Caller&, const SDL_Event&)>;
+
+        static EventHandler always_true_event_handler = [](const Caller&, const SDL_Event&){ return true; };
         
         class Element
         {

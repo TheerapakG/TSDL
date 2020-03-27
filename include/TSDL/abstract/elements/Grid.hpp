@@ -25,8 +25,8 @@ namespace TSDL::elements
             using Subelement_vector = typename ElementHolder::Subelement_vector;
 
             private:
-            std::optional<std::any> _current_mouse_focus;
-            std::optional<std::any> _left_origin, _right_origin, _middle_origin;
+            std::optional<Element_Traits> _current_mouse_focus;
+            std::optional<Element_Traits> _left_origin, _right_origin, _middle_origin;
             point_2d _mouse_location = {std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
             SDL_Event _last_mousemotion_event = ::TSDL::null_event;
 
@@ -53,30 +53,30 @@ namespace TSDL::elements
 
                 if(_left_origin.has_value())
                 {
-                    attrs::EventLookupable& _actual_origin_e = std::any_cast<attrs::EventLookupable&>(_left_origin.value());
-                    DependentElement& _actual_origin = std::any_cast<DependentElement&>(_left_origin.value());
-                    _actual_origin_e.dispatch_event(
-                        Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                    attrs::EventLookupable* _actual_origin_e = _left_origin.value();
+                    DependentElement* _actual_origin = _left_origin.value();
+                    if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(
+                        Caller(*this, _dist - child_info(*_actual_origin).dimension.first), 
                         events::EventType::MouseMotion, event
                     );
                     return false;
                 }
                 if(_middle_origin.has_value())
                 {
-                    attrs::EventLookupable& _actual_origin_e = std::any_cast<attrs::EventLookupable&>(_middle_origin.value());
-                    DependentElement& _actual_origin = std::any_cast<DependentElement&>(_middle_origin.value());
-                    _actual_origin_e.dispatch_event(
-                        Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                    attrs::EventLookupable* _actual_origin_e = _middle_origin.value();
+                    DependentElement* _actual_origin = _middle_origin.value();
+                    if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(
+                        Caller(*this, _dist - child_info(*_actual_origin).dimension.first), 
                         events::EventType::MouseMotion, event
                     );
                     return false;
                 }
                 if(_right_origin.has_value())
                 {
-                    attrs::EventLookupable& _actual_origin_e = std::any_cast<attrs::EventLookupable&>(_right_origin.value());
-                    DependentElement& _actual_origin = std::any_cast<DependentElement&>(_right_origin.value());
-                    _actual_origin_e.dispatch_event(
-                        Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                    attrs::EventLookupable* _actual_origin_e = _right_origin.value();
+                    DependentElement* _actual_origin = _right_origin.value();
+                    if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(
+                        Caller(*this, _dist - child_info(*_actual_origin).dimension.first), 
                         events::EventType::MouseMotion, event
                     );
                     return false;
@@ -84,39 +84,35 @@ namespace TSDL::elements
 
                 for(const Subelement& subelement: ::TSDL::reverse(get_child_order()))
                 {
-                    auto& [element_any, dim] = subelement;
+                    auto& [element_ptr, dim] = subelement;
                     auto [topleft, bottomright] = dim;
 
-                    try
-                    {
-                        auto _sizable = std::any_cast<attrs::Sizable*>(element_any);
-                        bottomright = topleft + _sizable->size();
-                    }
-                    catch(const std::bad_any_cast&) {}
+                    attrs::Sized* _sized = element_ptr;
+                    if(_sized != nullptr) bottomright = topleft + _sized->size();
 
-                    attrs::EventLookupable* element_e = std::any_cast<attrs::EventLookupable*>(element_any);
-                    DependentElement* element = std::any_cast<DependentElement*>(element_any);
+                    attrs::EventLookupable* element_e = element_ptr;
+                    DependentElement* element = element_ptr;
 
                     if (topleft.x < _dist.x && _dist.x < bottomright.x &&
                         topleft.y < _dist.y && _dist.y < bottomright.y)
                     {
                         if(!_current_mouse_focus.has_value())
                         {
-                            _current_mouse_focus = element;
-                            element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseIn, event);
-                            element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseMotion, event);
+                            _current_mouse_focus = element_ptr;
+                            if (element_e != nullptr) element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseIn, event);
+                            if (element_e != nullptr) element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseMotion, event);
                         }
-                        else if(*element == *std::any_cast<DependentElement*>(_current_mouse_focus.value()))
+                        else if(*element == *static_cast<DependentElement*>(_current_mouse_focus.value()))
                         {
-                            element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseMotion, event);
+                            if (element_e != nullptr) element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseMotion, event);
                         }
                         else
                         {
-                            attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
-                            DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
-                            _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MouseOut, event);
-                            _current_mouse_focus = element;
-                            element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseIn, event);
+                            attrs::EventLookupable* _actual_focus_e = _current_mouse_focus.value();
+                            DependentElement* _actual_focus = _current_mouse_focus.value();
+                            if (_actual_focus_e != nullptr) _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MouseOut, event);
+                            _current_mouse_focus = element_ptr;
+                            if (element_e != nullptr) element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseIn, event);
                         }
                         return false;
                     }
@@ -124,9 +120,24 @@ namespace TSDL::elements
 
                 if(_current_mouse_focus.has_value())
                 {
-                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
-                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
-                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MouseOut, event);
+                    attrs::EventLookupable* _actual_focus_e = _current_mouse_focus.value();
+                    DependentElement* _actual_focus = _current_mouse_focus.value();
+                    if (_actual_focus_e != nullptr) _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MouseOut, event);
+                    _current_mouse_focus.reset();
+                }
+                return false;
+            }
+
+            template <>
+            bool dispatch_templated_event<events::EventType::MouseOut>(const Caller& caller, const SDL_Event& event)
+            {
+                point_2d _dist = caller.second + render_position().topleft();
+
+                if (_current_mouse_focus.has_value())
+                {
+                    attrs::EventLookupable* _actual_focus_e = _current_mouse_focus.value();
+                    DependentElement* _actual_focus = _current_mouse_focus.value();
+                    if (_actual_focus_e != nullptr) _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MouseOut, event);
                     _current_mouse_focus.reset();
                 }
                 return false;
@@ -139,9 +150,9 @@ namespace TSDL::elements
                 {
                     _left_origin = _current_mouse_focus;
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
-                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
-                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first),events::EventType::LeftDown, event);
+                    attrs::EventLookupable* _actual_focus_e = _current_mouse_focus.value();
+                    DependentElement* _actual_focus = _current_mouse_focus.value();
+                    if (_actual_focus_e != nullptr) _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::LeftDown, event);
                 }
                 return false;
             }
@@ -152,20 +163,20 @@ namespace TSDL::elements
                 if(_current_mouse_focus.has_value())
                 {
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
-                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
-                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::LeftUp, event);
+                    attrs::EventLookupable* _actual_focus_e = _current_mouse_focus.value();
+                    DependentElement* _actual_focus = _current_mouse_focus.value();
+                    if (_actual_focus_e != nullptr) _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::LeftUp, event);
                     if(_left_origin.has_value())
                     {
-                        attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_left_origin.value());
-                        DependentElement* _actual_origin = std::any_cast<DependentElement*>(_left_origin.value());
+                        attrs::EventLookupable* _actual_origin_e = _left_origin.value();
+                        DependentElement* _actual_origin = _left_origin.value();
                         if(_actual_origin == _actual_focus)
                         {
-                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Inside, event);
+                            if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Inside, event);
                         }
                         else
                         {
-                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Outside, event);
+                            if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Outside, event);
                         }
                         _left_origin.reset();
                     }
@@ -173,9 +184,9 @@ namespace TSDL::elements
                 else if(_left_origin.has_value())
                 {
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_left_origin.value());
-                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_left_origin.value());
-                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Outside, event);
+                    attrs::EventLookupable* _actual_origin_e = _left_origin.value();
+                    DependentElement* _actual_origin = _left_origin.value();
+                    if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Outside, event);
                     _left_origin.reset();
                 }
                 return false;
@@ -187,9 +198,9 @@ namespace TSDL::elements
                 if(_left_origin.has_value())
                 {
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_left_origin.value());
-                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_left_origin.value());
-                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Outside, event);
+                    attrs::EventLookupable* _actual_origin_e = _left_origin.value();
+                    DependentElement* _actual_origin = _left_origin.value();
+                    if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Outside, event);
                     _left_origin.reset();
                 }
                 return false;
@@ -202,9 +213,9 @@ namespace TSDL::elements
                 {
                     _right_origin = _current_mouse_focus;
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
-                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
-                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::RightDown, event);
+                    attrs::EventLookupable* _actual_focus_e = _current_mouse_focus.value();
+                    DependentElement* _actual_focus = _current_mouse_focus.value();
+                    if (_actual_focus_e != nullptr) _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::RightDown, event);
                 }
                 return false;
             }
@@ -215,20 +226,20 @@ namespace TSDL::elements
                 if(_current_mouse_focus.has_value())
                 {
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
-                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
-                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::RightUp, event);
+                    attrs::EventLookupable* _actual_focus_e = _current_mouse_focus.value();
+                    DependentElement* _actual_focus = _current_mouse_focus.value();
+                    if (_actual_focus_e != nullptr) _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::RightUp, event);
                     if(_right_origin.has_value())
                     {
-                        attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_right_origin.value());
-                        DependentElement* _actual_origin = std::any_cast<DependentElement*>(_right_origin.value());
+                        attrs::EventLookupable* _actual_origin_e = _right_origin.value();
+                        DependentElement* _actual_origin = _right_origin.value();
                         if(_actual_origin == _actual_focus)
                         {
-                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Inside, event);
+                            if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Inside, event);
                         }
                         else
                         {
-                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Outside, event);
+                            if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Outside, event);
                         }
                         _right_origin.reset();
                     }
@@ -236,9 +247,9 @@ namespace TSDL::elements
                 else if(_right_origin.has_value())
                 {
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_right_origin.value());
-                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_right_origin.value());
-                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Outside, event);
+                    attrs::EventLookupable* _actual_origin_e = _right_origin.value();
+                    DependentElement* _actual_origin = _right_origin.value();
+                    if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Outside, event);
                     _right_origin.reset();
                 }
                 return false;
@@ -250,9 +261,9 @@ namespace TSDL::elements
                 if(_right_origin.has_value())
                 {
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_right_origin.value());
-                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_right_origin.value());
-                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Outside, event);
+                    attrs::EventLookupable* _actual_origin_e = _right_origin.value();
+                    DependentElement* _actual_origin = _right_origin.value();
+                    if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Outside, event);
                     _right_origin.reset();
                 }
                 return false;
@@ -265,9 +276,9 @@ namespace TSDL::elements
                 {
                     _middle_origin = _current_mouse_focus;
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
-                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
-                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MiddleDown, event);
+                    attrs::EventLookupable* _actual_focus_e = _current_mouse_focus.value();
+                    DependentElement* _actual_focus = _current_mouse_focus.value();
+                    if (_actual_focus_e != nullptr) _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MiddleDown, event);
                 }
                 return false;
             }
@@ -278,20 +289,20 @@ namespace TSDL::elements
                 if(_current_mouse_focus.has_value())
                 {
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
-                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
-                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MiddleUp, event);
+                    attrs::EventLookupable* _actual_focus_e = _current_mouse_focus.value();
+                    DependentElement* _actual_focus = _current_mouse_focus.value();
+                    if (_actual_focus_e != nullptr) _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MiddleUp, event);
                     if(_middle_origin.has_value())
                     {
-                        attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_middle_origin.value());
-                        DependentElement* _actual_origin = std::any_cast<DependentElement*>(_middle_origin.value());
+                        attrs::EventLookupable* _actual_origin_e = _middle_origin.value();
+                        DependentElement* _actual_origin = _middle_origin.value();
                         if(_actual_origin == _actual_focus)
                         {
-                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Inside, event);
+                            if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Inside, event);
                         }
                         else
                         {
-                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Outside, event);
+                            if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Outside, event);
                         }
                         _middle_origin.reset();
                     }
@@ -299,9 +310,9 @@ namespace TSDL::elements
                 else if(_middle_origin.has_value())
                 {
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_middle_origin.value());
-                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_middle_origin.value());
-                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Outside, event);
+                    attrs::EventLookupable* _actual_origin_e = _middle_origin.value();
+                    DependentElement* _actual_origin = _middle_origin.value();
+                    if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Outside, event);
                     _middle_origin.reset();
                 }
                 return false;
@@ -313,9 +324,9 @@ namespace TSDL::elements
                 if(_middle_origin.has_value())
                 {
                     point_2d _dist = caller.second + render_position().topleft();
-                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_middle_origin.value());
-                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_middle_origin.value());
-                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Outside, event);
+                    attrs::EventLookupable* _actual_origin_e = _middle_origin.value();
+                    DependentElement* _actual_origin = _middle_origin.value();
+                    if (_actual_origin_e != nullptr) _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Outside, event);
                     _middle_origin.reset();
                 }
                 return false;
@@ -330,20 +341,16 @@ namespace TSDL::elements
                 auto& [element, dim] = formed_subelement;
                 auto [topleft, bottomright] = dim;
                 
-                try
-                {
-                    auto _sizable = std::any_cast<attrs::Sizable*>(element);
-                    bottomright = topleft + _sizable->size();
-                }
-                catch(const std::bad_any_cast&) {}
+                attrs::Sized* _sized = element;
+                if (_sized != nullptr) bottomright = topleft + _sized->size();
 
-                attrs::EventLookupable* element_ptr = std::any_cast<attrs::EventLookupable*>(element);
+                attrs::EventLookupable* element_ptr = element;
 
                 if (topleft.x < _mouse_location.x && _mouse_location.x < bottomright.x &&
                     topleft.y < _mouse_location.y && _mouse_location.y < bottomright.y)
                 {
                     _current_mouse_focus = element;
-                    element_ptr->dispatch_event(
+                    if (element_ptr != nullptr) element_ptr->dispatch_event(
                         Caller(*this, _mouse_location - topleft), 
                         events::EventType::MouseIn, _last_mousemotion_event
                     );
@@ -358,20 +365,16 @@ namespace TSDL::elements
                 auto& [element, dim] = formed_subelement;
                 auto [topleft, bottomright] = dim;
                 
-                try
-                {
-                    auto _sizable = std::any_cast<attrs::Sizable*>(element);
-                    bottomright = topleft + _sizable->size();
-                }
-                catch(const std::bad_any_cast&) {}
+                attrs::Sized* _sized = element;
+                if (_sized != nullptr) bottomright = topleft + _sized->size();
 
-                attrs::EventLookupable* element_ptr = std::any_cast<attrs::EventLookupable*>(element);
+                attrs::EventLookupable* element_ptr = element;
 
                 if (topleft.x < _mouse_location.x && _mouse_location.x < bottomright.x &&
                     topleft.y < _mouse_location.y && _mouse_location.y < bottomright.y)
                 {
                     _current_mouse_focus = element;
-                    element_ptr->dispatch_event(
+                    if (element_ptr != nullptr) element_ptr->dispatch_event(
                         Caller(*this, _mouse_location - topleft), 
                         events::EventType::MouseIn, _last_mousemotion_event
                     );
@@ -389,20 +392,16 @@ namespace TSDL::elements
                 auto& [element, dim] = *it;
                 auto [topleft, bottomright] = dim;
                 
-                try
-                {
-                    auto _sizable = std::any_cast<attrs::Sizable*>(element);
-                    bottomright = topleft + _sizable->size();
-                }
-                catch(const std::bad_any_cast&) {}
+                attrs::Sized* _sized = element;
+                if (_sized != nullptr) bottomright = topleft + _sized->size();
 
-                attrs::EventLookupable* element_ptr = std::any_cast<attrs::EventLookupable*>(element);
+                attrs::EventLookupable* element_ptr = element;
 
                 if (topleft.x < _mouse_location.x && _mouse_location.x < bottomright.x &&
                     topleft.y < _mouse_location.y && _mouse_location.y < bottomright.y)
                 {
                     _current_mouse_focus = element;
-                    element_ptr->dispatch_event(
+                    if (element_ptr != nullptr) element_ptr->dispatch_event(
                         Caller(*this, _mouse_location - topleft), 
                         events::EventType::MouseIn, _last_mousemotion_event
                     );
@@ -415,19 +414,19 @@ namespace TSDL::elements
             {
                 if(_current_mouse_focus.has_value())
                 {
-                    if(*std::any_cast<Element*>(_current_mouse_focus.value())==element) _current_mouse_focus.reset();
+                    if(*static_cast<Element*>(_current_mouse_focus.value())==element) _current_mouse_focus.reset();
                 }
                 if(_left_origin.has_value())
                 {
-                    if(*std::any_cast<Element*>(_left_origin.value())==element) _left_origin.reset();
+                    if(*static_cast<Element*>(_left_origin.value())==element) _left_origin.reset();
                 }
                 if(_middle_origin.has_value())
                 {
-                    if(*std::any_cast<Element*>(_middle_origin.value())==element) _middle_origin.reset();
+                    if(*static_cast<Element*>(_middle_origin.value())==element) _middle_origin.reset();
                 }
                 if(_right_origin.has_value())
                 {
-                    if(*std::any_cast<Element*>(_right_origin.value())==element) _right_origin.reset();
+                    if(*static_cast<Element*>(_right_origin.value())==element) _right_origin.reset();
                 }
                 _Grid_Attrs<Derived>::remove_child(element);
             }
@@ -465,13 +464,26 @@ namespace TSDL::elements
         template <events::EventType eventtype>
         bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
         {
-            return attrs::sizable<impl::_Grid<GridWithScrollbar>>::dispatch_templated_event<eventtype>(caller, event);
+            if (!attrs::sizable<impl::_Grid<GridWithScrollbar>>::dispatch_templated_event<eventtype>(caller, event))
+                return _underly.template dispatch_templated_event<eventtype>(caller, event);
+            return true;
         }
 
         template <>
         bool dispatch_templated_event<events::EventType::Dragged>(const Caller&, const SDL_Event&);
 
         Grid& grid();
+        const Grid& grid() const;
+
+        /*
+        Query if parent need to update this element on the next cycle
+        */
+        virtual bool need_update() const override;
+
+        /*
+        Re-render this element
+        */
+        virtual void render(const ::TSDL::point_2d& dist) override;
     };
 }
 

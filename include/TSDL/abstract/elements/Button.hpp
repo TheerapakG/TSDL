@@ -41,7 +41,7 @@ namespace TSDL::elements
 
             ButtonState state = ButtonState::NORMAL;
 
-            EventHandler _on_button_activated;
+            EventHandler _on_button_activated = always_true_event_handler;
 
             public:
             _Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size):

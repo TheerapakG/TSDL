@@ -187,7 +187,10 @@ namespace TSDL::elements::attrs
         ): T(evloop, renderer, args...), Dragable(pos_transform, origin) {}
 
         template <events::EventType eventtype>
-        bool dispatch_templated_event(const Caller& caller, const SDL_Event& event);
+        bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
+        {
+            return T::dispatch_templated_event<eventtype>(caller, event);
+        }
 
         template <>
         bool dispatch_templated_event<events::EventType::LeftDown>(const Caller&, const SDL_Event& event)
