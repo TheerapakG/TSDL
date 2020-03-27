@@ -11,32 +11,468 @@
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
 #include "TSDL/TSDL_Meta.hpp"
 
-namespace TSDL
+namespace TSDL::elements
 {
-    namespace elements
+    namespace impl
     {
-        class Grid: public attrs::eventdispatcher<ElementHolder>
-        {
-            private:
-            optional_reference<DependentElement> _current_mouse_focus;
-            optional_reference<DependentElement> _left_origin, _right_origin, _middle_origin;
-            point_2d _mouse_location = {std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
-            SDL_Event _last_mousemotion_event;
+        template <typename Derived>
+        using _Grid_Attrs = attrs::eventdispatcher<attrs::staticeventlookup<ElementHolder, Derived>>;
 
-            void _init();
+        template <typename Derived>
+        class _Grid: public _Grid_Attrs<Derived>
+        {
+            public:
+            using Subelement_vector = typename ElementHolder::Subelement_vector;
+
+            private:
+            std::optional<std::any> _current_mouse_focus;
+            std::optional<std::any> _left_origin, _right_origin, _middle_origin;
+            point_2d _mouse_location = {std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
+            SDL_Event _last_mousemotion_event = ::TSDL::null_event;
 
             public:
-            Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer); 
-            Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const attrs::ListenerMap& listeners);
-            Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, attrs::ListenerMap&& listeners);
+            _Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer):
+                _Grid_Attrs<Derived>(evloop, renderer) {}
+            _Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const attrs::ListenerMap& listeners):
+                _Grid_Attrs<Derived>(evloop, renderer, listeners) {}
+            _Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, attrs::ListenerMap&& listeners):
+                _Grid_Attrs<Derived>(evloop, renderer, listeners) {}
 
-            using attrs::eventdispatcher<ElementHolder>::add_child;
-            virtual void add_child(const Subelement& formed_subelement) override;
-            virtual Subelement_vector::iterator add_child(const Subelement& formed_subelement, int order) override;
+            template <events::EventType eventtype>
+            bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
+            {
+                return _Grid_Attrs<Derived>::dispatch_templated_event<eventtype>(caller, event);
+            }
 
-            virtual void remove_child(DependentElement& element) override;
+            template <>
+            bool dispatch_templated_event<events::EventType::MouseMotion>(const Caller& caller, const SDL_Event& event)
+            {
+                point_2d _dist = caller.second + render_position().topleft();
+                _mouse_location = _dist;
+                _last_mousemotion_event = event;
+
+                if(_left_origin.has_value())
+                {
+                    attrs::EventLookupable& _actual_origin_e = std::any_cast<attrs::EventLookupable&>(_left_origin.value());
+                    DependentElement& _actual_origin = std::any_cast<DependentElement&>(_left_origin.value());
+                    _actual_origin_e.dispatch_event(
+                        Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                        events::EventType::MouseMotion, event
+                    );
+                    return false;
+                }
+                if(_middle_origin.has_value())
+                {
+                    attrs::EventLookupable& _actual_origin_e = std::any_cast<attrs::EventLookupable&>(_middle_origin.value());
+                    DependentElement& _actual_origin = std::any_cast<DependentElement&>(_middle_origin.value());
+                    _actual_origin_e.dispatch_event(
+                        Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                        events::EventType::MouseMotion, event
+                    );
+                    return false;
+                }
+                if(_right_origin.has_value())
+                {
+                    attrs::EventLookupable& _actual_origin_e = std::any_cast<attrs::EventLookupable&>(_right_origin.value());
+                    DependentElement& _actual_origin = std::any_cast<DependentElement&>(_right_origin.value());
+                    _actual_origin_e.dispatch_event(
+                        Caller(*this, _dist - child_info(_actual_origin).dimension.first), 
+                        events::EventType::MouseMotion, event
+                    );
+                    return false;
+                }
+
+                for(const Subelement& subelement: ::TSDL::reverse(get_child_order()))
+                {
+                    auto& [element_any, dim] = subelement;
+                    auto [topleft, bottomright] = dim;
+
+                    try
+                    {
+                        auto _sizable = std::any_cast<attrs::Sizable*>(element_any);
+                        bottomright = topleft + _sizable->size();
+                    }
+                    catch(const std::bad_any_cast&) {}
+
+                    attrs::EventLookupable* element_e = std::any_cast<attrs::EventLookupable*>(element_any);
+                    DependentElement* element = std::any_cast<DependentElement*>(element_any);
+
+                    if (topleft.x < _dist.x && _dist.x < bottomright.x &&
+                        topleft.y < _dist.y && _dist.y < bottomright.y)
+                    {
+                        if(!_current_mouse_focus.has_value())
+                        {
+                            _current_mouse_focus = element;
+                            element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseIn, event);
+                            element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseMotion, event);
+                        }
+                        else if(*element == *std::any_cast<DependentElement*>(_current_mouse_focus.value()))
+                        {
+                            element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseMotion, event);
+                        }
+                        else
+                        {
+                            attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
+                            DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
+                            _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MouseOut, event);
+                            _current_mouse_focus = element;
+                            element_e->dispatch_event(Caller(*this, _dist - topleft), events::EventType::MouseIn, event);
+                        }
+                        return false;
+                    }
+                }
+
+                if(_current_mouse_focus.has_value())
+                {
+                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
+                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
+                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MouseOut, event);
+                    _current_mouse_focus.reset();
+                }
+                return false;
+            }
+
+            template <>
+            bool dispatch_templated_event<events::EventType::LeftDown>(const Caller& caller, const SDL_Event& event)
+            {
+                if(_current_mouse_focus.has_value())
+                {
+                    _left_origin = _current_mouse_focus;
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
+                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
+                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first),events::EventType::LeftDown, event);
+                }
+                return false;
+            }
+
+            template <>
+            bool dispatch_templated_event<events::EventType::LeftUp>(const Caller& caller, const SDL_Event& event)
+            {
+                if(_current_mouse_focus.has_value())
+                {
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
+                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
+                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::LeftUp, event);
+                    if(_left_origin.has_value())
+                    {
+                        attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_left_origin.value());
+                        DependentElement* _actual_origin = std::any_cast<DependentElement*>(_left_origin.value());
+                        if(_actual_origin == _actual_focus)
+                        {
+                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Inside, event);
+                        }
+                        else
+                        {
+                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Outside, event);
+                        }
+                        _left_origin.reset();
+                    }
+                }
+                else if(_left_origin.has_value())
+                {
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_left_origin.value());
+                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_left_origin.value());
+                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Outside, event);
+                    _left_origin.reset();
+                }
+                return false;
+            }
+
+            template <>
+            bool dispatch_templated_event<events::EventType::LeftUp_Outside>(const Caller& caller, const SDL_Event& event)
+            { 
+                if(_left_origin.has_value())
+                {
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_left_origin.value());
+                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_left_origin.value());
+                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::LeftUp_Outside, event);
+                    _left_origin.reset();
+                }
+                return false;
+            }
+
+            template <>
+            bool dispatch_templated_event<events::EventType::RightDown>(const Caller& caller, const SDL_Event& event)
+            {
+                if(_current_mouse_focus.has_value())
+                {
+                    _right_origin = _current_mouse_focus;
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
+                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
+                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::RightDown, event);
+                }
+                return false;
+            }
+
+            template <>
+            bool dispatch_templated_event<events::EventType::RightUp>(const Caller& caller, const SDL_Event& event)
+            {
+                if(_current_mouse_focus.has_value())
+                {
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
+                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
+                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::RightUp, event);
+                    if(_right_origin.has_value())
+                    {
+                        attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_right_origin.value());
+                        DependentElement* _actual_origin = std::any_cast<DependentElement*>(_right_origin.value());
+                        if(_actual_origin == _actual_focus)
+                        {
+                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Inside, event);
+                        }
+                        else
+                        {
+                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Outside, event);
+                        }
+                        _right_origin.reset();
+                    }
+                }
+                else if(_right_origin.has_value())
+                {
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_right_origin.value());
+                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_right_origin.value());
+                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Outside, event);
+                    _right_origin.reset();
+                }
+                return false;
+            }
+
+            template <>
+            bool dispatch_templated_event<events::EventType::RightUp_Outside>(const Caller& caller, const SDL_Event& event)
+            { 
+                if(_right_origin.has_value())
+                {
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_right_origin.value());
+                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_right_origin.value());
+                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::RightUp_Outside, event);
+                    _right_origin.reset();
+                }
+                return false;
+            }
+
+            template <>
+            bool dispatch_templated_event<events::EventType::MiddleDown>(const Caller& caller, const SDL_Event& event)
+            {
+                if(_current_mouse_focus.has_value())
+                {
+                    _middle_origin = _current_mouse_focus;
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
+                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
+                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MiddleDown, event);
+                }
+                return false;
+            }
+            
+            template <>
+            bool dispatch_templated_event<events::EventType::MiddleUp>(const Caller& caller, const SDL_Event& event)
+            {
+                if(_current_mouse_focus.has_value())
+                {
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_focus_e = std::any_cast<attrs::EventLookupable*>(_current_mouse_focus.value());
+                    DependentElement* _actual_focus = std::any_cast<DependentElement*>(_current_mouse_focus.value());
+                    _actual_focus_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_focus).dimension.first), events::EventType::MiddleUp, event);
+                    if(_middle_origin.has_value())
+                    {
+                        attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_middle_origin.value());
+                        DependentElement* _actual_origin = std::any_cast<DependentElement*>(_middle_origin.value());
+                        if(_actual_origin == _actual_focus)
+                        {
+                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Inside, event);
+                        }
+                        else
+                        {
+                            _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Outside, event);
+                        }
+                        _middle_origin.reset();
+                    }
+                }
+                else if(_middle_origin.has_value())
+                {
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_middle_origin.value());
+                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_middle_origin.value());
+                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Outside, event);
+                    _middle_origin.reset();
+                }
+                return false;
+            }
+
+            template <>
+            bool dispatch_templated_event<events::EventType::MiddleUp_Outside>(const Caller& caller, const SDL_Event& event)
+            { 
+                if(_middle_origin.has_value())
+                {
+                    point_2d _dist = caller.second + render_position().topleft();
+                    attrs::EventLookupable* _actual_origin_e = std::any_cast<attrs::EventLookupable*>(_middle_origin.value());
+                    DependentElement* _actual_origin = std::any_cast<DependentElement*>(_middle_origin.value());
+                    _actual_origin_e->dispatch_event(Caller(*this, _dist - child_info(*_actual_origin).dimension.first), events::EventType::MiddleUp_Outside, event);
+                    _middle_origin.reset();
+                }
+                return false;
+            }
+
+            using _Grid_Attrs<Derived>::add_child;
+            virtual void add_child(const Subelement& formed_subelement) override
+            {
+                _Grid_Attrs<Derived>::add_child(formed_subelement);
+                if (_left_origin.has_value()||_middle_origin.has_value()||_right_origin.has_value()) return;
+
+                auto& [element, dim] = formed_subelement;
+                auto [topleft, bottomright] = dim;
+                
+                try
+                {
+                    auto _sizable = std::any_cast<attrs::Sizable*>(element);
+                    bottomright = topleft + _sizable->size();
+                }
+                catch(const std::bad_any_cast&) {}
+
+                attrs::EventLookupable* element_ptr = std::any_cast<attrs::EventLookupable*>(element);
+
+                if (topleft.x < _mouse_location.x && _mouse_location.x < bottomright.x &&
+                    topleft.y < _mouse_location.y && _mouse_location.y < bottomright.y)
+                {
+                    _current_mouse_focus = element;
+                    element_ptr->dispatch_event(
+                        Caller(*this, _mouse_location - topleft), 
+                        events::EventType::MouseIn, _last_mousemotion_event
+                    );
+                }
+            }
+            virtual typename Subelement_vector::iterator add_child(const Subelement& formed_subelement, int order) override
+            {
+                auto it = _Grid_Attrs<Derived>::add_child(formed_subelement, order);
+                if(std::next(it)!=get_child_order().end()) return it;
+                if(_left_origin.has_value()||_middle_origin.has_value()||_right_origin.has_value()) return it;
+
+                auto& [element, dim] = formed_subelement;
+                auto [topleft, bottomright] = dim;
+                
+                try
+                {
+                    auto _sizable = std::any_cast<attrs::Sizable*>(element);
+                    bottomright = topleft + _sizable->size();
+                }
+                catch(const std::bad_any_cast&) {}
+
+                attrs::EventLookupable* element_ptr = std::any_cast<attrs::EventLookupable*>(element);
+
+                if (topleft.x < _mouse_location.x && _mouse_location.x < bottomright.x &&
+                    topleft.y < _mouse_location.y && _mouse_location.y < bottomright.y)
+                {
+                    _current_mouse_focus = element;
+                    element_ptr->dispatch_event(
+                        Caller(*this, _mouse_location - topleft), 
+                        events::EventType::MouseIn, _last_mousemotion_event
+                    );
+                }
+
+                return it;
+            }
+
+            virtual typename Subelement_vector::iterator reorder_child(DependentElement& subelement, int order) override
+            {
+                auto it = _Grid_Attrs<Derived>::reorder_child(subelement, order);
+                if(std::next(it)!=get_child_order().end()) return it;
+                if(_left_origin.has_value()||_middle_origin.has_value()||_right_origin.has_value()) return it;
+
+                auto& [element, dim] = *it;
+                auto [topleft, bottomright] = dim;
+                
+                try
+                {
+                    auto _sizable = std::any_cast<attrs::Sizable*>(element);
+                    bottomright = topleft + _sizable->size();
+                }
+                catch(const std::bad_any_cast&) {}
+
+                attrs::EventLookupable* element_ptr = std::any_cast<attrs::EventLookupable*>(element);
+
+                if (topleft.x < _mouse_location.x && _mouse_location.x < bottomright.x &&
+                    topleft.y < _mouse_location.y && _mouse_location.y < bottomright.y)
+                {
+                    _current_mouse_focus = element;
+                    element_ptr->dispatch_event(
+                        Caller(*this, _mouse_location - topleft), 
+                        events::EventType::MouseIn, _last_mousemotion_event
+                    );
+                }
+
+                return it;
+            }
+
+            virtual void remove_child(DependentElement& element) override
+            {
+                if(_current_mouse_focus.has_value())
+                {
+                    if(*std::any_cast<Element*>(_current_mouse_focus.value())==element) _current_mouse_focus.reset();
+                }
+                if(_left_origin.has_value())
+                {
+                    if(*std::any_cast<Element*>(_left_origin.value())==element) _left_origin.reset();
+                }
+                if(_middle_origin.has_value())
+                {
+                    if(*std::any_cast<Element*>(_middle_origin.value())==element) _middle_origin.reset();
+                }
+                if(_right_origin.has_value())
+                {
+                    if(*std::any_cast<Element*>(_right_origin.value())==element) _right_origin.reset();
+                }
+                _Grid_Attrs<Derived>::remove_child(element);
+            }
         };
     }
+
+    class Grid: public impl::_Grid<Grid>
+    {
+        public:
+        Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer);
+        Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const attrs::ListenerMap& listeners);
+        Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, attrs::ListenerMap&& listeners);
+    };
+
+    class BaseHorizontalScrollbar;
+    class BaseVerticalScrollbar;
+
+    // TODO: really change size
+    class GridWithScrollbar: public attrs::sizable<impl::_Grid<GridWithScrollbar>>
+    {
+        private:
+        BaseHorizontalScrollbar* hbar;
+        BaseVerticalScrollbar* vbar;
+
+        Grid _underly;
+
+        void _init(int bar_width);
+
+        public:
+        GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width);
+        GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width, const attrs::ListenerMap& listeners);
+        GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width, attrs::ListenerMap&& listeners);
+        ~GridWithScrollbar();
+
+        template <events::EventType eventtype>
+        bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
+        {
+            return attrs::sizable<impl::_Grid<GridWithScrollbar>>::dispatch_templated_event<eventtype>(caller, event);
+        }
+
+        template <>
+        bool dispatch_templated_event<events::EventType::Dragged>(const Caller&, const SDL_Event&);
+
+        Grid& grid();
+    };
 }
 
 #endif

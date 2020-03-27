@@ -26,25 +26,14 @@ namespace TSDL
 
         using Caller = std::pair<std::reference_wrapper<::TSDL::elements::attrs::EventDispatcher>, point_2d>;
         using EventHandler = std::function<bool(const Caller&, const SDL_Event&)>;
-
-        /*
-        All types inherited from Element shall inherit Element virtually
-        */        
+        
         class Element
         {
-            // TODO: after_render queue for setting element as re-rendered callback and also other callback
-            private:
-            std::map <::TSDL::events::EventType, std::vector<EventHandler>> _evhdlrmap;
-            
             public:
             Element() = default;
             Element(const Element&) = delete;
-
-            virtual bool dispatch_event(const Caller& caller, const ::TSDL::events::EventType& eventtype, const SDL_Event& event);            
-            void add_event_handler(const ::TSDL::events::EventType& eventtype, const EventHandler& evhandler);
-            void remove_event_handler(const ::TSDL::events::EventType& eventtype);
         };
-
+        
         bool operator==(const Element& lhs, const Element& rhs);
         bool operator!=(const Element& lhs, const Element& rhs);
 

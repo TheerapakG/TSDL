@@ -5,9 +5,48 @@
 #include <optional>
 #include <functional>
 #include <tuple>
+#include <iterator>
+#include <utility>
+
+#if __cplusplus > 201703L
+#include <version>
+#ifdef __cpp_lib_concepts
+#include <concepts>
+#endif
+#endif
 
 namespace TSDL
 {
+    template <bool u, bool ...v>
+    struct _and
+    {
+        static constexpr bool value = u && _and<v...>::value;
+    };
+
+    template <>
+    struct _and <true> : std::true_type {};
+
+    template <>
+    struct _and <false> : std::false_type {};
+
+    template <bool ...v>
+    inline constexpr bool _and_v = _and<v...>::value;
+
+    template <bool u, bool ...v>
+    struct _or
+    {
+        static constexpr bool value = u || _or<v...>::value;
+    };
+
+    template <>
+    struct _or <true> : std::true_type {};
+
+    template <>
+    struct _or <false> : std::false_type {};
+
+    template <bool ...v>
+    inline constexpr bool _or_v = _or<v...>::value;
+
     template <typename T>
     struct remove_all_pointers
     {
@@ -40,27 +79,6 @@ namespace TSDL
 
     template <typename T>
     using remove_all_pointers_t = typename remove_all_pointers<T>::type;
-
-    template <typename T, typename Enable = void>
-    struct is_callable_not_overloaded
-    {
-        static constexpr bool value = false;
-    };
-
-    template <typename T>
-    struct is_callable_not_overloaded <T, std::enable_if_t<std::is_same_v<decltype(void(&T::operator())), void>>>
-    {
-        static constexpr bool value = true;
-    };
-    
-    template <typename T>
-    struct is_callable_not_overloaded <T, std::enable_if_t<std::is_function_v<remove_all_pointers_t<T>>>>
-    {
-        static constexpr bool value = true;
-    };
-
-    template <typename T>
-    inline constexpr bool is_callable_not_overloaded_v = is_callable_not_overloaded<T>::value;
 
     template <typename T>
     struct return_type { using type = typename std::function<T>::result_type; };
@@ -172,13 +190,13 @@ namespace TSDL
     using optional_reference = std::optional<std::reference_wrapper<T>>;
 
     template <typename T>
-    std::optional<std::reference_wrapper<T>> make_optional_ref(T&& ref)
+    std::optional<std::reference_wrapper<std::remove_reference_t<T>>> make_optional_ref(T&& ref)
     {
         return ref;
     }
 
     template <typename T>
-    std::optional<std::reference_wrapper<T>> make_optional_ref()
+    std::optional<std::reference_wrapper<std::remove_reference_t<T>>> make_optional_ref()
     {
         return std::optional<std::reference_wrapper<T>>();
     }
@@ -193,13 +211,13 @@ namespace TSDL
     using optional_const_reference = std::optional<const std::reference_wrapper<T>>;
 
     template <typename T>
-    std::optional<const std::reference_wrapper<T>> make_optional_const_ref(T&& ref)
+    std::optional<const std::reference_wrapper<std::remove_reference_t<T>>> make_optional_const_ref(T&& ref)
     {
         return ref;
     }
 
     template <typename T>
-    std::optional<const std::reference_wrapper<T>> make_optional_const_ref()
+    std::optional<const std::reference_wrapper<std::remove_reference_t<T>>> make_optional_const_ref()
     {
         return std::optional<const std::reference_wrapper<T>>();
     }
@@ -212,6 +230,178 @@ namespace TSDL
 
     template <typename T>
     using transformer = std::function<T(const T&)>;
+}
+
+namespace TSDL::traits
+{
+    template <typename T, typename Enable = void>
+    struct is_callable_not_overloaded
+    {
+        static constexpr bool value = false;
+    };
+    
+    template <typename T>
+    struct is_callable_not_overloaded <T, std::enable_if_t<std::is_same_v<decltype(void(&T::operator())), void>>>
+    {
+        static constexpr bool value = true;
+    };
+    
+    template <typename T>
+    struct is_callable_not_overloaded <T, std::enable_if_t<std::is_function_v<remove_all_pointers_t<T>>>>
+    {
+        static constexpr bool value = true;
+    };
+
+    template <typename T>
+    inline constexpr bool is_callable_not_overloaded_v = is_callable_not_overloaded<T>::value;
+
+    #if defined(__cpp_concepts) && defined(__cpp_lib_concepts)
+    /*
+    Concept for checking if T is an input iterator yielding type of U
+    */
+    template <typename T, typename U>
+    concept InputIterator = requires (T t)
+    {
+        requires std::input_iterator<T>;
+        requires std::same_as<std::iter_value_t<T>, U>;
+    };
+    #endif
+
+    /*
+    Check if T is an input iterator yielding type of U
+    */
+    template <typename T, typename U, typename Enable = void>
+    struct is_input_iterator
+    {
+        static constexpr bool value = false;
+    };
+
+    /*
+    Check if T is an input iterator yielding type of U
+    */
+    #if defined(__cpp_concepts) && defined(__cpp_lib_concepts)
+    template <typename T, typename U> requires InputIterator<T, U>
+    struct is_input_iterator <T, U, void>
+    {
+        static constexpr bool value = true;
+    };
+    #else
+    template <typename T, typename U>
+    struct is_input_iterator <T, U,
+        std::enable_if_t<
+            _and_v<
+                std::is_base_of_v<std::input_iterator_tag, typename std::iterator_traits<T>::iterator_category>,
+                std::is_same_v<typename std::iterator_traits<T>::value_type, U>
+            >
+        >
+    >
+    {
+        static constexpr bool value = true;
+    };
+    #endif
+
+    /*
+    Helper for is_input_iterator
+    */
+    template <typename T, typename U>
+    inline constexpr bool is_input_iterator_v = is_input_iterator<T, U>::value;
+
+
+
+    #if defined(__cpp_concepts) && defined(__cpp_lib_concepts)
+    /*
+    Concept for checking if T is an input iterator yielding type convertible to U
+    */
+    template <typename T, typename U>
+    concept InputIteratorConvertible = requires (T t)
+    {
+        requires std::input_iterator<T>;
+        requires std::derived_from<std::iter_value_t<T>, U>;
+    };
+    #endif
+
+    /*
+    Check if T is an input iterator yielding type convertible to U
+    */
+    template <typename T, typename U, typename Enable = void>
+    struct is_input_iterator_convertible
+    {
+        static constexpr bool value = false;
+    };
+
+    /*
+    Check if T is an input iterator yielding type convertible to U
+    */
+    #if defined(__cpp_concepts) && defined(__cpp_lib_concepts)
+    template <typename T, typename U> requires InputIteratorConvertible<T, U>
+    struct is_input_iterator_convertible <T, U, void>
+    {
+        static constexpr bool value = true;
+    };
+    #else
+    template <typename T, typename U>
+    struct is_input_iterator_convertible <T, U,
+        std::enable_if_t<
+            _and_v<
+                std::is_base_of_v<std::input_iterator_tag, typename std::iterator_traits<T>::iterator_category>,
+                std::is_base_of_v<U, typename std::iterator_traits<T>::value_type>
+            >
+        >
+    >
+    {
+        static constexpr bool value = true;
+    };
+    #endif
+
+    /*
+    Helper for is_input_iterator_convertible
+    */
+    template <typename T, typename U>
+    inline constexpr bool is_input_iterator_convertible_v = is_input_iterator_convertible<T, U>::value;
+
+
+
+    #if defined(__cpp_concepts) && defined(__cpp_lib_concepts)
+    template <typename T>
+    concept ForwardIterable = requires (T t)
+    {
+        typename T::iterator;
+        requires std::forward_iterator<typename T::iterator>;
+        requires std::same_as<decltype(std::begin(t)), typename T::iterator>;
+        requires std::same_as<decltype(std::end(t)), typename T::iterator>;
+    };
+    #endif
+
+    template <typename T, typename Enable = void>
+    struct is_forward_iterable
+    {
+        static constexpr bool value = false;
+    };
+
+    #if defined(__cpp_concepts) && defined(__cpp_lib_concepts)
+    template <typename T> requires ForwardIterable<T>
+    struct is_forward_iterable <T, void>
+    {
+        static constexpr bool value = true;
+    };
+    #else
+    template <typename T>
+    struct is_forward_iterable <T, 
+        std::enable_if_t<
+            _and_v<
+                std::is_base_of_v<std::forward_iterator_tag, typename std::iterator_traits<typename T::iterator>::iterator_category>,
+                std::is_same_v<decltype(std::begin(std::declval<T>())), typename T::iterator>,
+                std::is_same_v<decltype(std::end(std::declval<T>())), typename T::iterator>
+            >
+        >
+    >
+    {
+        static constexpr bool value = true;
+    };
+    #endif
+
+    template <typename T>
+    inline constexpr bool is_forward_iterable_v = is_forward_iterable<T>::value;
 }
 
 #endif

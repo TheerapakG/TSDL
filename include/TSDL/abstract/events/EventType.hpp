@@ -1,6 +1,9 @@
 #ifndef TSDL_EVENTS_EVENTTYPE_
 #define TSDL_EVENTS_EVENTTYPE_
 
+#include <type_traits>
+#include <variant>
+
 namespace TSDL
 {
     namespace events
@@ -39,6 +42,7 @@ namespace TSDL
             ButtonActivated,
             Dragged // Dragable dragged
         };
+        // If added event here, also add it in EventLookup
     }
 }
 

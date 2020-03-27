@@ -6,8 +6,11 @@
 #include <map>
 #include <functional>
 #include <optional>
+#include <any>
 #include "TSDL/abstract/elements/attrs/Sizable.hpp"
 #include "TSDL/abstract/elements/Element.hpp"
+#include "TSDL/abstract/elements/attrs/EventLookup.hpp"
+#include "TSDL/TSDL_Meta.hpp"
 
 namespace TSDL
 {
@@ -15,15 +18,13 @@ namespace TSDL
     {
         struct Subelement
         {
-            DependentElement* element = nullptr;
+            std::any element;
             std::pair<point_2d, point_2d> dimension;
-
-            attrs::Sizable* _sizable = nullptr;
 
             bool operator==(const Subelement& other);
         };
 
-        class ElementHolder: public DependentElement
+        class ElementHolder: public attrs::sized<DependentElement>
         {
             public:
             using Subelement_vector = std::vector <Subelement>;
@@ -39,33 +40,57 @@ namespace TSDL
             virtual void add_child(const Subelement& formed_subelement);
             virtual Subelement_vector::iterator add_child(const Subelement& formed_subelement, int order);
 
-            void add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright);
-            Subelement_vector::iterator add_child(DependentElement& subelement, const point_2d& topleft, const point_2d& bottomright, int order);
-
-            template<typename T>
-            void add_child(attrs::sizable<T>& subelement, const point_2d& topleft)
+            template<typename T, typename U =
+                std::enable_if_t<
+                std::is_base_of_v<attrs::EventLookupable, T> &&
+                std::is_base_of_v<DependentElement, T>
+            >>
+            void add_child(T& subelement, const point_2d& topleft, const point_2d& bottomright)
             {
-				std::pair<point_2d, point_2d> el_loc(topleft, {0, 0});
-                Subelement el_all{&subelement, el_loc, &subelement};
+                std::pair el_loc(topleft, bottomright);
+                Subelement el_all{&subelement, el_loc};
 
                 add_child(el_all);
             }
 
-            template<typename T>
-            Subelement_vector::iterator add_child(attrs::sizable<T>& subelement, const point_2d& topleft, int order)
+            template<typename T, typename U = 
+                std::enable_if_t<
+                    std::is_base_of_v<attrs::EventLookupable, T>&&
+                    std::is_base_of_v<DependentElement, T>
+            >>
+            Subelement_vector::iterator add_child(T& subelement, const point_2d& topleft, const point_2d& bottomright, int order)
             {
-                std::pair<point_2d, point_2d> el_loc(topleft, {0, 0});
-                Subelement el_all{&subelement, el_loc, &subelement};
+                std::pair el_loc(topleft, bottomright);
+                Subelement el_all{&subelement, el_loc};
 
                 return add_child(el_all, order);
             }
 
-            virtual void reorder_child(DependentElement& subelement, int order);
+            template<typename T, typename U = std::enable_if_t<std::is_base_of_v<attrs::Sized, T>>> 
+            void add_child(T& subelement, const point_2d& topleft)
+            {
+                std::pair el_loc(topleft, point_2d{0, 0});
+                Subelement el_all{&subelement, el_loc};
+
+                add_child(el_all);
+            }
+
+            template<typename T, typename U = std::enable_if_t<std::is_base_of_v<attrs::Sized, T>>>
+            Subelement_vector::iterator add_child(T& subelement, const point_2d& topleft, int order)
+            {
+                std::pair el_loc(topleft, point_2d{0, 0});
+                Subelement el_all{&subelement, el_loc};
+
+                return add_child(el_all, order);
+            }
+
+            virtual Subelement_vector::iterator reorder_child(DependentElement& subelement, int order);
             virtual void move_child(DependentElement& subelement, const point_2d& destination);
             virtual void remove_child(DependentElement& subelement);
 
             Subelement child_info(DependentElement& subelement);
-            rect bound();
+            rect bound() const;
+            virtual point_2d size() const override;
 
             const std::vector<Subelement>& get_child_order();
             std::optional<Subelement> highest_child(const point_2d& point);

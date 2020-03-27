@@ -2,36 +2,6 @@
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
 #include <memory>
 
-bool TSDL::elements::Element::dispatch_event(const Caller& caller, const TSDL::events::EventType& eventtype, const SDL_Event& event)
-{
-    std::vector<EventHandler> h;
-
-    try
-    {
-        h = _evhdlrmap.at(eventtype);
-    }
-    catch(const std::out_of_range&)
-    {
-        return false;
-    }
-
-    bool _ret = false;
-
-    for(auto& hi: h) _ret |= hi(caller, event);
-
-    return _ret;
-}
-
-void TSDL::elements::Element::add_event_handler(const TSDL::events::EventType& eventtype, const EventHandler& evhandler)
-{
-    _evhdlrmap[eventtype].emplace_back(evhandler);
-}
-
-void TSDL::elements::Element::remove_event_handler(const TSDL::events::EventType& eventtype)
-{
-    _evhdlrmap.erase(eventtype);
-}
-
 bool TSDL::elements::operator==(const TSDL::elements::Element& lhs, const TSDL::elements::Element& rhs)
 {
     return std::addressof(lhs) == std::addressof(rhs);

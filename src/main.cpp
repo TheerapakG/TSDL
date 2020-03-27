@@ -91,15 +91,13 @@ void generate_visual_from_path()
     );
 
     button->front(*buttontextelement);
-    button->add_event_handler(
-        TSDL::events::EventType::ButtonActivated,
-        [](const TSDL::elements::Caller&, const SDL_Event&) -> bool
-        {
-            current_path = current_path.parent_path();
-            grid->eventloop().register_call_next(generate_visual_from_path);
-            return true;
-        }
-    );
+    button->on_button_activated() =
+    [](const TSDL::elements::Caller&, const SDL_Event&) -> bool
+    {
+        current_path = current_path.parent_path();
+        grid->eventloop().register_call_next(generate_visual_from_path);
+        return true;
+    };
 
     grid->add_child(*button, {64, y});
     _previous_visual_elements.push_back(button);
@@ -131,15 +129,13 @@ void generate_visual_from_path()
         );
 
         button->front(*buttontextelement);
-        button->add_event_handler(
-            TSDL::events::EventType::ButtonActivated,
-            [path](const TSDL::elements::Caller&, const SDL_Event&) -> bool
-            {
-                current_path = path;
-                grid->eventloop().register_call_next(generate_visual_from_path);
-                return true;
-            }
-        );
+        button->on_button_activated() =
+        [path](const TSDL::elements::Caller&, const SDL_Event&) -> bool
+        {
+            current_path = path;
+            grid->eventloop().register_call_next(generate_visual_from_path);
+            return true;
+        };
 
         grid->add_child(*button, {64, y});
         _previous_visual_elements.push_back(button);
@@ -170,15 +166,12 @@ int main(int argc, char* argv[])
 
         TSDL::elements::EventloopAdapter evAdapter(eventloop);
 
-        TSDL::elements::Grid mgrid(evAdapter, renderer);
+        TSDL::elements::GridWithScrollbar mgrid(evAdapter, renderer, {SCREEN_WIDTH, SCREEN_HEIGHT}, 16);
         evAdapter.src(mgrid);
+        grid = &mgrid.grid();
 
         TSDL::elements::FilledRectangle bg(evAdapter, renderer, {SCREEN_WIDTH, SCREEN_HEIGHT});
-        mgrid.add_child(bg, {0, 0});
-
-        TSDL::elements::Grid grid(evAdapter, renderer);
-        mgrid.add_child(grid, {0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
-        ::grid = &grid;
+        grid->add_child(bg, {0, 0});
 
         #ifdef TSDL_USE_FONTCONFIG
         std::string font_path = TSDL::get_family_font_filename("sans-serif");
@@ -211,26 +204,7 @@ int main(int argc, char* argv[])
         delete buttontext;
 
         button.front(buttontextelement);
-        grid.add_child(button, {SCREEN_WIDTH-320, 64});
-
-        TSDL::elements::BaseHorizontalScrollbar hscrollbar(evAdapter, renderer, 2*SCREEN_WIDTH, {SCREEN_WIDTH-16, 16});
-        hscrollbar.dispatch_event_direct(TSDL::events::EventType::Dragged, grid);
-        ::hscrollbar = &hscrollbar;
-        TSDL::elements::BaseVerticalScrollbar vscrollbar(evAdapter, renderer, 2*SCREEN_HEIGHT, {16, SCREEN_HEIGHT-16});
-        vscrollbar.dispatch_event_direct(TSDL::events::EventType::Dragged, grid);
-        ::vscrollbar = &vscrollbar;
-        grid.add_event_handler(
-            TSDL::events::EventType::Dragged, 
-            [&grid, &hscrollbar, &vscrollbar](const TSDL::elements::Caller&, const SDL_Event&) -> bool
-            {
-                TSDL::point_2d region_x = hscrollbar.represented_section();
-                TSDL::point_2d region_y = vscrollbar.represented_section();
-                grid.render_position({region_x.x, region_y.x, region_x.y, region_y.y});
-                return true;
-            }
-        );
-        mgrid.add_child(hscrollbar, {0, SCREEN_HEIGHT-16});
-        mgrid.add_child(vscrollbar, {SCREEN_WIDTH-16, 0});
+        grid->add_child(button, {SCREEN_WIDTH-320, 64});
 
         generate_visual_from_path();
 

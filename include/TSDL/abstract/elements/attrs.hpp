@@ -1,4 +1,6 @@
 #include "TSDL/abstract/elements/attrs/Dragable.hpp"
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
+#include "TSDL/abstract/elements/attrs/EventForwarder.hpp"
+#include "TSDL/abstract/elements/attrs/EventLookup.hpp"
 #include "TSDL/abstract/elements/attrs/Gridded.hpp"
 #include "TSDL/abstract/elements/attrs/Sizable.hpp"

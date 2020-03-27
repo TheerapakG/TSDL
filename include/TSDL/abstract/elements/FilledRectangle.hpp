@@ -2,6 +2,7 @@
 #define TSDL_ELEMENTS_FILLEDRECTANGLE_
 
 #include "TSDL/abstract/elements/attrs/Sizable.hpp"
+#include "TSDL/abstract/elements/EventloopAdapter.hpp"
 
 #include "TSDL/TSDL_Meta.hpp"
 
