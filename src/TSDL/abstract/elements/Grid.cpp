@@ -14,7 +14,6 @@ namespace TSDL::elements
 
     void GridWithScrollbar::_init(int bar_width)
     {
-        add_child(_underly, {0, 0});
         hbar = new BaseHorizontalScrollbar(eventloop(), renderer(), size().y, {size().x, bar_width});
         vbar = new BaseVerticalScrollbar(eventloop(), renderer(), size().x, {bar_width, size().y});
         add_child(*hbar, {0, size().y - bar_width});
@@ -54,5 +53,24 @@ namespace TSDL::elements
     Grid& GridWithScrollbar::grid()
     {
         return _underly;
+    }
+
+    const Grid& GridWithScrollbar::grid() const
+    {
+        return _underly;
+    }
+
+    bool GridWithScrollbar::need_update() const
+    {
+        return grid().need_update() || attrs::sizable<impl::_Grid<GridWithScrollbar>>::need_update();
+    }
+
+    /*
+    Re-render this element
+    */
+    void GridWithScrollbar::render(const ::TSDL::point_2d& dist)
+    {
+        grid().render(dist);
+        attrs::sizable<impl::_Grid<GridWithScrollbar>>::render(dist);
     }
 }

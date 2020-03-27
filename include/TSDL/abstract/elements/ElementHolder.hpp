@@ -6,7 +6,6 @@
 #include <map>
 #include <functional>
 #include <optional>
-#include <any>
 #include "TSDL/abstract/elements/attrs/Sizable.hpp"
 #include "TSDL/abstract/elements/Element.hpp"
 #include "TSDL/abstract/elements/attrs/EventLookup.hpp"
@@ -16,9 +15,31 @@ namespace TSDL
 {
     namespace elements
     {
+        class Element_Traits
+        {
+            DependentElement* _dependent_ptr = nullptr;
+            attrs::EventLookupable* _lookupable_ptr = nullptr;
+            attrs::Sized* _sized_ptr = nullptr;
+
+            public:
+            constexpr Element_Traits(const Element_Traits&) = default;
+
+            template <typename T>
+            constexpr Element_Traits(T* element)
+            {
+                if constexpr (std::is_base_of_v<DependentElement, T>) _dependent_ptr = static_cast<DependentElement*>(element);
+                if constexpr (std::is_base_of_v<attrs::EventLookupable, T>) _lookupable_ptr = static_cast<attrs::EventLookupable*>(element);
+                if constexpr (std::is_base_of_v<attrs::Sized, T>) _sized_ptr = static_cast<attrs::Sized*>(element);
+            }
+
+            operator DependentElement* () const;
+            operator attrs::EventLookupable* () const;
+            operator attrs::Sized* () const;
+        };
+
         struct Subelement
         {
-            std::any element;
+            Element_Traits element;
             std::pair<point_2d, point_2d> dimension;
 
             bool operator==(const Subelement& other);

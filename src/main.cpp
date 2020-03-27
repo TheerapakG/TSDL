@@ -34,9 +34,7 @@ void say_fps()
     }
 }
 
-static TSDL::elements::Grid* grid = nullptr;
-TSDL::elements::BaseHorizontalScrollbar* hscrollbar = nullptr;
-TSDL::elements::BaseVerticalScrollbar* vscrollbar = nullptr;
+TSDL::elements::Grid* grid = nullptr;
 TSDL::TSDL_Font* font = nullptr;
 static std::filesystem::path current_path = std::filesystem::current_path();
 
@@ -142,8 +140,7 @@ void generate_visual_from_path()
         _dependent_visual_elements.push_back(buttontextelement);
 
         y += button->size().y;
-    }
-    vscrollbar->content_height(std::max(2*SCREEN_HEIGHT, static_cast<TSDL::_rect>(grid->bound()).second.y + 16));    
+    }   
 }
 
 int main(int argc, char* argv[])

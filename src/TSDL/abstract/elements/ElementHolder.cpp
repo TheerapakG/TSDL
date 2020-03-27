@@ -3,9 +3,25 @@
 #include "TSDL/TSDL_Meta.hpp"
 #include <algorithm>
 
+namespace TSDL::elements
+{
+    Element_Traits::operator DependentElement* () const
+    {
+        return _dependent_ptr;
+    }
+    Element_Traits::operator attrs::EventLookupable* () const
+    {
+        return _lookupable_ptr;
+    }
+    Element_Traits::operator attrs::Sized* () const
+    {
+        return _sized_ptr;
+    }
+}
+
 bool ::TSDL::elements::Subelement::operator==(const ::TSDL::elements::Subelement& other)
 {
-    return *std::any_cast<DependentElement*>(element) == *std::any_cast<DependentElement*>(other.element) && 
+    return *static_cast<DependentElement*>(element) == *static_cast<DependentElement*>(other.element) &&
         dimension == other.dimension;
 }
 
@@ -15,9 +31,9 @@ TSDL::elements::ElementHolder::ElementHolder(EventloopAdapter& evloop, TSDL_Rend
 void TSDL::elements::ElementHolder::add_child(const Subelement& formed_subelement)
 {
     _subelements_order.push_back(formed_subelement);
-    _subelements_info[std::any_cast<DependentElement*>(formed_subelement.element)] = formed_subelement;
+    _subelements_info.emplace(static_cast<DependentElement*>(formed_subelement.element), formed_subelement);
 
-    std::any_cast<DependentElement*>(formed_subelement.element)->_holders.emplace_back(*this);
+    static_cast<DependentElement*>(formed_subelement.element)->_holders.emplace_back(*this);
 
     update();
 }
@@ -26,9 +42,9 @@ TSDL::elements::ElementHolder::Subelement_vector::iterator TSDL::elements::Eleme
 {
     auto it = _subelements_order.begin();
     auto rit = _subelements_order.insert(it + order, formed_subelement);
-    _subelements_info[std::any_cast<DependentElement*>(formed_subelement.element)] = formed_subelement;
+    _subelements_info.emplace(static_cast<DependentElement*>(formed_subelement.element), formed_subelement);
 
-    std::any_cast<DependentElement*>(formed_subelement.element)->_holders.emplace_back(*this);
+    static_cast<DependentElement*>(formed_subelement.element)->_holders.emplace_back(*this);
 
     update();
 
@@ -39,7 +55,7 @@ TSDL::elements::ElementHolder::Subelement_vector::iterator TSDL::elements::Eleme
 {
     auto dit = _subelements_order.begin() + order;
     std::iter_swap(
-        std::find(_subelements_order.begin(), _subelements_order.end(), _subelements_info[&subelement]),
+        std::find(_subelements_order.begin(), _subelements_order.end(), _subelements_info.at(&subelement)),
         dit
     );
 
@@ -50,9 +66,9 @@ TSDL::elements::ElementHolder::Subelement_vector::iterator TSDL::elements::Eleme
 
 void TSDL::elements::ElementHolder::move_child(DependentElement& subelement, const point_2d& destination)
 {
-    auto el = std::find(_subelements_order.begin(), _subelements_order.end(), _subelements_info[&subelement]);
+    auto el = std::find(_subelements_order.begin(), _subelements_order.end(), _subelements_info.at(&subelement));
     el->dimension = {destination, el->dimension.second + destination - el->dimension.first};
-    _subelements_info[&subelement].dimension = el->dimension;
+    _subelements_info.at(&subelement).dimension = el->dimension;
 
     update();
 }
@@ -84,28 +100,28 @@ TSDL::elements::Subelement TSDL::elements::ElementHolder::child_info(::TSDL::ele
     int min_x = begin->dimension.first.x, min_y = begin->dimension.first.y, 
         max_x = begin->dimension.second.x, max_y = begin->dimension.second.y;
 
-    try
+    attrs::Sized* _sized = begin->element;
+    if (_sized != nullptr)
     {
-        auto _sizable = std::any_cast<attrs::Sizable*>(begin->element);
-        std::tie(max_x, max_y) = static_cast<_point_2d>(_sizable->size());
+        std::tie(max_x, max_y) = static_cast<_point_2d>(_sized->size());
         max_x += min_x;
         max_y += min_y;
     }
-    catch(const std::bad_any_cast&) {}
 
     for(begin++; begin != end; begin++)
     {
         auto [topleft, bottomright] = begin->dimension;
         if(topleft.x < min_x) min_x = topleft.x;
         if(topleft.y < min_y) min_y = topleft.y;
-        try
+        
+        _sized = begin->element;
+        if (_sized != nullptr)
         {
-            auto _sizable = std::any_cast<attrs::Sizable*>(begin->element);
-            auto [width_x, width_y] = static_cast<_point_2d>(_sizable->size());
+            auto [width_x, width_y] = static_cast<_point_2d>(_sized->size());
             if(topleft.x + width_x > max_x) max_x = topleft.x + width_x;
             if(topleft.y + width_y > max_y) max_y = topleft.y + width_y;
         }
-        catch(const std::bad_any_cast&)
+        else
         {
             if(bottomright.x > max_x) max_x = bottomright.x;
             if(bottomright.y > max_y) max_y = bottomright.y;
@@ -156,7 +172,7 @@ bool TSDL::elements::ElementHolder::need_update() const
         std::any_of(
             _subelements_order.cbegin(), 
             _subelements_order.cend(), 
-            [](const ::TSDL::elements::Subelement& subel){ return std::any_cast<DependentElement*>(subel.element)->need_update(); }
+            [](const ::TSDL::elements::Subelement& subel){ return static_cast<DependentElement*>(subel.element)->need_update(); }
         );
 }
 
@@ -168,16 +184,17 @@ void TSDL::elements::ElementHolder::render(const ::TSDL::point_2d& dist)
     for(Subelement& subelement: _subelements_order)
     {
         auto& [el_ptr, dim] = subelement;
-        auto el = std::any_cast<DependentElement*>(el_ptr);
+        DependentElement* el = el_ptr;
         
         ::TSDL::point_2d topleft = dim.first;
         ::TSDL::point_2d bottomright = {0, 0};
-        try
+
+        attrs::Sized* _sized = el_ptr;
+        if(_sized != nullptr)
         {
-            auto _sizable = std::any_cast<attrs::Sizable*>(el_ptr);
-            bottomright += dim.first + _sizable->size();
+            bottomright += dim.first + _sized->size();
         }
-        catch(const std::bad_any_cast&)
+        else
         {
             bottomright += dim.second;
         }

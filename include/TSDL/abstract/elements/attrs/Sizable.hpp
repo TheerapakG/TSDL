@@ -9,6 +9,7 @@ namespace TSDL::elements::attrs
 {
     class Sized
     {
+        public:
         virtual point_2d size() const = 0;
     };
 

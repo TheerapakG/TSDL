@@ -32,7 +32,7 @@ namespace TSDL::elements
             template <events::EventType eventtype>
             bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
             {
-                return _Button<_Bar<Scrollbar_T>>::dispatch_templated_event<eventtype>(caller, event);
+                return attrs::dragable<_Button<_Bar<Scrollbar_T>>>::dispatch_templated_event<eventtype>(caller, event);
             }
 
             template <>
@@ -95,6 +95,12 @@ namespace TSDL::elements
                 _content_width(content_width)
             {
                 _init();
+            }
+
+            template <events::EventType eventtype>
+            bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
+            {
+                return grid().dispatch_templated_event<eventtype>(caller, event);
             }
 
             int content_width() const
@@ -165,6 +171,12 @@ namespace TSDL::elements
                 _content_height(content_height)
             {
                 _init();
+            }
+
+            template <events::EventType eventtype>
+            bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
+            {
+                return grid().dispatch_templated_event<eventtype>(caller, event);
             }
 
             int content_height() const            
