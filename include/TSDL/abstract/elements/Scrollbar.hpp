@@ -53,7 +53,7 @@ namespace TSDL::elements
             virtual int _bar_length() const            
             {
                 int _size_x = size().x;
-                return (_size_x*_size_x)/_content_width;
+                return std::min((_size_x*_size_x)/_content_width, _content_width);
             }
 
             point_2d _bar_movement_calc(const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist)
@@ -103,6 +103,12 @@ namespace TSDL::elements
                 return grid().dispatch_templated_event<eventtype>(caller, event);
             }
 
+            template <>
+            bool dispatch_templated_event<events::EventType::Dragged>(const Caller&, const SDL_Event& event)
+            {
+                return _BaseScrollbar_Attrs<Derived>::dispatch_templated_event<events::EventType::Dragged>(Caller(*this, {0, 0}), event);
+            }
+
             int content_width() const
             {
                 return _content_width;
@@ -129,7 +135,7 @@ namespace TSDL::elements
             virtual int _bar_length() const
             {
                 int _size_y = size().y;
-                return (_size_y*_size_y)/_content_height;
+                return std::min((_size_y*_size_y)/_content_height, _content_height);
             }
 
             point_2d _bar_movement_calc(const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist)
@@ -177,6 +183,12 @@ namespace TSDL::elements
             bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
             {
                 return grid().dispatch_templated_event<eventtype>(caller, event);
+            }
+
+            template <>
+            bool dispatch_templated_event<events::EventType::Dragged>(const Caller&, const SDL_Event& event)
+            {
+                return _BaseScrollbar_Attrs<Derived>::dispatch_templated_event<events::EventType::Dragged>(Caller(*this, {0, 0}), event);
             }
 
             int content_height() const            

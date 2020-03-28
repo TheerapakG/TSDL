@@ -163,12 +163,15 @@ int main(int argc, char* argv[])
 
         TSDL::elements::EventloopAdapter evAdapter(eventloop);
 
-        TSDL::elements::GridWithScrollbar mgrid(evAdapter, renderer, {SCREEN_WIDTH, SCREEN_HEIGHT}, 16);
-        evAdapter.src(mgrid);
-        grid = &mgrid.grid();
+        TSDL::elements::Grid bggrid(evAdapter, renderer);
+        evAdapter.src(bggrid);
 
         TSDL::elements::FilledRectangle bg(evAdapter, renderer, {SCREEN_WIDTH, SCREEN_HEIGHT});
-        grid->add_child(bg, {0, 0});
+        bggrid.add_child(bg, {0, 0});
+
+        TSDL::elements::GridWithScrollbar mgrid(evAdapter, renderer, {SCREEN_WIDTH, SCREEN_HEIGHT}, 16);
+        bggrid.add_child(mgrid, {0, 0});
+        grid = &mgrid.grid();
 
         #ifdef TSDL_USE_FONTCONFIG
         std::string font_path = TSDL::get_family_font_filename("sans-serif");
