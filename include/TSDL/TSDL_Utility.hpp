@@ -118,6 +118,8 @@ namespace TSDL
         point_2d& operator+=(const point_2d& other);
         point_2d& operator-=(const point_2d& other);
 
+        bool operator!=(const point_2d& other) const;
+
         operator _point_2d() const;
     };
 
@@ -133,6 +135,8 @@ namespace TSDL
 
         point_2d topleft();
         point_2d bottomright();
+
+        bool operator!=(const rect & other) const;
 
         operator _rect() const;
     };

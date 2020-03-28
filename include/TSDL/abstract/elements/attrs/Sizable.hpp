@@ -55,7 +55,11 @@ namespace TSDL::elements::attrs
 
         virtual void size(const point_2d& size) override
         {
-            _size(size);
+            if (this->size() != size)
+            {
+                _size(size);
+                update();
+            }
         }
 
         virtual point_2d size() const final

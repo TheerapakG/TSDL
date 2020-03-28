@@ -35,6 +35,7 @@ void TSDL::elements::ElementHolder::add_child(const Subelement& formed_subelemen
 
     static_cast<DependentElement*>(formed_subelement.element)->_holders.emplace_back(*this);
 
+    // TODO: check if within _render_position and emit SizeChanged event
     update();
 }
 
@@ -46,6 +47,7 @@ TSDL::elements::ElementHolder::Subelement_vector::iterator TSDL::elements::Eleme
 
     static_cast<DependentElement*>(formed_subelement.element)->_holders.emplace_back(*this);
 
+    // TODO: check if within _render_position and emit SizeChanged event
     update();
 
     return rit;
@@ -70,6 +72,7 @@ void TSDL::elements::ElementHolder::move_child(DependentElement& subelement, con
     el->dimension = {destination, el->dimension.second + destination - el->dimension.first};
     _subelements_info.at(&subelement).dimension = el->dimension;
 
+    // TODO: check if within _render_position and emit SizeChanged event
     update();
 }
 
@@ -84,6 +87,7 @@ void TSDL::elements::ElementHolder::remove_child(DependentElement& subelement)
         std::find(subelement._holders.begin(), subelement._holders.end(), *this)
     );
 
+    // TODO: check if within _render_position and emit SizeChanged event
     update();
 }
 
@@ -103,9 +107,9 @@ TSDL::elements::Subelement TSDL::elements::ElementHolder::child_info(::TSDL::ele
     attrs::Sized* _sized = begin->element;
     if (_sized != nullptr)
     {
-        std::tie(max_x, max_y) = static_cast<_point_2d>(_sized->size());
-        max_x += min_x;
-        max_y += min_y;
+        point_2d _s = _sized->size();
+        max_x = _s.x + min_x;
+        max_y = _s.y + min_y;
     }
 
     for(begin++; begin != end; begin++)
@@ -117,7 +121,9 @@ TSDL::elements::Subelement TSDL::elements::ElementHolder::child_info(::TSDL::ele
         _sized = begin->element;
         if (_sized != nullptr)
         {
-            auto [width_x, width_y] = static_cast<_point_2d>(_sized->size());
+            point_2d _s = _sized->size();
+            int width_x = _s.x;
+            int width_y = _s.y;
             if(topleft.x + width_x > max_x) max_x = topleft.x + width_x;
             if(topleft.y + width_y > max_y) max_y = topleft.y + width_y;
         }
@@ -125,9 +131,8 @@ TSDL::elements::Subelement TSDL::elements::ElementHolder::child_info(::TSDL::ele
         {
             if(bottomright.x > max_x) max_x = bottomright.x;
             if(bottomright.y > max_y) max_y = bottomright.y;
-        }     
+        }
     }
-
     return {_point_2d{min_x, min_y}, _point_2d{max_x, max_y}};
 }
 
@@ -157,8 +162,11 @@ std::optional<TSDL::elements::Subelement> TSDL::elements::ElementHolder::highest
 
 void TSDL::elements::ElementHolder::render_position(const rect& position)
 {
-    _render_position = position;
-    update();
+    if (_render_position != position)
+    {
+        _render_position = position;
+        update();
+    }
 }
 
 ::TSDL::rect TSDL::elements::ElementHolder::render_position()

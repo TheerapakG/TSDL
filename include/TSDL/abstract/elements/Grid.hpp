@@ -450,10 +450,11 @@ namespace TSDL::elements
         private:
         BaseHorizontalScrollbar* hbar;
         BaseVerticalScrollbar* vbar;
+        int _bar_width;
 
         Grid _underly;
 
-        void _init(int bar_width);
+        void _init();
 
         public:
         GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width);

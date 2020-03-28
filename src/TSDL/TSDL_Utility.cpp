@@ -86,6 +86,11 @@ TSDL::point_2d& TSDL::point_2d::operator-=(const point_2d& other)
     return *this;
 }
 
+bool TSDL::point_2d::operator!=(const point_2d& other) const
+{
+    return x != other.x || y != other.y;
+}
+
 bool operator==(const TSDL::point_2d& lhs, const TSDL::point_2d& rhs)
 {
     return lhs.x == rhs.x && lhs.y == rhs.y;
@@ -126,6 +131,11 @@ TSDL::point_2d TSDL::rect::topleft()
 TSDL::point_2d TSDL::rect::bottomright()
 {
     return {x+w, y+h};
+}
+
+bool TSDL::rect::operator!=(const rect& other) const
+{
+    return x != other.x || y != other.y || w != other.w || h != other.h;
 }
 
 TSDL::rect::operator TSDL::_rect() const
