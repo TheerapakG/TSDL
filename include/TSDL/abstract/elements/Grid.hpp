@@ -451,15 +451,16 @@ namespace TSDL::elements
         BaseHorizontalScrollbar* hbar;
         BaseVerticalScrollbar* vbar;
         int _bar_width;
+        point_2d _margin;
 
         Grid _underly;
 
         void _init();
 
         public:
-        GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width);
-        GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width, const attrs::ListenerMap& listeners);
-        GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width, attrs::ListenerMap&& listeners);
+        GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width, const point_2d& margin = {64, 64});
+        GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width, const attrs::ListenerMap& listeners, const point_2d& margin = {64, 64});
+        GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width, attrs::ListenerMap&& listeners, const point_2d& margin = {64, 64});
         ~GridWithScrollbar();
 
         template <events::EventType eventtype>

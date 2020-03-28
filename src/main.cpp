@@ -66,10 +66,10 @@ void generate_visual_from_path()
         )
     );
 
-    grid->add_child(*pathtextelement, {64, 64});
+    grid->add_child(*pathtextelement, {0, 0});
     _previous_visual_elements.push_back(pathtextelement);
 
-    int y = 64 + pathtext.size().y + 16;
+    int y = pathtext.size().y + 16;
 
     TSDL::TSDL_Surface buttontext("..", *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
     TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
@@ -97,7 +97,7 @@ void generate_visual_from_path()
         return true;
     };
 
-    grid->add_child(*button, {64, y});
+    grid->add_child(*button, {0, y});
     _previous_visual_elements.push_back(button);
     _dependent_visual_elements.push_back(buttontextelement);
 
@@ -135,7 +135,7 @@ void generate_visual_from_path()
             return true;
         };
 
-        grid->add_child(*button, {64, y});
+        grid->add_child(*button, {0, y});
         _previous_visual_elements.push_back(button);
         _dependent_visual_elements.push_back(buttontextelement);
 
@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
         delete buttontext;
 
         button.front(buttontextelement);
-        grid->add_child(button, {SCREEN_WIDTH-320, 64});
+        grid->add_child(button, {SCREEN_WIDTH-384, 0});
 
         generate_visual_from_path();
 
