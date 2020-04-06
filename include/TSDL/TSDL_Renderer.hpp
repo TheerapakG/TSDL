@@ -9,6 +9,7 @@ namespace TSDL
 
 #include <optional>
 #include <SDL2/SDL.h>
+#include "TSDL_Meta.hpp"
 #include "TSDL_Utility.hpp"
 #include "TSDL_Macro.hpp"
 #include "TSDL_Window.hpp"
@@ -57,18 +58,18 @@ namespace TSDL
 
         int copy_from(
             TSDL_Texture& texture, 
-            std::optional<const std::reference_wrapper<rect>> srcrect, 
-            std::optional<const std::reference_wrapper<rect>> dstrect
+            optional_const_reference<rect> srcrect, 
+            optional_const_reference<rect> dstrect
         );
         /*
         * like copy_from(texture, srcrect, dstrct) but after copy, optionally rotating it by angle around the given 
         * center and also optionally flipping it.
         */
         int copy_from(TSDL_Texture& texture, 
-                      std::optional<const std::reference_wrapper<rect>> srcrect, 
-                      std::optional<const std::reference_wrapper<rect>> dstrect, 
+                      optional_const_reference<rect> srcrect,
+                      optional_const_reference<rect> dstrect,
                       const double angle, 
-                      std::optional<const std::reference_wrapper<point_2d>> center,
+                      optional_const_reference<point_2d> center,
                       const SDL_RendererFlip flip);
 
         int fill_rect(const rect& rect);

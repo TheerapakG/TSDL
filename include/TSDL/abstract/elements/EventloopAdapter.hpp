@@ -22,8 +22,8 @@ namespace TSDL
         {
             private:
             TSDL_Eventloop& _evloop;
-            std::optional<std::reference_wrapper<attrs::EventLookupable>> _src;
-            std::optional<std::reference_wrapper<DependentElement>> _d_src;
+            optional_reference<attrs::EventLookupable> _src;
+            optional_reference<DependentElement> _d_src;
             std::set <::TSDL::EventHandler*> _handlers;
             std::queue<std::reference_wrapper<DependentElement>> _not_update_el;
             std::queue<std::function<void()>> _calls;
@@ -58,10 +58,24 @@ namespace TSDL
                 _src = src;
                 _d_src = src;
             }
+
             // set source to none
             void src(std::nullopt_t);
 
-            attrs::EventLookupable& src() const;
+            template<typename T>
+            T& src() const;
+
+            template<>
+            attrs::EventLookupable& src<attrs::EventLookupable>() const
+            {
+                return _src.value().get();
+            }
+
+            template<>
+            DependentElement& src<DependentElement>() const
+            {
+                return _d_src.value().get();
+            }
         };
     }
 }

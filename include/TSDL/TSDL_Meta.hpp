@@ -187,45 +187,43 @@ namespace TSDL
     reversion_wrapper<T> reverse (T&& iterable) { return { iterable }; }
 
     template <typename T>
-    using optional_reference = std::optional<std::reference_wrapper<T>>;
+    using optional_reference = typename std::optional<std::reference_wrapper<typename std::remove_reference_t<T>>>;
 
     template <typename T>
-    std::optional<std::reference_wrapper<std::remove_reference_t<T>>> make_optional_ref(T&& ref)
+    optional_reference<T> make_optional_ref(T&& ref)
     {
         return ref;
     }
 
     template <typename T>
-    std::optional<std::reference_wrapper<std::remove_reference_t<T>>> make_optional_ref()
+    optional_reference<T> make_optional_ref()
     {
-        return std::optional<std::reference_wrapper<T>>();
+        return optional_reference<T>();
     }
 
-    template <typename T>
-    T& get_ref(const optional_reference<T>& stdref)
+    template <
+        typename T, 
+        typename _Return_T = T::value_type::type, 
+        typename _SNIFAE = std::enable_if_t<std::is_same_v<T, optional_reference<_Return_T>>>
+    >
+    _Return_T& get_ref(const T& stdref)
     {
         return stdref.value().get();
     }
 
     template <typename T>
-    using optional_const_reference = std::optional<const std::reference_wrapper<T>>;
+    using optional_const_reference = typename optional_reference<typename std::add_const_t<typename std::remove_reference_t<T>>>;
 
     template <typename T>
-    std::optional<const std::reference_wrapper<std::remove_reference_t<T>>> make_optional_const_ref(T&& ref)
+    optional_const_reference<T> make_optional_const_ref(T&& ref)
     {
         return ref;
     }
 
     template <typename T>
-    std::optional<const std::reference_wrapper<std::remove_reference_t<T>>> make_optional_const_ref()
+    optional_const_reference<T> make_optional_const_ref()
     {
-        return std::optional<const std::reference_wrapper<T>>();
-    }
-
-    template <typename T>
-    T& get_ref(const optional_const_reference<T>& stdref)
-    {
-        return stdref.value().get();
+        return optional_const_reference<T>();
     }
 
     template <typename T>

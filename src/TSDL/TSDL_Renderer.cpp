@@ -125,8 +125,8 @@ int TSDL::TSDL_Renderer::clear(const color_rgba& c)
 
 int TSDL::TSDL_Renderer::copy_from(
     TSDL::TSDL_Texture& texture, 
-    std::optional<const std::reference_wrapper<rect>> srcrect, 
-    std::optional<const std::reference_wrapper<rect>> dstrect
+    optional_const_reference<rect> srcrect, 
+    optional_const_reference<rect> dstrect
 )
 {
     int _t = SDL_RenderCopy(
@@ -144,10 +144,10 @@ int TSDL::TSDL_Renderer::copy_from(
 
 int TSDL::TSDL_Renderer::copy_from(
     TSDL::TSDL_Texture& texture, 
-    std::optional<const std::reference_wrapper<rect>> srcrect, 
-    std::optional<const std::reference_wrapper<rect>> dstrect, 
+    optional_const_reference<rect> srcrect,
+    optional_const_reference<rect> dstrect,
     const double angle, 
-    std::optional<const std::reference_wrapper<point_2d>> center, 
+    optional_const_reference<point_2d> center,
     const SDL_RendererFlip flip
 )
 {
