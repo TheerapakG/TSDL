@@ -3,14 +3,23 @@
 
 namespace TSDL::elements
 {
-    Scene::Scene(EventloopAdapter& evloop, TSDL_Renderer& renderer, DependentElement& target): 
-        attrs::eventforwarder<DependentElement>(evloop, renderer, target)
+    Scene::Scene(Scene&& other): _target(other._target)
     {
-        evloop.src(target);
+        other._unbind = false;
+    }
+
+    Scene& Scene::operator=(Scene&& other)
+    {
+        _target = other._target;
+        other._unbind = false;
+        return *this;
     }
 
     Scene::~Scene()
     {
-        eventloop().src(std::nullopt);
+        const DependentElement& _t_target = get_ref(_target);
+        if (_unbind && 
+            _t_target == _t_target.eventloop().template src<DependentElement>()) 
+            _t_target.eventloop().src(std::nullopt);
     }
 }

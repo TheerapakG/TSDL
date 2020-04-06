@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <functional>
 #include <tuple>
+#include <type_traits>
 #include <stdexcept>
 
 #ifndef __cpp_exceptions
@@ -51,13 +52,15 @@ namespace TSDL
     template <typename T>
     T or_enum(T _self, T _other)
     {
-        return static_cast<T>(_self|_other);
+        using underlying_t = std::underlying_type_t<T>;
+        return static_cast<T>(static_cast<underlying_t>(_self)|static_cast<underlying_t>(_other));
     }
 
     template <typename T>
     T and_enum(T _self, T _other)
     {
-        return static_cast<T>(_self&_other);
+        using underlying_t = std::underlying_type_t<T>;
+        return static_cast<T>(static_cast<underlying_t>(_self)&static_cast<underlying_t>(_other));
     }
 
     enum class Orientation

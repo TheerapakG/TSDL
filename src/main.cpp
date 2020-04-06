@@ -34,6 +34,7 @@ void say_fps()
     }
 }
 
+TSDL::elements::Scene current_scene;
 TSDL::elements::Grid* grid = nullptr;
 TSDL::TSDL_Font* font = nullptr;
 static std::filesystem::path current_path = std::filesystem::current_path();
@@ -164,7 +165,7 @@ int main(int argc, char* argv[])
         TSDL::elements::EventloopAdapter evAdapter(eventloop);
 
         TSDL::elements::Grid bggrid(evAdapter, renderer);
-        evAdapter.src(bggrid);
+        current_scene = bggrid;
 
         TSDL::elements::FilledRectangle bg(evAdapter, renderer, {SCREEN_WIDTH, SCREEN_HEIGHT});
         bggrid.add_child(bg, {0, 0});
