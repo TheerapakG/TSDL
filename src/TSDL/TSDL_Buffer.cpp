@@ -10,9 +10,9 @@ TSDL::TSDL_Buffer::TSDL_Buffer(SDL_RWops* ptr): TSDL_Buffer(ptr, false) {}
 
 TSDL::TSDL_Buffer::TSDL_Buffer(SDL_RWops* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
 
-TSDL::TSDL_Buffer::TSDL_Buffer(const std::string& file, const std::string& mode)
+TSDL::TSDL_Buffer::TSDL_Buffer(const std::_TSDL_U8(string)& file, const std::string& mode)
 {
-    SDL_RWops* _t_internal_ptr = SDL_RWFromFile(file.c_str(), mode.c_str());
+    SDL_RWops* _t_internal_ptr = SDL_RWFromFile(reinterpret_cast<const char*>(file.c_str()), mode.c_str());
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Buffer could not be created! SDL_Error: " + std::string(SDL_GetError()));
@@ -74,7 +74,7 @@ _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Buffer)
 void _tsdl_buffer_py(const py::module& m)
 {
     py::class_<_PY::_PY_GET_TYPEERASE(Buffer)>(m, "Buffer")
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Buffer)<const std::string, const std::string>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Buffer)<const std::_TSDL_U8(string), const std::string>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Buffer, enter_ctx), py::return_value_policy::reference)
         .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Buffer, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Buffer, exit_ctx));

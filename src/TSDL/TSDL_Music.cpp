@@ -7,9 +7,9 @@ TSDL::TSDL_Music::TSDL_Music(Mix_Music* ptr): TSDL_Music(ptr, false) {}
 
 TSDL::TSDL_Music::TSDL_Music(Mix_Music* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
 
-TSDL::TSDL_Music::TSDL_Music(const std::string& file): _destroy(true)
+TSDL::TSDL_Music::TSDL_Music(const std::_TSDL_U8(string)& file): _destroy(true)
 {
-    Mix_Music* _t_internal_ptr = Mix_LoadMUS(file.c_str());
+    Mix_Music* _t_internal_ptr = Mix_LoadMUS(reinterpret_cast<const char*>(file.c_str()));
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Music could not be loaded! SDL_Mixer_Error: " + std::string(Mix_GetError()));
@@ -70,7 +70,7 @@ _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Music)
 void _tsdl_music_py(const py::module& m)
 {
     py::class_<_PY::_PY_GET_TYPEERASE(Music)>(m, "Music")
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Music)<const std::string>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Music)<const std::_TSDL_U8(string)>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Music, enter_ctx), py::return_value_policy::reference)
         .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Music, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Music, exit_ctx));

@@ -9,10 +9,10 @@ TSDL::TSDL_Window::TSDL_Window(SDL_Window* ptr): TSDL_Window(ptr, false) {}
 
 TSDL::TSDL_Window::TSDL_Window(SDL_Window* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
 
-TSDL::TSDL_Window::TSDL_Window(const std::string& title, int x, int y, int w, int h, Uint32 flags)
+TSDL::TSDL_Window::TSDL_Window(const std::_TSDL_U8(string)& title, int x, int y, int w, int h, Uint32 flags)
 {
     std::cout << "Creating window named " << title.c_str() << std::endl;
-    SDL_Window* _t_internal_ptr = SDL_CreateWindow(title.c_str(), x, y, w, h, flags);
+    SDL_Window* _t_internal_ptr = SDL_CreateWindow(reinterpret_cast<const char*>(title.c_str()), x, y, w, h, flags);
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Window could not be created! SDL_Error: " + std::string(SDL_GetError()));
@@ -96,7 +96,7 @@ _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Window)
 void _tsdl_window_py(const py::module& m)
 {
     py::class_<_PY::_PY_GET_TYPEERASE(Window)>(m, "Window")
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Window)<const std::string, int, int, int, int, Uint32>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Window)<const std::_TSDL_U8(string), int, int, int, int, Uint32>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Window, enter_ctx), py::return_value_policy::reference)
         .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Window, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Window, exit_ctx));

@@ -32,7 +32,7 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const TSDL::poin
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const std::string& file): 
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const std::_TSDL_U8(string)& file): 
     TSDL_Texture(renderer, TSDL::TSDL_Surface(file)) {}
 
 TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, TSDL_Buffer& buffer): 
@@ -71,7 +71,7 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, TSDL::TSDL_Surfa
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b): 
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const std::_TSDL_U8(string)& file, Uint8 r, Uint8 g, Uint8 b): 
     TSDL_Texture(renderer, TSDL::TSDL_Surface(file), r, g, b) {}
 
 TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, TSDL_Buffer& buffer, Uint8 r, Uint8 g, Uint8 b): 
@@ -167,8 +167,8 @@ _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Texture)
 void _tsdl_texture_py(const py::module& m)
 {
     py::class_<_PY::_PY_GET_TYPEERASE(Texture)>(m, "Texture")
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, const std::string>())
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, const std::string>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, const std::_TSDL_U8(string)>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, const std::_TSDL_U8(string)>())
         .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>())
         .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>())
         .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Surface>())

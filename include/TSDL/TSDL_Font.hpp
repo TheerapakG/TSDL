@@ -5,7 +5,6 @@
 #include "TSDL_Macro.hpp"
 #include "TSDL_Buffer.hpp"
 #include <vector>
-#include <string>
 
 #ifdef TSDL_USE_FONTCONFIG
 #include <fontconfig/fontconfig.h>
@@ -50,8 +49,8 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Font(const std::string& file, int pt);
-        TSDL_Font(const std::string& file, int pt, long index);
+        TSDL_Font(const std::_TSDL_U8(string)& file, int pt);
+        TSDL_Font(const std::_TSDL_U8(string)& file, int pt, long index);
         TSDL_Font(TSDL_Buffer& buffer, int pt);
         TSDL_Font(TSDL_Buffer& buffer, int pt, long index);
         TSDL_Font(const void* mem, size_t size, int pt);
@@ -63,9 +62,9 @@ namespace TSDL
     };
 
     #ifdef TSDL_USE_FONTCONFIG
-    std::vector<std::string> get_all_font_filename();
-    std::string get_family_font_filename(const std::string& family);
-    std::string get_name_font_filename(const std::string& name);
+    std::vector<std::_TSDL_U8(string)> get_all_font_filename();
+    std::_TSDL_U8(string) get_family_font_filename(const std::_TSDL_U8(string)& family);
+    std::_TSDL_U8(string) get_name_font_filename(const std::_TSDL_U8(string)& name);
     #endif
 }
 

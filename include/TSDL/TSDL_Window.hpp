@@ -13,7 +13,7 @@ namespace _PY
 {
     _PY_EXPAND_DECLARE_CONTEXTMANAGER(Window)
     _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Window)
-    _PY_GET_CONTEXTMANAGER(Window)<const std::string, int, int, int, int, Uint32>
+    _PY_GET_CONTEXTMANAGER(Window)<const std::_TSDL_U8(string), int, int, int, int, Uint32>
     _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 }
 #else
@@ -42,7 +42,7 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Window(const std::string& title, int x, int y, int w, int h, Uint32 flags);
+        TSDL_Window(const std::_TSDL_U8(string)& title, int x, int y, int w, int h, Uint32 flags);
 
         ~TSDL_Window();
 

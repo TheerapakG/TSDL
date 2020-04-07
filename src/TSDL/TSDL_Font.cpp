@@ -11,9 +11,9 @@ TSDL::TSDL_Font::TSDL_Font(TTF_Font* ptr): TSDL_Font(ptr, false) {}
 
 TSDL::TSDL_Font::TSDL_Font(TTF_Font* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
 
-TSDL::TSDL_Font::TSDL_Font(const std::string& file, int pt): _destroy(true)
+TSDL::TSDL_Font::TSDL_Font(const std::_TSDL_U8(string)& file, int pt): _destroy(true)
 {
-    TTF_Font* _t_internal_ptr = TTF_OpenFont(file.c_str(), pt);
+    TTF_Font* _t_internal_ptr = TTF_OpenFont(reinterpret_cast<const char*>(file.c_str()), pt);
     if(_t_internal_ptr == NULL)
     {
         ::TSDL::safe_throw<std::runtime_error>("Font could not be loaded! SDL_TTF_Error: " + std::string(TTF_GetError()));
@@ -22,9 +22,9 @@ TSDL::TSDL_Font::TSDL_Font(const std::string& file, int pt): _destroy(true)
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Font::TSDL_Font(const std::string& file, int pt, long index): _destroy(true)
+TSDL::TSDL_Font::TSDL_Font(const std::_TSDL_U8(string)& file, int pt, long index): _destroy(true)
 {
-    TTF_Font* _t_internal_ptr = TTF_OpenFontIndex(file.c_str(), pt, index);
+    TTF_Font* _t_internal_ptr = TTF_OpenFontIndex(reinterpret_cast<const char*>(file.c_str()), pt, index);
     if(_t_internal_ptr == NULL)
     {
         ::TSDL::safe_throw<std::runtime_error>("Font could not be loaded! SDL_TTF_Error: " + std::string(TTF_GetError()));
@@ -92,9 +92,9 @@ TSDL::TSDL_Font::operator TTF_Font*() const
 }
 
 #ifdef TSDL_USE_FONTCONFIG
-std::vector<std::string> TSDL::get_all_font_filename()
+std::vector<std::_TSDL_U8(string)> TSDL::get_all_font_filename()
 {
-    std::vector<std::string> ret;
+    std::vector<std::_TSDL_U8(string)> ret;
 
     FcConfig* config = FcConfigGetCurrent();
     FcPattern* pat = FcPatternCreate();
@@ -115,7 +115,7 @@ std::vector<std::string> TSDL::get_all_font_filename()
         FcChar8* file;
         if (FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch)
         {
-            ret.emplace_back((const char*)(file)); //eww
+            ret.emplace_back((const _TSDL_char*)(file)); //eww
         }
     }
 
@@ -124,7 +124,7 @@ std::vector<std::string> TSDL::get_all_font_filename()
 }
 
 // pattern built from FcPatternBuild, pattern is automatically freed
-std::string _get_pattern_font_filename(FcPattern* pattern)
+std::_TSDL_U8(string) _get_pattern_font_filename(FcPattern* pattern)
 {
     FcPattern* result = NULL;
 
@@ -149,7 +149,7 @@ std::string _get_pattern_font_filename(FcPattern* pattern)
     FcResult got = FcPatternGetString(result, FC_FILE, 0, &file);
     if (got == FcResultMatch)
     {
-        std::string ret((const char*)(file)); //eww
+        std::string ret((const _TSDL_char*)(file)); //eww
         FcPatternDestroy(result);
         return ret;
     }
@@ -157,17 +157,17 @@ std::string _get_pattern_font_filename(FcPattern* pattern)
     return "";
 }
 
-std::string TSDL::get_family_font_filename(const std::string& family)
+std::_TSDL_U8(string) TSDL::get_family_font_filename(const std::_TSDL_U8(string)& family)
 {
     return _get_pattern_font_filename(
-        FcPatternBuild(NULL, FC_FAMILY, FcTypeString, (const FcChar8*)(family.c_str()), (const char *) 0)
+        FcPatternBuild(NULL, FC_FAMILY, FcTypeString, (const FcChar8*)(reinterpret_cast<const char*>(family.c_str())), (const char *) 0)
     );
 }
 
-std::string TSDL::get_name_font_filename(const std::string& name)
+std::string TSDL::get_name_font_filename(const std::_TSDL_U8(string)& name)
 {
     return _get_pattern_font_filename(
-        FcNameParse((const FcChar8*)(name.c_str()))
+        FcNameParse((const FcChar8*)(reinterpret_cast<const char*>(name.c_str())))
     );
 }
 #endif
@@ -179,8 +179,8 @@ _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Font)
 void _tsdl_font_py(const py::module& m)
 {
     py::class_<_PY::_PY_GET_TYPEERASE(Font)>(m, "Font")
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Font)<const std::string, int>())
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Font)<const std::string, int, long>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Font)<const std::_TSDL_U8(string), int>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Font)<const std::_TSDL_U8(string), int, long>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, enter_ctx), py::return_value_policy::reference)
         .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, exit_ctx));
