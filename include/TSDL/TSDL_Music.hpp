@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #include "TSDL_Macro.hpp"
-#include <string>
+#include "TSDL_Compat.hpp"
 
 #ifdef TSDL_EXPOSE_PYBIND11
 #include "TSDL_PY_TypeErase.hpp"
@@ -42,7 +42,7 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Music(const std::string& file);
+        TSDL_Music(const std::_TSDL_U8(string)& file);
 
         ~TSDL_Music();
 

@@ -5,7 +5,6 @@
 #include "TSDL_Utility.hpp"
 #include "TSDL_Buffer.hpp"
 #include "TSDL_Macro.hpp"
-#include <string>
 
 namespace TSDL
 {
@@ -23,10 +22,10 @@ namespace _PY
     _PY_EXPAND_DECLARE_CONTEXTMANAGER(Texture)
     _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Texture)
     _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Surface>, 
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, const std::string>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, const std::_TSDL_U8(string)>, 
     _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Buffer>, 
     _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Surface, Uint8, Uint8, Uint8>,
-    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, const std::string, Uint8, Uint8, Uint8>, 
+    _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, const std::_TSDL_U8(string), Uint8, Uint8, Uint8>, 
     _PY_GET_CONTEXTMANAGER(Texture)<TSDL::TSDL_Renderer, TSDL::TSDL_Buffer, Uint8, Uint8, Uint8>
     _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 }
@@ -58,7 +57,7 @@ namespace TSDL
         */
         TSDL_Texture(TSDL_Renderer& renderer, TSDL_Surface& surface);
         TSDL_Texture(TSDL_Renderer& renderer, const point_2d& size, int access = SDL_TEXTUREACCESS_TARGET);
-        TSDL_Texture(TSDL_Renderer& renderer, const std::string& file);        
+        TSDL_Texture(TSDL_Renderer& renderer, const std::_TSDL_U8(string)& file);        
         TSDL_Texture(TSDL_Renderer& renderer, TSDL_Buffer& buffer);
         TSDL_Texture(TSDL_Renderer& renderer, const void* mem, size_t size);
 
@@ -69,7 +68,7 @@ namespace TSDL
         if the object creation resulted in an error or not
         */
         TSDL_Texture(TSDL_Renderer& renderer, TSDL_Surface& surface, Uint8 r, Uint8 g, Uint8 b);
-        TSDL_Texture(TSDL_Renderer& renderer, const std::string& file, Uint8 r, Uint8 g, Uint8 b);
+        TSDL_Texture(TSDL_Renderer& renderer, const std::_TSDL_U8(string)& file, Uint8 r, Uint8 g, Uint8 b);
         TSDL_Texture(TSDL_Renderer& renderer, TSDL_Buffer& buffer, Uint8 r, Uint8 g, Uint8 b);
         TSDL_Texture(TSDL_Renderer& renderer, const void* mem, size_t size, Uint8 r, Uint8 g, Uint8 b);
 

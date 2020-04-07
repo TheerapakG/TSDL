@@ -49,9 +49,9 @@ TSDL::TSDL_Surface::TSDL_Surface(int width, int height, int depth, Uint32 format
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& file): _destroy(true)
+TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& file): _destroy(true)
 {
-    SDL_Surface* _t_internal_ptr = IMG_Load(file.c_str());
+    SDL_Surface* _t_internal_ptr = IMG_Load(reinterpret_cast<const char*>(file.c_str()));
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
@@ -84,28 +84,28 @@ TSDL::TSDL_Surface::TSDL_Surface(const void* mem, size_t size): _destroy(true)
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, TSDL::TTF_Rendermethod m):
+TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, TSDL::TTF_Rendermethod m):
     TSDL::TSDL_Surface(text, font, r, g, b, 255, m){}
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, const TSDL::color_rgb& c, TSDL::TTF_Rendermethod m):
+TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, const TSDL::color_rgb& c, TSDL::TTF_Rendermethod m):
     TSDL::TSDL_Surface(text, font, c.r, c.g, c.b, m){}
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TSDL::TTF_Rendermethod m): _destroy(true)
+TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TSDL::TTF_Rendermethod m): _destroy(true)
 {
     SDL_Surface* _t_internal_ptr = nullptr;
     switch (m)
     {
     case TSDL::TTF_Rendermethod::Solid:
-        _t_internal_ptr = TTF_RenderUTF8_Solid(font, text.c_str(), {r, g, b, a});
+        _t_internal_ptr = TTF_RenderUTF8_Solid(font, reinterpret_cast<const char*>(text.c_str()), {r, g, b, a});
         break;
 
     case TSDL::TTF_Rendermethod::Shaded:
         // assume white bg with 0 as alpha
-        _t_internal_ptr = TTF_RenderUTF8_Shaded(font, text.c_str(), {r, g, b, a}, {255, 255, 255, 0});
+        _t_internal_ptr = TTF_RenderUTF8_Shaded(font, reinterpret_cast<const char*>(text.c_str()), {r, g, b, a}, {255, 255, 255, 0});
         break;
 
     case TSDL::TTF_Rendermethod::Blended:
-        _t_internal_ptr = TTF_RenderUTF8_Blended(font, text.c_str(), {r, g, b, a});
+        _t_internal_ptr = TTF_RenderUTF8_Blended(font, reinterpret_cast<const char*>(text.c_str()), {r, g, b, a});
         break;
     
     default:
@@ -122,19 +122,19 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, const TSDL::color_rgba& c, TSDL::TTF_Rendermethod m):
+TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, const TSDL::color_rgba& c, TSDL::TTF_Rendermethod m):
     TSDL::TSDL_Surface(text, font, c.r, c.g, c.b, c.a, m){}
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb):
+TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb):
     TSDL::TSDL_Surface(text, font, fr, fg, fb, 255, br, bg, bb, 0){}
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, const TSDL::color_rgb& fc, const TSDL::color_rgb& bc):
+TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, const TSDL::color_rgb& fc, const TSDL::color_rgb& bc):
     TSDL::TSDL_Surface(text, font, fc.r, fc.g, fc.b, bc.r, bc.g, bc.b){}
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba): 
+TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba): 
     _destroy(true)
 {
-    SDL_Surface* _t_internal_ptr = TTF_RenderUTF8_Shaded(font, text.c_str(), {fr, fg, fb, fa}, {br, bg, bb, ba});
+    SDL_Surface* _t_internal_ptr = TTF_RenderUTF8_Shaded(font, reinterpret_cast<const char*>(text.c_str()), {fr, fg, fb, fa}, {br, bg, bb, ba});
     if(_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Surface could not be created! SDL_Error: " + std::string(SDL_GetError()));
@@ -143,7 +143,7 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Surface::TSDL_Surface(const std::string& text, TSDL_Font& font, const TSDL::color_rgba& fc, const TSDL::color_rgba& bc):
+TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, const TSDL::color_rgba& fc, const TSDL::color_rgba& bc):
     TSDL::TSDL_Surface(text, font, fc.r, fc.g, fc.b, fc.a, bc.r, bc.g, bc.b, bc.a){}
 
 TSDL::TSDL_Surface::~TSDL_Surface()
@@ -316,7 +316,7 @@ _PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Surface)
 void _tsdl_surface_py(const py::module& m)
 {
     py::class_<_PY::_PY_GET_TYPEERASE(Surface)>(m, "Surface")
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Surface)<const std::string>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Surface)<const std::_TSDL_U8(string)>())
         .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Surface, enter_ctx), py::return_value_policy::reference)
         .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Surface, enter_ctx), py::return_value_policy::reference)
         .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Surface, exit_ctx));

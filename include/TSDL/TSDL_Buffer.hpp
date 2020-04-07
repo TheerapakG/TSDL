@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "TSDL_Macro.hpp"
-#include <string>
+#include "TSDL_Compat.hpp"
 
 #ifdef TSDL_EXPOSE_PYBIND11
 #include "TSDL_PY_TypeErase.hpp"
@@ -41,7 +41,7 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Buffer(const std::string& file, const std::string& mode);
+        TSDL_Buffer(const std::_TSDL_U8(string)& file, const std::string& mode);
         TSDL_Buffer(void* mem, size_t size);
         TSDL_Buffer(const void* mem, size_t size);
 

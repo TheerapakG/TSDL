@@ -7,7 +7,6 @@
 #include "TSDL_Utility.hpp"
 #include "TSDL_Buffer.hpp"
 #include "TSDL_Macro.hpp"
-#include <string>
 
 #ifdef TSDL_EXPOSE_PYBIND11
 #include "TSDL_PY_TypeErase.hpp"
@@ -16,7 +15,7 @@ namespace _PY
 {
     _PY_EXPAND_DECLARE_CONTEXTMANAGER(Surface)
     _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Surface)
-    _PY_GET_CONTEXTMANAGER(Surface)<const std::string>, 
+    _PY_GET_CONTEXTMANAGER(Surface)<const std::_TSDL_U8(string)>, 
     _PY_GET_CONTEXTMANAGER(Surface)<TSDL::TSDL_Buffer>
     _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
 }
@@ -66,7 +65,7 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Surface(const std::string& file);
+        TSDL_Surface(const std::_TSDL_U8(string)& file);
         TSDL_Surface(TSDL_Buffer& buffer);
         TSDL_Surface(const void* mem, size_t size);
 
@@ -74,29 +73,29 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, TTF_Rendermethod m);
-        TSDL_Surface(const std::string& text, TSDL_Font& font, const color_rgb& c, TTF_Rendermethod m);
+        TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, TTF_Rendermethod m);
+        TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, const color_rgb& c, TTF_Rendermethod m);
 
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TTF_Rendermethod m);
-        TSDL_Surface(const std::string& text, TSDL_Font& font, const color_rgba& c, TTF_Rendermethod m);
+        TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, Uint8 a, TTF_Rendermethod m);
+        TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, const color_rgba& c, TTF_Rendermethod m);
 
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb);
-        TSDL_Surface(const std::string& text, TSDL_Font& font, const color_rgb& fc, const color_rgb& bc);
+        TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 br, Uint8 bg, Uint8 bb);
+        TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, const color_rgb& fc, const color_rgb& bc);
 
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_Surface(const std::string& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba);
-        TSDL_Surface(const std::string& text, TSDL_Font& font, const color_rgba& fc, const color_rgba& bc);
+        TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba);
+        TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, const color_rgba& fc, const color_rgba& bc);
 
         ~TSDL_Surface();
 
