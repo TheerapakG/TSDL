@@ -1,21 +1,21 @@
 #include "TSDL/abstract/elements/FilledEllipse.hpp"
-#include "TSDL/abstract/elements/EventloopAdapter.hpp"
+#include "TSDL/abstract/elements/WindowAdapter.hpp"
 #include "TSDL/TSDL_Meta.hpp"
 
 TSDL::elements::FilledEllipse::FilledEllipse(const FilledEllipse& other):
-    attrs::sizable<RenderSizedElement>(other.eventloop(), other.renderer(), other.size()), _color(other._color) {}
+    attrs::sizable<RenderSizedElement>(other.size()), _color(other._color) {}
 
-TSDL::elements::FilledEllipse::FilledEllipse(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ::TSDL::point_2d& size, const ::TSDL::color_rgba& color):
-    attrs::sizable<RenderSizedElement>(evloop, renderer, size), _color(color) {}
+TSDL::elements::FilledEllipse::FilledEllipse(const ::TSDL::point_2d& size, const ::TSDL::color_rgba& color):
+    attrs::sizable<RenderSizedElement>(size), _color(color) {}
 
-void TSDL::elements::FilledEllipse::render(const ::TSDL::point_2d& dist)
+void TSDL::elements::FilledEllipse::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
 {
-    render(dist, size());
+    render(window, dist, size());
 }
 
-void TSDL::elements::FilledEllipse::render(const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size)
+void TSDL::elements::FilledEllipse::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size)
 {
-    TSDL_Renderer& _render = renderer();
+    TSDL_Renderer& _render = window.renderer();
 
     color_rgba prev_col = _render.render_color();
     _render.render_color(_color); // TODO: check when noexcept signify error

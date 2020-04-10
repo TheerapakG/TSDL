@@ -1,4 +1,5 @@
 #include "TSDL/abstract/elements/ElementHolder.hpp"
+#include "TSDL/abstract/elements/WindowAdapter.hpp"
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
 #include "TSDL/TSDL_Meta.hpp"
 #include <algorithm>
@@ -25,8 +26,7 @@ bool ::TSDL::elements::Subelement::operator==(const ::TSDL::elements::Subelement
         dimension == other.dimension;
 }
 
-TSDL::elements::ElementHolder::ElementHolder(EventloopAdapter& evloop, TSDL_Renderer& renderer): 
-    attrs::sized<DependentElement>(evloop, renderer) {}
+TSDL::elements::ElementHolder::ElementHolder(): attrs::sized<DependentElement>() {}
 
 void TSDL::elements::ElementHolder::add_child(const Subelement& formed_subelement)
 {
@@ -184,7 +184,7 @@ bool TSDL::elements::ElementHolder::need_update() const
         );
 }
 
-void TSDL::elements::ElementHolder::render(const ::TSDL::point_2d& dist)
+void TSDL::elements::ElementHolder::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
 {
     ::TSDL::point_2d r_topleft = _render_position.topleft();
     ::TSDL::point_2d r_bottomright = _render_position.bottomright();
@@ -211,7 +211,7 @@ void TSDL::elements::ElementHolder::render(const ::TSDL::point_2d& dist)
             (topleft.x < r_bottomright.x || topleft.y < r_bottomright.y)
         )
         {
-            el->render(dist+topleft-r_topleft);
+            el->render(window, dist+topleft-r_topleft);
         }
     }
     not_update();

@@ -7,14 +7,14 @@
 
 namespace TSDL::elements
 {
-    Button::Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& _size):
-        impl::_Button<Button>(evloop, renderer, _size) {}
+    Button::Button(const point_2d& _size):
+        impl::_Button<Button>(_size) {}
 
-    Button::Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& _size, const attrs::ListenerMap& listeners):
-        impl::_Button<Button>(evloop, renderer, _size, listeners) {}
+    Button::Button(const point_2d& _size, const attrs::ListenerMap& listeners):
+        impl::_Button<Button>(_size, listeners) {}
 
-    Button::Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& _size, attrs::ListenerMap&& listeners):
-        impl::_Button<Button>(evloop, renderer, _size, listeners) {}
+    Button::Button(const point_2d& _size, attrs::ListenerMap&& listeners):
+        impl::_Button<Button>(_size, listeners) {}
 
     Button& Button::normal(const std::shared_ptr<RenderSizedElement>& element)
     {

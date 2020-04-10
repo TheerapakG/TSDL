@@ -1,6 +1,7 @@
 #include <optional>
 #include <functional>
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
+#include "TSDL/abstract/elements/WindowAdapter.hpp"
 #include "TSDL/TSDL_Meta.hpp"
 
 using namespace std::placeholders;
@@ -12,61 +13,63 @@ namespace
 
     void _handle_window_event(EventloopAdapter* adapter, const SDL_Event& event)
     {
+        auto _window = adapter->windows().find(event.window.windowID);
+        if (_window == adapter->windows().end()) return;
         switch (event.window.event)
         {
         case SDL_WINDOWEVENT_SHOWN:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::WindowShown, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::WindowShown, event
             );
             break;
         case SDL_WINDOWEVENT_HIDDEN:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::WindowHidden, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::WindowHidden, event
             );
             break;
         case SDL_WINDOWEVENT_EXPOSED:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::WindowExposed, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::WindowExposed, event
             );
             break;
         case SDL_WINDOWEVENT_MOVED:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::WindowMoved, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::WindowMoved, event
             );
             break;
         case SDL_WINDOWEVENT_RESIZED:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::WindowResized, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::WindowResized, event
             );
             break;
         case SDL_WINDOWEVENT_MINIMIZED:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::WindowMinimized, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::WindowMinimized, event
             );
             break;
         case SDL_WINDOWEVENT_MAXIMIZED:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::WindowMaximized, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::WindowMaximized, event
             );
             break;
         case SDL_WINDOWEVENT_RESTORED:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::WindowRestored, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::WindowRestored, event
             );
             break;
         case SDL_WINDOWEVENT_ENTER:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::MouseIn, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::MouseIn, event
             );
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::MouseOut, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::MouseOut, event
             );
             break;
         case SDL_WINDOWEVENT_CLOSE:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(0, 0)), events::EventType::WindowClose, event
+            _window->second.get().dispatch_event(
+                point_2d(0, 0), events::EventType::WindowClose, event
             );
             break;
         default:
@@ -76,49 +79,59 @@ namespace
 
     void _handle_keydown_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
-        adapter->src<attrs::EventLookupable>().dispatch_event(
-            Caller(*adapter, point_2d(0, 0)), events::EventType::KeyDown, event
+        auto _window = adapter->windows().find(event.key.windowID);
+        if (_window == adapter->windows().end()) return;
+        _window->second.get().dispatch_event(
+            point_2d(0, 0), events::EventType::KeyDown, event
         );
     }
 
     void _handle_keyup_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
-        adapter->src<attrs::EventLookupable>().dispatch_event(
-            Caller(*adapter, point_2d(0, 0)), events::EventType::KeyUp, event
+        auto _window = adapter->windows().find(event.key.windowID);
+        if (_window == adapter->windows().end()) return;
+        _window->second.get().dispatch_event(
+            point_2d(0, 0), events::EventType::KeyUp, event
         );
     }
 
     void _handle_textinput_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
-        adapter->src<attrs::EventLookupable>().dispatch_event(
-            Caller(*adapter, point_2d(0, 0)), events::EventType::TextInput, event
+        auto _window = adapter->windows().find(event.text.windowID);
+        if (_window == adapter->windows().end()) return;
+        _window->second.get().dispatch_event(
+            point_2d(0, 0), events::EventType::TextInput, event
         );
     }
 
     void _handle_mousemotion_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
-        adapter->src<attrs::EventLookupable>().dispatch_event(
-            Caller(*adapter, point_2d(event.motion.x, event.motion.y)), events::EventType::MouseMotion, event
+        auto _window = adapter->windows().find(event.motion.windowID);
+        if (_window == adapter->windows().end()) return;
+        _window->second.get().dispatch_event(
+            point_2d(event.motion.x, event.motion.y), events::EventType::MouseMotion, event
         );
     }
 
     void _handle_mousebuttondown_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
+        auto _window = adapter->windows().find(event.button.windowID);
+        if (_window == adapter->windows().end()) return;
         switch (event.button.button)
         {
         case SDL_BUTTON_LEFT:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(event.button.x, event.button.y)), events::EventType::LeftDown, event
+            _window->second.get().dispatch_event(
+                point_2d(event.button.x, event.button.y), events::EventType::LeftDown, event
             );
             break;
         case SDL_BUTTON_MIDDLE:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(event.button.x, event.button.y)), events::EventType::MiddleDown, event
+            _window->second.get().dispatch_event(
+                point_2d(event.button.x, event.button.y), events::EventType::MiddleDown, event
             );
             break;
         case SDL_BUTTON_RIGHT:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(event.button.x, event.button.y)), events::EventType::RightDown, event
+            _window->second.get().dispatch_event(
+                point_2d(event.button.x, event.button.y), events::EventType::RightDown, event
             );
             break;
         default:
@@ -128,21 +141,23 @@ namespace
 
     void _handle_mousebuttonup_event(TSDL::elements::EventloopAdapter* adapter, const ::SDL_Event& event)
     {
+        auto _window = adapter->windows().find(event.button.windowID);
+        if (_window == adapter->windows().end()) return;
         switch (event.button.button)
         {
         case SDL_BUTTON_LEFT:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(event.button.x, event.button.y)), events::EventType::LeftUp, event
+            _window->second.get().dispatch_event(
+                point_2d(event.button.x, event.button.y), events::EventType::LeftUp, event
             );
             break;
         case SDL_BUTTON_MIDDLE:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(event.button.x, event.button.y)), events::EventType::MiddleUp, event
+            _window->second.get().dispatch_event(
+                point_2d(event.button.x, event.button.y), events::EventType::MiddleUp, event
             );
             break;
         case SDL_BUTTON_RIGHT:
-            adapter->src<attrs::EventLookupable>().dispatch_event(
-                Caller(*adapter, point_2d(event.button.x, event.button.y)), events::EventType::RightUp, event
+            _window->second.get().dispatch_event(
+                point_2d(event.button.x, event.button.y), events::EventType::RightUp, event
             );
             break;
         default:
@@ -153,8 +168,18 @@ namespace
 
 namespace TSDL::elements
 {
-    EventloopAdapter::EventloopAdapter(TSDL_Eventloop& evloop): _evloop(evloop)
+    namespace impl
     {
+        optional_reference<EventloopAdapter> _current_eventloop_adapter;
+    }
+
+    EventloopAdapter::EventloopAdapter(): _evloop(current_eventloop())
+    {
+        if(impl::_current_eventloop_adapter.has_value())
+        {
+            safe_throw<std::runtime_error>("There is already an eventloop, running two eventloop simultaneously is not possible");
+            return;
+        }
         if(_evloop.render_function()) 
         {
             safe_throw<std::runtime_error>("Could not bind render adapter to an eventloop that already have render function");
@@ -168,13 +193,9 @@ namespace TSDL::elements
                     _calls.front()();
                     _calls.pop();
                 }
-                if (_d_src.has_value())
+                for(auto _window: _windows)
                 {
-                    DependentElement& d_src = _d_src.value().get();
-                    if (!d_src.need_update()) return;
-                    d_src.renderer().clear({255, 255, 255, 255});
-                    d_src.render({0, 0});
-                    d_src.renderer().update();
+                    _window.second.get().render();
                 }
                 while(!_not_update_el.empty())
                 {
@@ -204,10 +225,12 @@ namespace TSDL::elements
         _evloop.add_event_handler(
             SDL_MOUSEBUTTONUP, std::bind(_handle_mousebuttonup_event, this, _1)
         );
+        impl::_current_eventloop_adapter = *this;
     }
 
     EventloopAdapter::~EventloopAdapter()
     {
+        impl::_current_eventloop_adapter.reset();
         _evloop.render_function(nullptr);
         _evloop.remove_event_handler(SDL_WINDOWEVENT);
         _evloop.remove_event_handler(SDL_KEYDOWN);
@@ -228,9 +251,23 @@ namespace TSDL::elements
         _calls.push(call);
     }
 
-    void EventloopAdapter::src(std::nullopt_t)
+    void EventloopAdapter::add_window(WindowAdapter& window_adapter)
     {
-        _src.reset();
-        _d_src.reset();
+        _windows.emplace(window_adapter.window().id(), window_adapter);
+    }
+
+    void EventloopAdapter::remove_window(WindowAdapter& window_adapter)
+    {
+        _windows.erase(window_adapter.window().id());
+    }
+
+    const std::unordered_map <Uint32, std::reference_wrapper<WindowAdapter>>& EventloopAdapter::windows()
+    {
+        return _windows;
+    }
+
+    EventloopAdapter& current_eventloop_adapter()
+    {
+        return impl::_current_eventloop_adapter.value();
     }
 }

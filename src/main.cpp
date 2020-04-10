@@ -15,13 +15,11 @@ namespace elattrs = TSDL::elements::attrs;
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 
-TSDL::TSDL_Eventloop eventloop;
-
 std::atomic_bool quit(false);
 
 void quit_handler(const SDL_Event& event)
 {
-    eventloop.interrupt();
+    TSDL::current_eventloop().interrupt();
     quit = true;
 }
 
@@ -29,12 +27,12 @@ void say_fps()
 {    
     while (!quit.load())
     {
-        std::cout << eventloop.fps() << std::endl;
+        std::cout << TSDL::current_eventloop().fps() << std::endl;
         std::this_thread::sleep_for(1s);
     }
 }
 
-TSDL::elements::Scene current_scene;
+TSDL::elements::Scene* current_scene = nullptr;
 TSDL::elements::Grid* grid = nullptr;
 TSDL::TSDL_Font* font = nullptr;
 static std::filesystem::path current_path = std::filesystem::current_path();
@@ -57,11 +55,10 @@ void generate_visual_from_path()
     TSDL::TSDL_Surface pathtext("Current path: " + current_path.u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
     TSDL::elements::TextureElement* pathtextelement = new TSDL::elements::TextureElement(
-        grid->eventloop(), grid->renderer(),
         pathtext.size(),
         std::shared_ptr <TSDL::TSDL_Texture> ( 
             new TSDL::TSDL_Texture(
-                grid->renderer(),
+                current_scene->bounded_window().renderer(),
                 pathtext
             )
         )
@@ -74,27 +71,25 @@ void generate_visual_from_path()
 
     TSDL::TSDL_Surface buttontext("..", *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
     TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
-        grid->eventloop(), grid->renderer(),
         buttontext.size(),
         std::shared_ptr <TSDL::TSDL_Texture> ( 
             new TSDL::TSDL_Texture(
-                grid->renderer(),
+                current_scene->bounded_window().renderer(),
                 buttontext
             )
         )
     );
 
     TSDL::elements::Button* button = new TSDL::elements::Button(
-        grid->eventloop(), grid->renderer(),
         {buttontext.size().x + 32, 64}
     );
 
     button->front(*buttontextelement);
     button->on_button_activated() =
-    [](const TSDL::elements::Caller&, const SDL_Event&) -> bool
+    [](const TSDL::elements::Caller& caller, const SDL_Event&) -> bool
     {
         current_path = current_path.parent_path();
-        grid->eventloop().register_call_next(generate_visual_from_path);
+        TSDL::elements::current_eventloop_adapter().register_call_next(generate_visual_from_path);
         return true;
     };
 
@@ -112,27 +107,25 @@ void generate_visual_from_path()
         TSDL::TSDL_Surface buttontext(path.stem().u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
         TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
-            grid->eventloop(), grid->renderer(),
             buttontext.size(),
             std::shared_ptr <TSDL::TSDL_Texture> ( 
                 new TSDL::TSDL_Texture(
-                    grid->renderer(),
+                    current_scene->bounded_window().renderer(),
                     buttontext
                 )
             )
         );
 
         TSDL::elements::Button* button = new TSDL::elements::Button(
-            grid->eventloop(), grid->renderer(),
             {buttontext.size().x + 32, 64}
         );
 
         button->front(*buttontextelement);
         button->on_button_activated() =
-        [path](const TSDL::elements::Caller&, const SDL_Event&) -> bool
+        [path](const TSDL::elements::Caller& caller, const SDL_Event&) -> bool
         {
             current_path = path;
-            grid->eventloop().register_call_next(generate_visual_from_path);
+            TSDL::elements::current_eventloop_adapter().register_call_next(generate_visual_from_path);
             return true;
         };
 
@@ -156,21 +149,23 @@ int main(int argc, char* argv[])
         //Initialize SDL
         TSDL::TSDL tsdl;
 
+        TSDL::TSDL_Eventloop eventloop;
+
         eventloop.add_event_handler(SDL_QUIT, quit_handler);
 
         TSDL::TSDL_Window window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-        
-        TSDL::TSDL_Renderer renderer(window, SDL_RENDERER_TARGETTEXTURE);
 
-        TSDL::elements::EventloopAdapter evAdapter(eventloop);
+        TSDL::elements::EventloopAdapter evAdapter;
+        TSDL::elements::WindowAdapter winAdapter(window);
 
-        TSDL::elements::Grid bggrid(evAdapter, renderer);
-        current_scene = bggrid;
+        TSDL::elements::Grid bggrid;
+        TSDL::elements::Scene _scene(winAdapter, bggrid);
+        current_scene = &_scene;
 
-        TSDL::elements::FilledRectangle bg(evAdapter, renderer, {SCREEN_WIDTH, SCREEN_HEIGHT});
+        TSDL::elements::FilledRectangle bg({SCREEN_WIDTH, SCREEN_HEIGHT});
         bggrid.add_child(bg, {0, 0});
 
-        TSDL::elements::GridWithScrollbar mgrid(evAdapter, renderer, {SCREEN_WIDTH, SCREEN_HEIGHT}, 16);
+        TSDL::elements::GridWithScrollbar mgrid({SCREEN_WIDTH, SCREEN_HEIGHT}, 16);
         bggrid.add_child(mgrid, {0, 0});
         grid = &mgrid.grid();
 
@@ -184,7 +179,6 @@ int main(int argc, char* argv[])
         ::font = &font;
 
         elattrs::dragable<TSDL::elements::Button> button(
-            evAdapter, renderer,
             [](const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist) -> ::TSDL::point_2d { return start + dist; }, 
             ::TSDL::point_2d{256, 64}
         );
@@ -192,11 +186,10 @@ int main(int argc, char* argv[])
         TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Drag Me!", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
         TSDL::elements::TextureElement buttontextelement(
-            evAdapter, renderer,
             buttontext->size(),
             std::shared_ptr <TSDL::TSDL_Texture> ( 
                 new TSDL::TSDL_Texture(
-                    renderer,
+                    current_scene->bounded_window().renderer(),
                     *buttontext
                 )
             )

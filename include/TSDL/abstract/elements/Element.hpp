@@ -17,14 +17,20 @@ namespace TSDL
         class Element;
 
         class EventloopAdapter;
+        class WindowAdapter;
         class ElementHolder;
 
         namespace attrs
         {
-            class EventDispatcher;
+            class EventLookupable;
         }
 
-        using Caller = std::pair<std::reference_wrapper<::TSDL::elements::attrs::EventDispatcher>, point_2d>;
+        struct Caller
+        {
+            attrs::EventLookupable& event_origin;
+            point_2d event_location;
+        };
+
         using EventHandler = std::function<bool(const Caller&, const SDL_Event&)>;
 
         static EventHandler always_true_event_handler = [](const Caller&, const SDL_Event&){ return true; };
@@ -42,14 +48,10 @@ namespace TSDL
         class DependentElement: virtual public Element
         {
             private:
-            TSDL_Renderer& _renderer;
-            EventloopAdapter& _evloop;
             std::atomic<bool> _update = true;
             std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> _holders;
 
             public:
-            DependentElement(EventloopAdapter& evloop, TSDL_Renderer& renderer);
-
             friend class EventloopAdapter;
             friend class ElementHolder;
 
@@ -57,16 +59,6 @@ namespace TSDL
             Get bounded holder
             */
             std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> holder() const;
-
-            /*
-            Get bounded renderer
-            */
-            TSDL_Renderer& renderer() const;
-
-            /*
-            Get bounded eventloop
-            */
-            EventloopAdapter& eventloop() const;
 
             /*
             Make parent update this element on the next cycle
@@ -86,7 +78,7 @@ namespace TSDL
             /*
             Re-render this element
             */
-            virtual void render(const ::TSDL::point_2d& dist) = 0;
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) = 0;
         };
 
         class RenderSizedElement: public DependentElement
@@ -97,7 +89,7 @@ namespace TSDL
             /*
             Forces this element to be rendered with specified size
             */
-            virtual void render(const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) = 0;
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) = 0;
         };
     }
 }

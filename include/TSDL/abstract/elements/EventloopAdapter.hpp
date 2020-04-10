@@ -18,21 +18,27 @@ namespace TSDL
 {
     namespace elements
     {
-        class EventloopAdapter: public attrs::eventdispatcher<Element>
+        class WindowAdapter;
+
+        class EventloopAdapter
         {
             private:
             TSDL_Eventloop& _evloop;
-            optional_reference<attrs::EventLookupable> _src;
-            optional_reference<DependentElement> _d_src;
             std::set <::TSDL::EventHandler*> _handlers;
+            std::unordered_map <Uint32, std::reference_wrapper<WindowAdapter>> _windows;
+
             std::queue<std::reference_wrapper<DependentElement>> _not_update_el;
             std::queue<std::function<void()>> _calls;
+
+            void add_window(WindowAdapter& window_adapter);
+            void remove_window(WindowAdapter& window_adapter);
             
             public:
-            EventloopAdapter() = delete;
-            EventloopAdapter(TSDL_Eventloop& evloop);
+            EventloopAdapter();
 
             ~EventloopAdapter();
+
+            friend class WindowAdapter;
 
             /*
             Call not_update on the specified element after render finished
@@ -44,39 +50,10 @@ namespace TSDL
             */
             void register_call_next(std::function<void()> call);
 
-            /*
-            set source
-            */
-            template <typename T, typename U = std::enable_if_t<
-                _and_v<
-                    std::is_base_of_v<DependentElement, T>,
-                    std::is_base_of_v<attrs::EventLookupable, T>
-                >
-            >>
-            void src(T& src)
-            {
-                _src = src;
-                _d_src = src;
-            }
-
-            // set source to none
-            void src(std::nullopt_t);
-
-            template<typename T>
-            T& src() const;
-
-            template<>
-            attrs::EventLookupable& src<attrs::EventLookupable>() const
-            {
-                return _src.value().get();
-            }
-
-            template<>
-            DependentElement& src<DependentElement>() const
-            {
-                return _d_src.value().get();
-            }
+            const std::unordered_map <Uint32, std::reference_wrapper<WindowAdapter>>& windows();
         };
+
+        EventloopAdapter& current_eventloop_adapter();
     }
 }
 

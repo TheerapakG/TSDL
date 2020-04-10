@@ -67,6 +67,8 @@ namespace TSDL
         #ifdef __cpp_exceptions
         TSDL_Eventloop(bool thrownoevhandler, bool thrownorenderhandler);
         #endif
+        TSDL_Eventloop(const TSDL_Eventloop&) = delete;
+        TSDL_Eventloop& operator=(const TSDL_Eventloop&) = delete;
 
         ~TSDL_Eventloop();
 
@@ -96,6 +98,8 @@ namespace TSDL
 
         double fps_target() const;
     };
+
+    TSDL_Eventloop& current_eventloop();
 }
 
 #ifdef TSDL_EXPOSE_PYBIND11

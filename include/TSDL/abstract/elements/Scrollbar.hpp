@@ -26,8 +26,8 @@ namespace TSDL::elements
 
             public:
             template <typename ...Args>
-            _Bar(EventloopAdapter& evloop, TSDL_Renderer& renderer, attrs::DragablePosTransformer pos_transform, const point_2d& size, Scrollbar_T* scrollbar):
-                attrs::dragable<_Button<_Bar>>(evloop, renderer, pos_transform, size), _scrollbar_ptr(scrollbar) {}
+            _Bar(attrs::DragablePosTransformer pos_transform, const point_2d& size, Scrollbar_T* scrollbar):
+                attrs::dragable<_Button<_Bar>>(pos_transform, size), _scrollbar_ptr(scrollbar) {}
 
             template <events::EventType eventtype>
             bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
@@ -36,9 +36,9 @@ namespace TSDL::elements
             }
 
             template <>
-            bool dispatch_templated_event<events::EventType::Dragged>(const Caller&, const SDL_Event& event)
+            bool dispatch_templated_event<events::EventType::Dragged>(const Caller& caller, const SDL_Event& event)
             {
-                return _scrollbar_ptr->dispatch_event(Caller(*_scrollbar_ptr, {0, 0}), events::EventType::Dragged, event);
+                return _scrollbar_ptr->dispatch_event(Caller{*_scrollbar_ptr, {0, 0}}, events::EventType::Dragged, event);
             }
         };
 
@@ -66,7 +66,6 @@ namespace TSDL::elements
             }
 
             _Bar<_BaseHorizontalScrollbar<Derived>> _bar{
-                eventloop(), renderer(),
                 std::bind(std::mem_fn(&_BaseHorizontalScrollbar::_bar_movement_calc), this, _1, _2),
                 point_2d{_bar_length(), size().y},
                 this
@@ -78,20 +77,20 @@ namespace TSDL::elements
             }
 
             public:
-            _BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size):
-                _BaseScrollbar_Attrs<Derived>(evloop, renderer, size), 
+            _BaseHorizontalScrollbar(int content_width, const point_2d& size):
+                _BaseScrollbar_Attrs<Derived>(size), 
                 _content_width(content_width)
             {
                 _init();
             }
-            _BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size, const attrs::ListenerMap& listeners):
-                _BaseScrollbar_Attrs<Derived>(evloop, renderer, size, listeners), 
+            _BaseHorizontalScrollbar(int content_width, const point_2d& size, const attrs::ListenerMap& listeners):
+                _BaseScrollbar_Attrs<Derived>(size, listeners), 
                 _content_width(content_width)
             {
                 _init();
             }
-            _BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size, attrs::ListenerMap&& listeners):
-                _BaseScrollbar_Attrs<Derived>(evloop, renderer, size, listeners), 
+            _BaseHorizontalScrollbar(int content_width, const point_2d& size, attrs::ListenerMap&& listeners):
+                _BaseScrollbar_Attrs<Derived>(size, listeners), 
                 _content_width(content_width)
             {
                 _init();
@@ -104,9 +103,9 @@ namespace TSDL::elements
             }
 
             template <>
-            bool dispatch_templated_event<events::EventType::Dragged>(const Caller&, const SDL_Event& event)
+            bool dispatch_templated_event<events::EventType::Dragged>(const Caller& caller, const SDL_Event& event)
             {
-                return _BaseScrollbar_Attrs<Derived>::dispatch_templated_event<events::EventType::Dragged>(Caller(*this, {0, 0}), event);
+                return _BaseScrollbar_Attrs<Derived>::dispatch_templated_event<events::EventType::Dragged>(Caller{*this, {0, 0}}, event);
             }
 
             int content_width() const
@@ -148,7 +147,6 @@ namespace TSDL::elements
             }
 
             _Bar<_BaseVerticalScrollbar<Derived>> _bar{
-                eventloop(), renderer(),
                 std::bind(std::mem_fn(&_BaseVerticalScrollbar::_bar_movement_calc), this, _1, _2),
                 point_2d{size().x, _bar_length()},
                 this
@@ -160,20 +158,20 @@ namespace TSDL::elements
             }
 
             public:
-            _BaseVerticalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_height, const point_2d& size):
-                _BaseScrollbar_Attrs<Derived>(evloop, renderer, size), 
+            _BaseVerticalScrollbar(int content_height, const point_2d& size):
+                _BaseScrollbar_Attrs<Derived>(size), 
                 _content_height(content_height)
             {
                 _init();
             }
-            _BaseVerticalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_height, const point_2d& size, const attrs::ListenerMap& listeners):
-                _BaseScrollbar_Attrs<Derived>(evloop, renderer, size, listeners), 
+            _BaseVerticalScrollbar(int content_height, const point_2d& size, const attrs::ListenerMap& listeners):
+                _BaseScrollbar_Attrs<Derived>(size, listeners), 
                 _content_height(content_height)
             {
                 _init();
             }
-            _BaseVerticalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, Derived* d_ptr, int content_height, const point_2d& size, attrs::ListenerMap&& listeners):
-                _BaseScrollbar_Attrs<Derived>(evloop, renderer, d_ptr, size, listeners), 
+            _BaseVerticalScrollbar(Derived* d_ptr, int content_height, const point_2d& size, attrs::ListenerMap&& listeners):
+                _BaseScrollbar_Attrs<Derived>(d_ptr, size, listeners), 
                 _content_height(content_height)
             {
                 _init();
@@ -186,9 +184,9 @@ namespace TSDL::elements
             }
 
             template <>
-            bool dispatch_templated_event<events::EventType::Dragged>(const Caller&, const SDL_Event& event)
+            bool dispatch_templated_event<events::EventType::Dragged>(const Caller& caller, const SDL_Event& event)
             {
-                return _BaseScrollbar_Attrs<Derived>::dispatch_templated_event<events::EventType::Dragged>(Caller(*this, {0, 0}), event);
+                return _BaseScrollbar_Attrs<Derived>::dispatch_templated_event<events::EventType::Dragged>(Caller{*this, {0, 0}}, event);
             }
 
             int content_height() const            
@@ -213,17 +211,17 @@ namespace TSDL::elements
     class BaseHorizontalScrollbar: public impl::_BaseHorizontalScrollbar<BaseHorizontalScrollbar>
     {
         public:        
-        BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size);
-        BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size, const attrs::ListenerMap& listeners);
-        BaseHorizontalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_width, const point_2d& size, attrs::ListenerMap&& listeners);
+        BaseHorizontalScrollbar(int content_width, const point_2d& size);
+        BaseHorizontalScrollbar(int content_width, const point_2d& size, const attrs::ListenerMap& listeners);
+        BaseHorizontalScrollbar(int content_width, const point_2d& size, attrs::ListenerMap&& listeners);
     };
 
     class BaseVerticalScrollbar: public impl::_BaseVerticalScrollbar<BaseVerticalScrollbar>
     {
         public:        
-        BaseVerticalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_height, const point_2d& size);
-        BaseVerticalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_height, const point_2d& size, const attrs::ListenerMap& listeners);
-        BaseVerticalScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, int content_height, const point_2d& size, attrs::ListenerMap&& listeners);
+        BaseVerticalScrollbar(int content_height, const point_2d& size);
+        BaseVerticalScrollbar(int content_height, const point_2d& size, const attrs::ListenerMap& listeners);
+        BaseVerticalScrollbar(int content_height, const point_2d& size, attrs::ListenerMap&& listeners);
     };
 }
 

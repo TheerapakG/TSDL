@@ -1,0 +1,57 @@
+#include "TSDL/abstract/elements/WindowAdapter.hpp"
+#include "TSDL/abstract/elements/EventloopAdapter.hpp"
+
+namespace TSDL::elements
+{
+    WindowAdapter::WindowAdapter(TSDL_Window& window): 
+        _window(window), 
+        _renderer(window)
+    {
+        current_eventloop_adapter().add_window(*this);
+    }
+
+    WindowAdapter::WindowAdapter(TSDL_Window& window, Uint32 renderer_flags): 
+        _window(window), 
+        _renderer(window, renderer_flags)
+    {
+        current_eventloop_adapter().add_window(*this);
+    }
+
+    WindowAdapter::~WindowAdapter()
+    {
+        current_eventloop_adapter().remove_window(*this);
+    }
+            
+    TSDL_Window& WindowAdapter::window()
+    {
+        return _window;
+    }
+            
+    TSDL_Renderer& WindowAdapter::renderer()
+    {
+        return _renderer;
+    }
+
+    void WindowAdapter::src(std::nullopt_t)
+    {
+        _src.reset();
+        _d_src.reset();
+    }
+
+    bool WindowAdapter::dispatch_event(point_2d pos, events::EventType eventtype, const SDL_Event& event)
+    {
+        return attrs::staticeventlookup<Element, WindowAdapter>::dispatch_event(Caller{*this, pos}, eventtype, event);
+    }
+
+    void WindowAdapter::render()
+    {
+        if (_d_src.has_value())
+        {
+            DependentElement& d_src = src <DependentElement>();
+            if (!d_src.need_update()) return;
+            renderer().clear({255, 255, 255, 255});
+            d_src.render(*this, {0, 0});
+            renderer().update();
+        }
+    }
+}

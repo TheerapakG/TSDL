@@ -56,6 +56,8 @@ namespace TSDL
 
         TSDL_Display display(void);
 
+        Uint32 id(void);
+
         void window_position(int x, int y);
         void window_position(const TSDL_Display& display, int x, int y);
     };

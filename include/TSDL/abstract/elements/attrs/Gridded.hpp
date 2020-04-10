@@ -16,9 +16,9 @@ namespace TSDL::elements::attrs
         Grid_T _grid;
 
         public:
-        Gridded(EventloopAdapter& evloop, TSDL_Renderer& renderer): _grid(evloop, renderer) {}
-        Gridded(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ListenerMap& listeners): _grid(evloop, renderer, listeners) {}
-        Gridded(EventloopAdapter& evloop, TSDL_Renderer& renderer, ListenerMap&& listeners): _grid(evloop, renderer, listeners) {}
+        Gridded(): _grid() {}
+        Gridded(const ListenerMap& listeners): _grid(listeners) {}
+        Gridded(ListenerMap&& listeners): _grid(listeners) {}
 
         Grid_T& grid()
         {
@@ -36,27 +36,19 @@ namespace TSDL::elements::attrs
     {
         public:
         template <typename ...Args>
-        gridded(
-            EventloopAdapter& evloop, 
-            TSDL_Renderer& renderer, 
-            Args... args
-        ): T(evloop, renderer, args...), Gridded<Grid_T>(evloop, renderer) {}
+        gridded(Args... args): T(args...), Gridded<Grid_T>() {}
 
         template <typename ...Args>
         gridded(
-            EventloopAdapter& evloop,
-            TSDL_Renderer& renderer, 
             const ListenerMap& listeners,
             Args... args
-        ): T(evloop, renderer, args...), Gridded<Grid_T>(evloop, renderer, listeners) {}
+        ): T(args...), Gridded<Grid_T>(listeners) {}
 
         template <typename ...Args>
         gridded(
-            EventloopAdapter& evloop,
-            TSDL_Renderer& renderer, 
             ListenerMap&& listeners,
             Args... args
-        ): T(evloop, renderer, args...), Gridded<Grid_T>(evloop, renderer, listeners) {}
+        ): T(args...), Gridded<Grid_T>(listeners) {}
 
         /*
         Query if parent need to update this element on the next cycle
@@ -69,9 +61,9 @@ namespace TSDL::elements::attrs
         /*
         Re-render this element
         */
-        virtual void render(const ::TSDL::point_2d& dist) override
+        virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) override
         {
-            grid().render(dist);
+            grid().render(window, dist);
         }
     };
 }

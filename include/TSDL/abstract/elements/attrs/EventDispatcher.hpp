@@ -38,14 +38,6 @@ namespace TSDL::elements::attrs
         template <typename ...Args>
         eventdispatcher(ListenerMap&& listeners, Args... args):
             T(args...), EventDispatcher(listeners) {}
-        template <typename ...Args>
-        eventdispatcher(EventloopAdapter& evloop, TSDL_Renderer& renderer, Args... args): T(evloop, renderer, args...), EventDispatcher(ListenerMap()) {}
-        template <typename ...Args>
-        eventdispatcher(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ListenerMap& listeners, Args... args):
-            T(evloop, renderer, args...), EventDispatcher(listeners) {}
-        template <typename ...Args>
-        eventdispatcher(EventloopAdapter& evloop, TSDL_Renderer& renderer, ListenerMap&& listeners, Args... args):
-            T(evloop, renderer, args...), EventDispatcher(listeners) {}
 
         virtual bool dispatch_event(
             const Caller& caller, events::EventType eventtype, const SDL_Event& event) override
