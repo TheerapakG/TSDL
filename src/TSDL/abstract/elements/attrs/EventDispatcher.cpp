@@ -19,7 +19,7 @@ void TSDL::elements::attrs::EventDispatcher::stop_dispatch_event_direct(TSDL::ev
 
 bool TSDL::elements::attrs::EventDispatcher::dispatch_event(const Caller& caller, events::EventType eventtype, const SDL_Event& event)
 {
-    const Caller _this_caller = Caller(*this, caller.second);
+    const Caller _this_caller = Caller{*this, caller.event_location};
     for(EventLookupable* subelement: _event_listeners[eventtype])
     {
         if(subelement->dispatch_event(_this_caller, eventtype, event)) return true;

@@ -30,11 +30,11 @@ namespace TSDL::elements::attrs
     {
         public:
         template <typename ...Args>
-        eventforwarder(EventloopAdapter& evloop, TSDL_Renderer& renderer, EventLookupable& target, Args... args): T(evloop, renderer, args...), EventForwarder(target) {}
+        eventforwarder(EventLookupable& target, Args... args): T(args...), EventForwarder(target) {}
 
         virtual bool dispatch_event(const Caller& caller, events::EventType eventtype, const SDL_Event& event) override
         {
-            return event_target().dispatch_event(Caller{std::reference_wrapper<EventDispatcher>(*this), caller.second}, eventtype, event);
+            return event_target().dispatch_event(Caller{std::reference_wrapper<EventDispatcher>(*this), caller.event_location}, eventtype, event);
         }
     };
 }

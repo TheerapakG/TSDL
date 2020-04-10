@@ -30,7 +30,7 @@ namespace TSDL::elements::attrs
     {
         public:
         template <typename ...Args>
-        sized(EventloopAdapter& evloop, TSDL_Renderer& renderer, Args... args): T(evloop, renderer, args...) {}
+        sized(Args... args): T(args...) {}
     };
 
     template <class T>
@@ -38,7 +38,7 @@ namespace TSDL::elements::attrs
     {
         public:
         template <typename ...Args>
-        sizable(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, Args... args): sized<T>(evloop, renderer, args...), Sizable(size) {}
+        sizable(const point_2d& size, Args... args): sized<T>(args...), Sizable(size) {}
 
         template <typename U = T>
         typename std::enable_if_t<!std::is_base_of_v<EventDispatcher, U>> _size(const point_2d& size)
@@ -50,7 +50,7 @@ namespace TSDL::elements::attrs
         typename std::enable_if_t<std::is_base_of_v<EventDispatcher, U>> _size(const point_2d& size)
         {
             Sizable::size(size);
-            dispatch_event(Caller(*this, {0, 0}), events::EventType::ElementResized, ::TSDL::null_event);
+            dispatch_event(Caller{*this, {0, 0}}, events::EventType::ElementResized, ::TSDL::null_event);
         }
 
         virtual void size(const point_2d& size) override

@@ -53,10 +53,10 @@ namespace TSDL
             private:
             Subelement_vector _subelements_order;
             std::map <DependentElement*, Subelement> _subelements_info;
-            rect _render_position = {{0, 0}, renderer().render_size()};
+            rect _render_position = {{0, 0}, {std::numeric_limits<int>::max(), std::numeric_limits<int>::max()}};
 
             public:
-            ElementHolder(EventloopAdapter& evloop, TSDL_Renderer& renderer);
+            ElementHolder();
 
             virtual void add_child(const Subelement& formed_subelement);
             virtual Subelement_vector::iterator add_child(const Subelement& formed_subelement, int order);
@@ -127,7 +127,7 @@ namespace TSDL
             /*
             Re-render this element
             */
-            virtual void render(const ::TSDL::point_2d& dist) override;
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) override;
         };
 
         bool operator==(const ElementHolder& lhs, const ElementHolder& rhs);

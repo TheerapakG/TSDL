@@ -4,7 +4,7 @@
 #include "TSDL/abstract/elements/TextureElement.hpp"
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
 #include "TSDL/abstract/elements/FilledRectangle.hpp"
-#include "TSDL/abstract/elements/EventloopAdapter.hpp"
+#include "TSDL/abstract/elements/WindowAdapter.hpp"
 
 #include "TSDL/TSDL_Meta.hpp"
 #include <memory>
@@ -33,9 +33,9 @@ namespace TSDL::elements
             using Derived_T = typename _Button_Attrs<Derived>::Derived_T;
 
             private:
-            std::shared_ptr<RenderSizedElement> _normal = std::make_shared<FilledRectangle>(eventloop(), renderer(), point_2d{0, 0}, color_rgba{128, 128, 128, 128});
-            std::shared_ptr<RenderSizedElement> _hover = std::make_shared<FilledRectangle>(eventloop(), renderer(), point_2d{0, 0}, color_rgba{192, 192, 192, 128});
-            std::shared_ptr<RenderSizedElement> _clicked = std::make_shared<FilledRectangle>(eventloop(), renderer(), point_2d{0, 0}, color_rgba{211, 211, 211, 128});
+            std::shared_ptr<RenderSizedElement> _normal = std::make_shared<FilledRectangle>(point_2d{0, 0}, color_rgba{128, 128, 128, 128});
+            std::shared_ptr<RenderSizedElement> _hover = std::make_shared<FilledRectangle>(point_2d{0, 0}, color_rgba{192, 192, 192, 128});
+            std::shared_ptr<RenderSizedElement> _clicked = std::make_shared<FilledRectangle>(point_2d{0, 0}, color_rgba{211, 211, 211, 128});
             optional_reference<attrs::sizable<RenderSizedElement>> _front;
             int _padding = 8;
 
@@ -44,12 +44,12 @@ namespace TSDL::elements
             EventHandler _on_button_activated = always_true_event_handler;
 
             public:
-            _Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size):
-                _Button_Attrs<Derived>(evloop, renderer, size) {}
-            _Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, const attrs::ListenerMap& listeners):
-                _Button_Attrs<Derived>(evloop, renderer, size, listeners) {}
-            _Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, attrs::ListenerMap&& listeners):
-                _Button_Attrs<Derived>(evloop, renderer, size, listeners) {}
+            _Button(const point_2d& size):
+                _Button_Attrs<Derived>(size) {}
+            _Button(const point_2d& size, const attrs::ListenerMap& listeners):
+                _Button_Attrs<Derived>(size, listeners) {}
+            _Button(const point_2d& size, attrs::ListenerMap&& listeners):
+                _Button_Attrs<Derived>(size, listeners) {}
 
             EventHandler& on_button_activated()
             {
@@ -69,7 +69,7 @@ namespace TSDL::elements
             }
 
             template <>
-            bool dispatch_templated_event<events::EventType::MouseIn>(const Caller& caller, const SDL_Event& event)
+            bool dispatch_templated_event<events::EventType::MouseIn>(const Caller&, const SDL_Event& event)
             {
                 if(state != ButtonState::CLICKED)
                 {
@@ -99,10 +99,10 @@ namespace TSDL::elements
             }
 
             template <>
-            bool dispatch_templated_event<events::EventType::LeftUp_Inside>(const Caller&, const SDL_Event&)
+            bool dispatch_templated_event<events::EventType::LeftUp_Inside>(const Caller& caller, const SDL_Event&)
             {
                 state = ButtonState::HOVER;
-                dispatch_event(Caller(*this, {0, 0}), events::EventType::ButtonActivated, ::TSDL::null_event);
+                dispatch_event(Caller{*this, {0, 0}}, events::EventType::ButtonActivated, ::TSDL::null_event);
                 update();
                 return true;
             }
@@ -181,22 +181,20 @@ namespace TSDL::elements
             /*
             Re-render this element
             */
-            virtual void render(const ::TSDL::point_2d& dist) override
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) override
             {
-                // TODO: renderer RAII
-                auto& _renderer = renderer();
                 switch (state)
                 {
                 case ButtonState::NORMAL:
-                    _normal->render(dist, size());
+                    _normal->render(window, dist, size());
                     break;
 
                 case ButtonState::HOVER:
-                    _hover->render(dist, size());
+                    _hover->render(window, dist, size());
                     break;
 
                 case ButtonState::CLICKED:
-                    _clicked->render(dist, size());
+                    _clicked->render(window, dist, size());
                     break;
                 
                 default:
@@ -214,11 +212,11 @@ namespace TSDL::elements
                     const ::TSDL::point_2d render_size(std::round(ratio * texture_size.x), std::round(ratio * texture_size.y));
                     if(ratio>0)
                     {
-                        _telement.render(dist + (size() - render_size)/2, render_size);
+                        _telement.render(window, dist + (size() - render_size)/2, render_size);
                     }
                 }
 
-                not_update();
+                _Button_Attrs<Derived>::not_update();
             }
         };
 
@@ -227,9 +225,9 @@ namespace TSDL::elements
     class Button: public impl::_Button<Button>
     {
         public:
-        Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size);
-        Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, const attrs::ListenerMap& listeners);
-        Button(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, attrs::ListenerMap&& listeners);
+        Button(const point_2d& size);
+        Button(const point_2d& size, const attrs::ListenerMap& listeners);
+        Button(const point_2d& size, attrs::ListenerMap&& listeners);
 
         Button& normal(const std::shared_ptr<RenderSizedElement>& element);
         Button& hover(const std::shared_ptr<RenderSizedElement>& element);

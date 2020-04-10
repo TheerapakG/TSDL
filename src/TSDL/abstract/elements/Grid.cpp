@@ -4,18 +4,16 @@
 
 namespace TSDL::elements
 {
-    Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer): _Grid<Grid>(evloop, renderer) {}
+    Grid::Grid(): _Grid<Grid>() {}
     
-    Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, const attrs::ListenerMap& listeners): 
-        _Grid<Grid>(evloop, renderer, listeners) {}
+    Grid::Grid(const attrs::ListenerMap& listeners): _Grid<Grid>(listeners) {}
 
-    Grid::Grid(EventloopAdapter& evloop, TSDL_Renderer& renderer, attrs::ListenerMap&& listeners): 
-        _Grid<Grid>(evloop, renderer, listeners) {}
+    Grid::Grid(attrs::ListenerMap&& listeners): _Grid<Grid>(listeners) {}
 
     void GridWithScrollbar::_init()
     {
-        hbar = new BaseHorizontalScrollbar(eventloop(), renderer(), size().x, {size().x - _bar_width, _bar_width});
-        vbar = new BaseVerticalScrollbar(eventloop(), renderer(), size().y, {_bar_width, size().y - _bar_width});
+        hbar = new BaseHorizontalScrollbar(size().x, {size().x - _bar_width, _bar_width});
+        vbar = new BaseVerticalScrollbar(size().y, {_bar_width, size().y - _bar_width});
         hbar->dispatch_event_direct(events::EventType::Dragged, *this);
         vbar->dispatch_event_direct(events::EventType::Dragged, *this);
         add_child(*hbar, {0, size().y - _bar_width});
@@ -23,18 +21,18 @@ namespace TSDL::elements
         grid().render_position({-_margin, size()-_margin});
     }
 
-    GridWithScrollbar::GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width, const point_2d& margin)
-        : attrs::sizable<_Grid<GridWithScrollbar>>(evloop, renderer, size), _underly(evloop, renderer), _bar_width(bar_width), _margin(margin)
+    GridWithScrollbar::GridWithScrollbar(const point_2d& size, int bar_width, const point_2d& margin)
+        : attrs::sizable<_Grid<GridWithScrollbar>>(size), _underly(), _bar_width(bar_width), _margin(margin)
     {
         _init();
     }
-    GridWithScrollbar::GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width, const attrs::ListenerMap& listeners, const point_2d& margin)
-        : attrs::sizable<_Grid<GridWithScrollbar>>(evloop, renderer, size), _underly(evloop, renderer, listeners), _bar_width(bar_width), _margin(margin)
+    GridWithScrollbar::GridWithScrollbar(const point_2d& size, int bar_width, const attrs::ListenerMap& listeners, const point_2d& margin)
+        : attrs::sizable<_Grid<GridWithScrollbar>>(size), _underly(listeners), _bar_width(bar_width), _margin(margin)
     {
         _init();
     }
-    GridWithScrollbar::GridWithScrollbar(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int bar_width, attrs::ListenerMap&& listeners, const point_2d& margin)
-        : attrs::sizable<_Grid<GridWithScrollbar>>(evloop, renderer, size), _underly(evloop, renderer, listeners), _bar_width(bar_width), _margin(margin)
+    GridWithScrollbar::GridWithScrollbar(const point_2d& size, int bar_width, attrs::ListenerMap&& listeners, const point_2d& margin)
+        : attrs::sizable<_Grid<GridWithScrollbar>>(size), _underly(listeners), _bar_width(bar_width), _margin(margin)
     {
         _init();
     }
@@ -79,12 +77,12 @@ namespace TSDL::elements
     /*
     Re-render this element
     */
-    void GridWithScrollbar::render(const ::TSDL::point_2d& dist)
+    void GridWithScrollbar::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
     {
         point_2d _grid_size = grid().size();
         hbar->content_width(_grid_size.x + 2*_margin.x);
         vbar->content_height(_grid_size.y + 2 * _margin.y);
-        grid().render(dist);
-        attrs::sizable<impl::_Grid<GridWithScrollbar>>::render(dist);
+        grid().render(window, dist);
+        attrs::sizable<impl::_Grid<GridWithScrollbar>>::render(window, dist);
     }
 }

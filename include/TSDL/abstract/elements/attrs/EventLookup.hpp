@@ -27,7 +27,7 @@ namespace TSDL::elements::attrs
 
         public:
         template <typename ...Args>
-        dynamiceventlookup(EventloopAdapter& evloop, TSDL_Renderer& renderer, Args... args): T(evloop, renderer, args...) {}
+        dynamiceventlookup(Args... args): T(args...) {}
 
         void add_event_handler(::TSDL::events::EventType eventtype, const EventHandler& evhandler)
         {
@@ -68,7 +68,7 @@ namespace TSDL::elements::attrs
 
         public:
         template <typename ...Args>
-        staticeventlookup(EventloopAdapter& evloop, TSDL_Renderer& renderer, Args... args): T(evloop, renderer, args...){}
+        staticeventlookup(Args... args): T(args...){}
 
         template<events::EventType eventtype>
         bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)

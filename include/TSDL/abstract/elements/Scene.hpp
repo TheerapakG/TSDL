@@ -2,6 +2,7 @@
 #define TSDL_ELEMENTS_SCENE_
 
 #include "TSDL/abstract/elements/Element.hpp"
+#include "TSDL/abstract/elements/WindowAdapter.hpp"
 #include "TSDL/abstract/elements/attrs/EventLookup.hpp"
 
 namespace TSDL::elements
@@ -12,26 +13,38 @@ namespace TSDL::elements
     class Scene
     {
         private:
-        optional_const_reference<DependentElement> _target;
+        std::reference_wrapper<const DependentElement> _target;
+        WindowAdapter& _window;
         bool _unbind = false;
 
-        public:
-        Scene() = default;
-        
+        public:        
         template <typename T, typename U = std::enable_if_t<
             _and_v<
                 std::is_base_of_v<DependentElement, T>,
                 std::is_base_of_v<attrs::EventLookupable, T>
             >
         >>
-        Scene(T& target): _target(make_optional_const_ref(target)), _unbind(true)
+        Scene(WindowAdapter& window, T& target): _target(target), _window(window), _unbind(true)
         {
-            target.eventloop().src(target);
+            window.src(target);
         }
 
         Scene(Scene&& other);
-        
-        Scene& operator=(Scene&& other);
+
+        template <typename T, typename U = std::enable_if_t<
+            _and_v<
+                std::is_base_of_v<DependentElement, T>,
+                std::is_base_of_v<attrs::EventLookupable, T>
+            >
+        >>
+        Scene& operator=(T& target)
+        {
+            _target = target;
+            window.src(target);
+            return *this;
+        }
+
+        WindowAdapter& bounded_window();
 
         virtual ~Scene();
     };

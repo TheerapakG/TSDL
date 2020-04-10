@@ -45,11 +45,9 @@ namespace TSDL::elements::attrs
         public:
         template <typename ...Args>
         dragable(
-            EventloopAdapter& evloop, 
-            TSDL_Renderer& renderer, 
             DragablePosTransformer pos_transform, 
             Args... args
-        ): T(evloop, renderer, args...), Dragable(pos_transform) 
+        ): T(args...), Dragable(pos_transform) 
         {
             T::add_event_handler(
                 ::TSDL::events::EventType::LeftDown,
@@ -104,12 +102,10 @@ namespace TSDL::elements::attrs
 
         template <typename ...Args>
         dragable(
-            EventloopAdapter& evloop,
-            TSDL_Renderer& renderer,  
             ::TSDL::point_2d origin, 
             DragablePosTransformer pos_transform, 
             Args... args
-        ): T(evloop, renderer, args...), Dragable(pos_transform, origin)
+        ): T(args...), Dragable(pos_transform, origin)
         {
             T::add_event_handler(
                 ::TSDL::events::EventType::LeftDown,
@@ -171,20 +167,16 @@ namespace TSDL::elements::attrs
         public:
         template <typename ...Args>
         dragable(
-            EventloopAdapter& evloop, 
-            TSDL_Renderer& renderer, 
             DragablePosTransformer pos_transform, 
             Args... args
-        ): T(evloop, renderer, args...), Dragable(pos_transform) {}
+        ): T(args...), Dragable(pos_transform) {}
 
         template <typename ...Args>
-        dragable(
-            EventloopAdapter& evloop,
-            TSDL_Renderer& renderer,  
+        dragable( 
             ::TSDL::point_2d origin, 
             DragablePosTransformer pos_transform, 
             Args... args
-        ): T(evloop, renderer, args...), Dragable(pos_transform, origin) {}
+        ): T(args...), Dragable(pos_transform, origin) {}
 
         template <events::EventType eventtype>
         bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
@@ -229,7 +221,7 @@ namespace TSDL::elements::attrs
                     _hold.move_child(*this, _this_pos - _last_pos + _hold.child_info(*this).dimension.first);
                 }
                 _last_pos = _this_pos;
-                dispatch_event(Caller(*this, {0, 0}), events::EventType::Dragged, event);
+                dispatch_event(Caller{*this, {0, 0}}, events::EventType::Dragged, event);
             }
             return true;
         }

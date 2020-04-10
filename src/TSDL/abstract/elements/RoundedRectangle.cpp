@@ -1,21 +1,21 @@
 #include "TSDL/abstract/elements/RoundedRectangle.hpp"
-#include "TSDL/abstract/elements/EventloopAdapter.hpp"
+#include "TSDL/abstract/elements/WindowAdapter.hpp"
 #include "TSDL/TSDL_Meta.hpp"
 
 TSDL::elements::RoundedRectangle::RoundedRectangle(const RoundedRectangle& other):
-    attrs::sizable<RenderSizedElement>(other.eventloop(), other.renderer(), other.size()), _color(other._color), _r(other._r) {}
+    attrs::sizable<RenderSizedElement>(other.size()), _color(other._color), _r(other._r) {}
 
-TSDL::elements::RoundedRectangle::RoundedRectangle(EventloopAdapter& evloop, TSDL_Renderer& renderer, const ::TSDL::point_2d& size, int r, const ::TSDL::color_rgba& color):
-    attrs::sizable<RenderSizedElement>(evloop, renderer, size), _color(color), _r(r) {}
+TSDL::elements::RoundedRectangle::RoundedRectangle(const ::TSDL::point_2d& size, int r, const ::TSDL::color_rgba& color):
+    attrs::sizable<RenderSizedElement>(size), _color(color), _r(r) {}
 
-void TSDL::elements::RoundedRectangle::render(const ::TSDL::point_2d& dist)
+void TSDL::elements::RoundedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
 {
-    render(dist, size());
+    render(window, dist, size());
 }
 
-void TSDL::elements::RoundedRectangle::render(const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size)
+void TSDL::elements::RoundedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size)
 {
-    TSDL_Renderer& _render = renderer();
+    TSDL_Renderer& _render = window.renderer();
 
     color_rgba prev_col = _render.render_color();
     _render.render_color(_color); // TODO: check when noexcept signify error
@@ -34,7 +34,7 @@ void TSDL::elements::RoundedRectangle::render(const ::TSDL::point_2d& dist, cons
         cr += (2*i + 1);
     }
 
-    renderer().fill_rect({dist+point_2d{0, _r}, dist+size-point_2d{0, _r}});
+    _render.fill_rect({dist+point_2d{0, _r}, dist+size-point_2d{0, _r}});
     
     _render.render_color(prev_col); // TODO: check when noexcept signify error
 

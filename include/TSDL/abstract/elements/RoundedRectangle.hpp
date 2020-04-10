@@ -17,17 +17,17 @@ namespace TSDL
 
             public:
             RoundedRectangle(const RoundedRectangle& other);
-            RoundedRectangle(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, int r, const color_rgba& color = {0, 0, 0, 255});
+            RoundedRectangle(const point_2d& size, int r, const color_rgba& color = {0, 0, 0, 255});
 
             /*
             Re-render this element
             */
-            virtual void render(const ::TSDL::point_2d& dist) override;
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) override;
 
             /*
             Forces this element to be rendered with specified size
             */
-            virtual void render(const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) override;
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) override;
         };
     }
 }

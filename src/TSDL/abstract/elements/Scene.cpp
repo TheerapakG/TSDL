@@ -1,25 +1,25 @@
 #include "TSDL/abstract/elements/Scene.hpp"
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
 
+#include <cassert>
+
 namespace TSDL::elements
 {
-    Scene::Scene(Scene&& other): _target(other._target)
+    Scene::Scene(Scene&& other): _target(other._target), _window(other._window)
     {
         other._unbind = false;
     }
 
-    Scene& Scene::operator=(Scene&& other)
+    WindowAdapter& Scene::bounded_window()
     {
-        _target = other._target;
-        other._unbind = false;
-        return *this;
+        return _window;
     }
 
     Scene::~Scene()
     {
-        const DependentElement& _t_target = get_ref(_target);
+        const DependentElement& _t_target = _target;
         if (_unbind && 
-            _t_target == _t_target.eventloop().template src<DependentElement>()) 
-            _t_target.eventloop().src(std::nullopt);
+            _t_target == _window.template src<DependentElement>()) 
+            _window.src(std::nullopt);
     }
 }

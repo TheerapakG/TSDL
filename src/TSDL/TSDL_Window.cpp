@@ -68,6 +68,17 @@ TSDL::TSDL_Display TSDL::TSDL_Window::display(void)
     return TSDL_Display(_t);
 }
 
+Uint32 TSDL::TSDL_Window::id(void)
+{
+    Uint32 _t = SDL_GetWindowID(_internal_ptr);
+    if (_t == 0)
+    {
+        TSDL::safe_throw<std::runtime_error>("Cannot get window id! SDL_Error: " + std::string(SDL_GetError()));
+        // TODO: noexcept signify error
+    }
+    return _t;
+}
+
 void TSDL::TSDL_Window::window_position(int x, int y)
 {
     this->window_position(this->display(), x, y);

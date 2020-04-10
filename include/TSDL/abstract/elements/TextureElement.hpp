@@ -15,17 +15,17 @@ namespace TSDL
 
             public:
             TextureElement(const TextureElement& other);
-            TextureElement(EventloopAdapter& evloop, TSDL_Renderer& renderer, const point_2d& size, std::shared_ptr<TSDL_Texture> texture);
+            TextureElement(const point_2d& size, std::shared_ptr<TSDL_Texture> texture);
 
             /*
             Re-render this element
             */
-            virtual void render(const ::TSDL::point_2d& dist) override;
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) override;
 
             /*
             Forces this element to be rendered with specified size
             */
-            virtual void render(const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) override;
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) override;
         };
     }
 }

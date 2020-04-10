@@ -1,5 +1,6 @@
 #include "TSDL/TSDL_Eventloop.hpp"
 #include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/TSDL_Utility.hpp"
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -10,13 +11,33 @@
 
 using namespace std::literals::chrono_literals;
 
-TSDL::TSDL_Eventloop::TSDL_Eventloop() {}
+namespace TSDL::impl
+{
+    optional_reference<TSDL_Eventloop> _current_eventloop;
+}
+
+TSDL::TSDL_Eventloop::TSDL_Eventloop()
+{
+    if (impl::_current_eventloop.has_value())
+    {
+        TSDL::safe_throw<std::runtime_error>("There is already an eventloop, running two eventloop simultaneously is not possible");
+        return;
+    }
+    impl::_current_eventloop = *this;
+}
 
 #ifdef __cpp_exceptions
 TSDL::TSDL_Eventloop::TSDL_Eventloop(bool thrownoevhandler, bool thrownorenderhandler) :
 _throw_if_no_event_handler(thrownoevhandler),
 _throw_if_no_render_handler(thrownorenderhandler)
-{}
+{
+    if (impl::_current_eventloop.has_value())
+    {
+        TSDL::safe_throw<std::runtime_error>("There is already an eventloop, running two eventloop simultaneously is not possible");
+        return;
+    }
+    impl::_current_eventloop = *this;
+}
 #endif
 
 TSDL::TSDL_Eventloop::~TSDL_Eventloop()
@@ -25,6 +46,7 @@ TSDL::TSDL_Eventloop::~TSDL_Eventloop()
     {
         this->interrupt();
     }
+    impl::_current_eventloop.reset();
 }
 
 void TSDL::TSDL_Eventloop::add_event_handler(SDL_EventType evType, TSDL::EventHandler handler)
@@ -245,6 +267,11 @@ void TSDL::TSDL_Eventloop::fps_target(double frames)
 double TSDL::TSDL_Eventloop::fps_target() const
 {
     return static_cast<double>((1s).count())/_fps_update_interval.load().count();
+}
+
+TSDL::TSDL_Eventloop& TSDL::current_eventloop()
+{
+    return TSDL::impl::_current_eventloop.value();
 }
 
 #ifdef TSDL_EXPOSE_PYBIND11
