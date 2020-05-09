@@ -3,4 +3,5 @@
 #include "TSDL/abstract/elements/attrs/EventForwarder.hpp"
 #include "TSDL/abstract/elements/attrs/EventLookup.hpp"
 #include "TSDL/abstract/elements/attrs/Gridded.hpp"
+#include "TSDL/abstract/elements/attrs/NoneAttr.hpp"
 #include "TSDL/abstract/elements/attrs/Sizable.hpp"

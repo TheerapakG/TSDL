@@ -3,6 +3,7 @@
 
 #include "TSDL/abstract/elements/TextureElement.hpp"
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
+#include "TSDL/abstract/elements/attrs/NoneAttr.hpp"
 #include "TSDL/abstract/elements/FilledRectangle.hpp"
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
 
@@ -44,11 +45,11 @@ namespace TSDL::elements
             EventHandler _on_button_activated = always_true_event_handler;
 
             public:
-            _Button(const point_2d& size):
+            explicit _Button(const point_2d& size):
                 _Button_Attrs<Derived>(size) {}
-            _Button(const point_2d& size, const attrs::ListenerMap& listeners):
+            explicit _Button(const point_2d& size, const attrs::ListenerMap& listeners):
                 _Button_Attrs<Derived>(size, listeners) {}
-            _Button(const point_2d& size, attrs::ListenerMap&& listeners):
+            explicit _Button(const point_2d& size, attrs::ListenerMap&& listeners):
                 _Button_Attrs<Derived>(size, listeners) {}
 
             EventHandler& on_button_activated()
@@ -222,18 +223,39 @@ namespace TSDL::elements
 
     }
 
-    class Button: public impl::_Button<Button>
+    template <template <typename> typename Attr>
+    class Button_WithAttrs: public Attr<impl::_Button<Button_WithAttrs<Attr>>>
     {
         public:
-        Button(const point_2d& size);
-        Button(const point_2d& size, const attrs::ListenerMap& listeners);
-        Button(const point_2d& size, attrs::ListenerMap&& listeners);
+        template <typename ...Args>
+        Button_WithAttrs(Args... args): Attr<impl::_Button<Button_WithAttrs<Attr>>>(args...) {}
 
-        Button& normal(const std::shared_ptr<RenderSizedElement>& element);
-        Button& hover(const std::shared_ptr<RenderSizedElement>& element);
-        Button& clicked(const std::shared_ptr<RenderSizedElement>& element);
-        Button& front(optional_reference<attrs::sizable<RenderSizedElement>> front);
+        Button_WithAttrs& normal(const std::shared_ptr<RenderSizedElement>& element)
+        {
+            impl::_Button<Button_WithAttrs>::normal(element);
+            return *this;
+        }
+
+        Button_WithAttrs& hover(const std::shared_ptr<RenderSizedElement>& element)
+        {
+            impl::_Button<Button_WithAttrs>::hover(element);
+            return *this;
+        }
+
+        Button_WithAttrs& clicked(const std::shared_ptr<RenderSizedElement>& element)
+        {
+            impl::_Button<Button_WithAttrs>::clicked(element);
+            return *this;
+        }
+
+        Button_WithAttrs& front(optional_reference<attrs::sizable<RenderSizedElement>> front)
+        {
+            impl::_Button<Button_WithAttrs>::front(front);
+            return *this;
+        }
     };
+
+    using Button = typename Button_WithAttrs<attrs::noneattr>;
 }
 
 #endif

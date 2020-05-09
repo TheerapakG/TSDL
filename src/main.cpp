@@ -81,7 +81,7 @@ void generate_visual_from_path()
     );
 
     TSDL::elements::Button* button = new TSDL::elements::Button(
-        {buttontext.size().x + 32, 64}
+        TSDL::point_2d{buttontext.size().x + 32, 64}
     );
 
     button->front(*buttontextelement);
@@ -117,7 +117,7 @@ void generate_visual_from_path()
         );
 
         TSDL::elements::Button* button = new TSDL::elements::Button(
-            {buttontext.size().x + 32, 64}
+            TSDL::point_2d{buttontext.size().x + 32, 64}
         );
 
         button->front(*buttontextelement);
@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
         #endif
         ::font = &font;
 
-        elattrs::dragable<TSDL::elements::Button> button(
+        TSDL::elements::Button_WithAttrs<elattrs::dragable> button(
             [](const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist) -> ::TSDL::point_2d { return start + dist; }, 
             ::TSDL::point_2d{256, 64}
         );
