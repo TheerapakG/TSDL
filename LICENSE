@@ -1,0 +1,36 @@
+LICENSE
+(c) 2020 Theerapak Gomolmanee (https://github.com/TheerapakG)
+
+This license only applies to files with reference to this license. The embedded license
+text within the file is applicable otherwise.
+
+This software is licensed under the terms of the TheerapakG Proprietary License Version 1
+or (at your option) any later version, or alternatively under the terms of the 
+General Public License (GPL) Version 3.
+You may use the software according to either of these licenses as it is suitable for 
+your project.
+
+a) TheerapakG Proprietary License Version 1
+This software may not be distributed in parts or its entirety without prior written 
+agreement by Theerapak Gomolmanee.
+This software must not be used to re-engineer or manipulate any technology used in any of 
+Theerapak Gomolmanee's application or software module, unless permitted by law.
+The name of this software's contributors must not be used to endorse or promote products 
+derived from this software without prior written permission from Theerapak Gomolmanee.
+If you institute patent litigation alleging that any software covered by this license 
+constitutes patent infringement, then any License Agreement granted to you under this 
+license shall terminate as of the date such litigation is filed.
+Before publishing a software under this license, you need to obtain a copy of the 
+License Agreement signed by Theerapak Gomolmanee.
+
+THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES TO THE EXTENT 
+PERMITTED BY LAW, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
+AND FITNESS FOR A PARTICULAR PURPOSE.
+
+IN NO EVENT SHALL THEERAPAAK GOMOLMANEE BE LIABLE FOR ANY DAMAGES, INCLUDING ANY GENERAL, 
+SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES (INCLUDING BUT NOT LIMITED TO LOSS OF DATA 
+OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES) ARISING FROM THE USE OF THIS SOFTWARE, EVEN 
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+b) General Public License (GPL) Version 3
+Details of this licenses can be found at www.gnu.org/licenses/gpl-3.0.html
