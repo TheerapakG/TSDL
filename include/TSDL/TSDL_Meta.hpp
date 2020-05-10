@@ -1,3 +1,12 @@
+//-----------------------------------------------------------------------------
+// This file is subject to the license terms in the LICENSE file found in the 
+// top-level directory of this distribution.
+//
+// No part of this software, including this file, may be copied, modified, 
+// propagated, or distributed except according to the terms contained in the 
+// LICENSE file.
+//-----------------------------------------------------------------------------
+
 #ifndef TSDL_META_
 #define TSDL_META_
 
@@ -228,6 +237,56 @@ namespace TSDL
 
     template <typename T>
     using transformer = std::function<T(const T&)>;
+
+    /*
+    Make T parameterized by the same template argument of U
+    */
+    template <template <typename...> typename T, typename U>
+    struct make_same_parameterized {}; // U is not a parametized template
+
+    /*
+    Make T parameterized by the same template argument of U
+    */
+    template <template <typename...> typename T, template <typename...> typename _U, typename... _UTypes>
+    struct make_same_parameterized<T, _U<_UTypes...>>
+    {
+        using type = T<_UTypes...>;
+    };
+
+    /*
+    Make T parameterized by the same template argument of Us joined together
+    */
+    template <template <typename...> typename T, typename... Us>
+    struct make_merge_parameterized {}; // One of the U is not a parametized template
+
+    /*
+    Make T parameterized by the same template argument of Us joined together
+    */
+    template <template <typename...> typename T, typename U>
+    struct make_merge_parameterized
+    {
+        using type = typename make_same_parameterized<T, U>::type;
+    };
+
+    /*
+    Make T parameterized by the same template argument of Us joined together
+    */
+    template <
+        template <typename...> typename T, 
+        template <typename...> typename _First_U, 
+        template <typename...> typename _Second_U, 
+        typename... _First_UTypes, 
+        typename... _Second_UTypes, 
+        typename... _Rest_U
+    >
+    struct make_merge_parameterized<T, _First_U<_First_UTypes...>, _Second_U<_Second_UTypes...>, _Rest_U...>
+    {
+        using type = typename make_merge_parameterized<
+            T, 
+            std::tuple<_First_UTypes..., _Second_UTypes..>, 
+            _Rest_U...
+        >::type;
+    };
 }
 
 namespace TSDL::traits
@@ -400,6 +459,45 @@ namespace TSDL::traits
 
     template <typename T>
     inline constexpr bool is_forward_iterable_v = is_forward_iterable<T>::value;
+
+    /*
+    Check if T is parameterized type of template U
+    */
+    template <typename T, template <typename...> typename U>
+    struct is_parameterized_template
+    {
+        static constexpr bool value = false;
+    };
+
+    /*
+    Check if T is parameterized type of template U
+    */
+    template <template <typename...> typename U, typename... Types>
+    struct is_parameterized_template <U<Types...>, U>
+    {
+        static constexpr bool value = true;
+    };
+
+    /*
+    Get information about the template
+    */
+    template <typename T>
+    struct template_traits {}; // T is not a parametized template
+
+    /*
+    Get information about the template
+    */
+    template <template <typename...> typename U, typename... Types>
+    struct template_traits <U<Types...>>
+    {
+        template <typename... Ts>
+        using other_parameterized_type = U<Ts...>;
+
+        template <size_t I>
+        using argument = typename std::tuple_element<I, std::tuple<Types...>>::type;
+
+        static constexpr size_t size = sizeof...(Types);
+    };
 }
 
 #endif
