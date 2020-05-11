@@ -238,6 +238,13 @@ namespace TSDL
     template <typename T>
     using transformer = std::function<T(const T&)>;
 
+    template <template <typename...> typename Template, typename... Types>
+    struct partial
+    {
+        template <typename... Rest_Types>
+        using type = typename Template<Types..., Rest_Types...>;
+    };
+
     /*
     Make T parameterized by the same template argument of U
     */
@@ -263,7 +270,7 @@ namespace TSDL
     Make T parameterized by the same template argument of Us joined together
     */
     template <template <typename...> typename T, typename U>
-    struct make_merge_parameterized
+    struct make_merge_parameterized<T, U>
     {
         using type = typename make_same_parameterized<T, U>::type;
     };
@@ -281,12 +288,68 @@ namespace TSDL
     >
     struct make_merge_parameterized<T, _First_U<_First_UTypes...>, _Second_U<_Second_UTypes...>, _Rest_U...>
     {
-        using type = typename make_merge_parameterized<
-            T, 
-            std::tuple<_First_UTypes..., _Second_UTypes..>, 
-            _Rest_U...
-        >::type;
+        using type = typename make_merge_parameterized<T, std::tuple<_First_UTypes..., _Second_UTypes...>, _Rest_U...>::type;
     };
+
+    /*
+    Remove all template argument of parameterized template U satisfying Predicate
+    Predicate<type>::value must yield constexpr bool value
+    */
+    template <template <typename> typename Predicate, typename U>
+    struct remove_parameterized {}; // U is not a parametized template
+
+    /*
+    Remove all template argument of parameterized template U satisfying Predicate
+    Predicate<type>::value must yield constexpr bool value
+    */
+    template <template <typename> typename Predicate, template <typename...> typename _U, typename... _UTypes>
+    struct remove_parameterized<Predicate, _U<_UTypes...>>
+    {
+        template <typename _Removed_Tpl, typename... _Rest_UTypes>
+        struct _remove_iterator {};
+
+        template <typename _Removed_Tpl, typename _First_UTypes, typename... _Rest_UTypes>
+        struct _remove_iterator<_Removed_Tpl, _First_UTypes, _Rest_UTypes...>
+        {
+            template <typename _SNIFAE = void>
+            struct _remove_iterator_remove_current
+            {
+                template <typename _Tpl>
+                struct _push_back__first_utypes_tpl {}; // Tpl is not a parametized template
+
+                template <template <typename...> typename __Tpl, typename... __TplTypes>
+                struct _push_back__first_utypes_tpl<typename __Tpl<__TplTypes...>>
+                {
+                    using type = typename __Tpl<__TplTypes..., _First_UTypes>;
+                };
+
+                using type = typename _remove_iterator<typename _push_back__first_utypes_tpl<_Removed_Tpl>::type, _Rest_UTypes...>::type;
+            };
+
+            template <>
+            struct _remove_iterator_remove_current<std::enable_if_t<Predicate<_First_UTypes>::value>>
+            {
+                using type = typename _remove_iterator<_Removed_Tpl, _Rest_UTypes...>::type;
+            };
+
+            using type = typename _remove_iterator_remove_current<>::type;
+        };
+
+        template <typename _Removed_Tpl>
+        struct _remove_iterator<_Removed_Tpl>
+        {
+            using type = typename make_same_parameterized<_U, _Removed_Tpl>::type;
+        };
+
+        using type = typename _remove_iterator<std::tuple<>, _UTypes...>::type;
+    };
+
+    /*
+    Remove all template T from the template argument of parameterized template U
+    TODO:
+    */
+    template <template <typename...> typename T, typename U>
+    struct remove_parameterized_template {}; // U is not a parametized template
 }
 
 namespace TSDL::traits
@@ -477,6 +540,9 @@ namespace TSDL::traits
     {
         static constexpr bool value = true;
     };
+
+    template <typename T, template <typename...> typename U>
+    inline constexpr bool is_parameterized_template_v = is_parameterized_template<T, U>::value;
 
     /*
     Get information about the template

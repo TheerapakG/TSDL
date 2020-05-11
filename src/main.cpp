@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
         #endif
         ::font = &font;
 
-        TSDL::elements::Button_WithAttrs<elattrs::dragable> button(
+        TSDL::elements::Button::push_back_attr<elattrs::dragable> button(
             [](const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist) -> ::TSDL::point_2d { return start + dist; }, 
             ::TSDL::point_2d{256, 64}
         );
