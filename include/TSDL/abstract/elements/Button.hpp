@@ -17,6 +17,7 @@
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
 
 #include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/utilities/meta_list.hpp"
 #include <memory>
 #include <functional>
 
@@ -232,39 +233,49 @@ namespace TSDL::elements
 
     }
 
-    template <template <typename> typename Attr>
-    class Button_WithAttrs: public Attr<impl::_Button<Button_WithAttrs<Attr>>>
+    template <template <typename> typename... Attrs>
+    class Button_: public util::reduce<util::meta_list_template<Attrs...>, impl::_Button<Button_<Attrs...>>>::type
     {
+        using Attr_List = typename util::meta_list_template<Attrs...>;
+        using Impl = typename impl::_Button<Button_<Attrs...>>;
+        using Parent = typename util::reduce<util::meta_list_template<Attrs...>, Impl>::type;
+
         public:
+        template <template <typename> typename Attr>
+        using push_front_attr = typename Button_<Attr, Attrs...>;
+
+        template <template <typename> typename Attr>
+        using push_back_attr = typename Button_<Attrs..., Attr>;
+        
         template <typename ...Args>
-        Button_WithAttrs(Args... args): Attr<impl::_Button<Button_WithAttrs<Attr>>>(args...) {}
+        Button_(Args... args): Parent(args...) {}
 
-        Button_WithAttrs& normal(const std::shared_ptr<RenderSizedElement>& element)
+        Button_& normal(const std::shared_ptr<RenderSizedElement>& element)
         {
-            impl::_Button<Button_WithAttrs>::normal(element);
+            Impl::normal(element);
             return *this;
         }
 
-        Button_WithAttrs& hover(const std::shared_ptr<RenderSizedElement>& element)
+        Button_& hover(const std::shared_ptr<RenderSizedElement>& element)
         {
-            impl::_Button<Button_WithAttrs>::hover(element);
+            Impl::hover(element);
             return *this;
         }
 
-        Button_WithAttrs& clicked(const std::shared_ptr<RenderSizedElement>& element)
+        Button_& clicked(const std::shared_ptr<RenderSizedElement>& element)
         {
-            impl::_Button<Button_WithAttrs>::clicked(element);
+            Impl::clicked(element);
             return *this;
         }
 
-        Button_WithAttrs& front(optional_reference<attrs::sizable<RenderSizedElement>> front)
+        Button_& front(optional_reference<attrs::sizable<RenderSizedElement>> front)
         {
-            impl::_Button<Button_WithAttrs>::front(front);
+            Impl::front(front);
             return *this;
         }
     };
 
-    using Button = typename Button_WithAttrs<attrs::noneattr>;
+    using Button = typename Button_<>;
 }
 
 #endif
