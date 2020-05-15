@@ -13,6 +13,7 @@
 #include "TSDL/abstract/elements/TextureElement.hpp"
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
 #include "TSDL/abstract/elements/attrs/NoneAttr.hpp"
+#include "TSDL/abstract/elements/AttredType.hpp"
 #include "TSDL/abstract/elements/FilledRectangle.hpp"
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
 
@@ -234,21 +235,10 @@ namespace TSDL::elements
     }
 
     template <template <typename> typename... Attrs>
-    class Button_: public util::reduce<util::meta_list_template<Attrs...>, impl::_Button<Button_<Attrs...>>>::type
-    {
-        using Attr_List = typename util::meta_list_template<Attrs...>;
-        using Impl = typename impl::_Button<Button_<Attrs...>>;
-        using Parent = typename util::reduce<util::meta_list_template<Attrs...>, Impl>::type;
-
-        public:
-        template <template <typename> typename Attr>
-        using push_front_attr = typename Button_<Attr, Attrs...>;
-
-        template <template <typename> typename Attr>
-        using push_back_attr = typename Button_<Attrs..., Attr>;
-        
+    class Button_: public ATTRedType<impl::_Button, Button_, Attrs...>
+    {        
         template <typename ...Args>
-        Button_(Args... args): Parent(args...) {}
+        Button_(Args... args): ATTRedType<impl::_Button, Button_, Attrs...>(args...) {}
 
         Button_& normal(const std::shared_ptr<RenderSizedElement>& element)
         {
