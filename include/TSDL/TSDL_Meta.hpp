@@ -26,6 +26,12 @@
 
 namespace TSDL
 {
+    namespace impl
+    {
+        template <template <typename...> typename... Templates>
+        struct _template_holder {};
+    }
+
     template <bool u, bool ...v>
     struct _and
     {
@@ -238,10 +244,23 @@ namespace TSDL
     template <typename T>
     using transformer = std::function<T(const T&)>;
 
+    template <template <typename...> typename T, template <typename...> typename U>
+    struct is_same_template: std::false_type {};
+
+    template <template <typename...> typename T>
+    struct is_same_template<T, T>: std::true_type {};
+
     template <template <typename...> typename Template, typename... Types>
     struct partial
     {
         template <typename... Rest_Types>
+        using type = typename Template<Types..., Rest_Types...>;
+    };
+
+    template <template <template <typename...> typename...> typename Template, template <typename...> typename... Types>
+    struct partial_template
+    {
+        template <template <typename...> typename... Rest_Types>
         using type = typename Template<Types..., Rest_Types...>;
     };
 
@@ -256,6 +275,21 @@ namespace TSDL
     */
     template <template <typename...> typename T, template <typename...> typename _U, typename... _UTypes>
     struct make_same_parameterized<T, _U<_UTypes...>>
+    {
+        using type = T<_UTypes...>;
+    };
+
+    /*
+    Make T parameterized by the same template argument of U
+    */
+    template <template <template <typename...> typename...> typename T, typename U>
+    struct make_same_parameterized_template {}; // U is not a parametized template
+
+    /*
+    Make T parameterized by the same template argument of U
+    */
+    template <template <template <typename...> typename...> typename T, template <template <typename...> typename...> typename _U, template <typename...> typename... _UTypes>
+    struct make_same_parameterized_template<T, _U<_UTypes...>>
     {
         using type = T<_UTypes...>;
     };
@@ -289,6 +323,37 @@ namespace TSDL
     struct make_merge_parameterized<T, _First_U<_First_UTypes...>, _Second_U<_Second_UTypes...>, _Rest_U...>
     {
         using type = typename make_merge_parameterized<T, std::tuple<_First_UTypes..., _Second_UTypes...>, _Rest_U...>::type;
+    };
+
+    /*
+    Make T parameterized by the same template argument of Us joined together
+    */
+    template <template <template <typename...> typename...> typename T, typename... Us>
+    struct make_merge_parameterized_template {}; // One of the U is not a parametized template
+
+    /*
+    Make T parameterized by the same template argument of Us joined together
+    */
+    template <template <template <typename...> typename...> typename T, typename U>
+    struct make_merge_parameterized_template<T, U>
+    {
+        using type = typename make_same_parameterized_template<T, U>::type;
+    };
+
+    /*
+    Make T parameterized by the same template argument of Us joined together
+    */
+    template <
+        template <template <typename...> typename...> typename T, 
+        template <template <typename...> typename...> typename _First_U, 
+        template <template <typename...> typename...> typename _Second_U, 
+        template <typename...> typename... _First_UTypes, 
+        template <typename...> typename... _Second_UTypes, 
+        typename... _Rest_U
+    >
+    struct make_merge_parameterized_template<T, _First_U<_First_UTypes...>, _Second_U<_Second_UTypes...>, _Rest_U...>
+    {
+        using type = typename make_merge_parameterized_template<T, impl::_template_holder<_First_UTypes..., _Second_UTypes...>, _Rest_U...>::type;
     };
 
     /*
@@ -345,11 +410,56 @@ namespace TSDL
     };
 
     /*
-    Remove all template T from the template argument of parameterized template U
-    TODO:
+    Remove all template template argument of parameterized template U satisfying Predicate
     */
-    template <template <typename...> typename T, typename U>
+    template <template <template <typename...> typename> typename Predicate, typename U>
     struct remove_parameterized_template {}; // U is not a parametized template
+
+    /*
+    Remove all template template argument of parameterized template U satisfying Predicate
+    Predicate<type>::value must yield constexpr bool value
+    */
+    template <template <template <typename...> typename> typename Predicate, template <template <typename...> typename...> typename _U, template <typename...> typename... _UTypes>
+    struct remove_parameterized_template<Predicate, _U<_UTypes...>>
+    {
+        template <typename _Removed_Tpl, template <typename...> typename... _Rest_UTypes>
+        struct _remove_iterator {};
+
+        template <typename _Removed_Tpl, template <typename...> typename _First_UTypes, template <typename...> typename... _Rest_UTypes>
+        struct _remove_iterator<_Removed_Tpl, _First_UTypes, _Rest_UTypes...>
+        {
+            template <typename _SNIFAE = void>
+            struct _remove_iterator_remove_current
+            {
+                template <typename _Tpl>
+                struct _push_back__first_utypes_tpl {}; // Tpl is not a parametized template template
+
+                template <template <template <typename...> typename...> typename __Tpl, template <typename...> typename... __TplTypes>
+                struct _push_back__first_utypes_tpl<typename __Tpl<__TplTypes...>>
+                {
+                    using type = typename __Tpl<__TplTypes..., _First_UTypes>;
+                };
+
+                using type = typename _remove_iterator<typename _push_back__first_utypes_tpl<_Removed_Tpl>::type, _Rest_UTypes...>::type;
+            };
+
+            template <>
+            struct _remove_iterator_remove_current<std::enable_if_t<Predicate<_First_UTypes>::value>>
+            {
+                using type = typename _remove_iterator<_Removed_Tpl, _Rest_UTypes...>::type;
+            };
+
+            using type = typename _remove_iterator_remove_current<>::type;
+        };
+
+        template <typename _Removed_Tpl>
+        struct _remove_iterator<_Removed_Tpl>
+        {
+            using type = typename make_same_parameterized_template<_U, _Removed_Tpl>::type;
+        };
+
+        using type = typename _remove_iterator<impl::_template_holder<>, _UTypes...>::type;
+    };
 }
 
 namespace TSDL::traits

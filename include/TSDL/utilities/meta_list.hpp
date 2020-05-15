@@ -43,14 +43,14 @@ namespace TSDL::util
         template <typename T, std::enable_if_t<traits::is_parameterized_template_v<T, meta_list>>>
         using merge = typename make_merge_parameterized<meta_list, std::tuple<Types...>, T>::type;
 
-        template <typename T>
-        using remove = typename remove_parameterized<partial<std::is_same, T>::type, meta_list<Types...>>;
-
         /*
         Predicate<type>::value must yield constexpr bool value
         */
         template <template <typename> typename Predicate>
         using remove_if = typename remove_parameterized<Predicate, meta_list<Types...>>;
+
+        template <typename T>
+        using remove = typename remove_if<partial<std::is_same, T>::type>;
     };
 
     template <template <typename...> typename... Templates>
@@ -94,23 +94,23 @@ namespace TSDL::util
         static constexpr bool empty = (size==0);
 
         template <template <typename...> typename T>
-        using push_front = typename meta_list<T, Templates...>;
+        using push_front = typename meta_list_template<T, Templates...>;
 
         template <template <typename...> typename T>
-        using push_back = typename meta_list<Templates..., T>;
+        using push_back = typename meta_list_template<Templates..., T>;
         
-        // // merge two meta_list together
-        // template <typename T, std::enable_if_t<traits::is_parameterized_template<T, meta_list>>>
-        // using merge = typename make_merge_parameterized<meta_list, std::tuple<Types...>, T>::type;
+        // merge two meta_list together
+        template <typename T, std::enable_if_t<traits::is_parameterized_template<T, meta_list>>>
+        using merge = typename make_merge_parameterized_template<meta_list_template, meta_list_template<Types...>, T>::type;
 
-        // template <typename T>
-        // using remove = typename remove_parameterized<partial<std::is_same, T>::type, meta_list<Types...>>;
+        /*
+        Predicate<type>::value must yield constexpr bool value
+        */
+        template <template <template <typename...> typename> typename Predicate>
+        using remove_if = typename remove_parameterized_template<Predicate, meta_list_template<Types...>>;
 
-        // /*
-        // Predicate<type>::value must yield constexpr bool value
-        // */
-        // template <template <typename> typename Predicate>
-        // using remove_if = typename remove_parameterized<Predicate, meta_list<Types...>>;        
+        template <template <typename...> typename T>
+        using remove = typename remove_if<partial_template<is_same_template, T>::type>;
     };
 
     template <typename Meta_Template_Container, typename T>
