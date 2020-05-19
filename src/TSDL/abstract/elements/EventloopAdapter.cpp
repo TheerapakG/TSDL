@@ -270,6 +270,11 @@ namespace TSDL::elements
         _windows.erase(window_adapter.window().id());
     }
 
+    TSDL_Eventloop::clock::time_point EventloopAdapter::now()
+    {
+        return _evloop.now();
+    }
+
     const std::unordered_map <Uint32, std::reference_wrapper<WindowAdapter>>& EventloopAdapter::windows()
     {
         return _windows;

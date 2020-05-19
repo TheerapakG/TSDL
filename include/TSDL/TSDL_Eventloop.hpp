@@ -54,6 +54,8 @@ namespace TSDL
         bool _throw_if_no_render_handler = false;
         #endif
 
+        clock::time_point _now;
+
         std::atomic<bool> _track_fps = true;
         std::atomic<clock::duration> _fps_update_interval = std::chrono::duration_cast<clock::duration>(1s);
         std::recursive_mutex _lock_frame_calc;
@@ -92,6 +94,8 @@ namespace TSDL
         void run();
 
         void interrupt();
+
+        clock::time_point now();
 
         void track_fps(bool track = true);
 

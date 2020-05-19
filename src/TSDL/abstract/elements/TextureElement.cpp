@@ -17,6 +17,11 @@ TSDL::elements::TextureElement::TextureElement(const TextureElement& other):
 TSDL::elements::TextureElement::TextureElement(const ::TSDL::point_2d& size, std::shared_ptr<::TSDL::TSDL_Texture> texture):
     attrs::sizable<RenderSizedElement>(size), _texture(texture) {}
 
+TSDL::TSDL_Texture& TSDL::elements::TextureElement::texture()
+{
+    return *_texture;
+}
+
 void TSDL::elements::TextureElement::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
 {
     render(window, dist, size());

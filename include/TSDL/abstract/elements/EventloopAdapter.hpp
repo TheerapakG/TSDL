@@ -59,6 +59,8 @@ namespace TSDL
             */
             void register_call_next(std::function<void()> call);
 
+            TSDL_Eventloop::clock::time_point now();
+
             const std::unordered_map <Uint32, std::reference_wrapper<WindowAdapter>>& windows();
         };
 
