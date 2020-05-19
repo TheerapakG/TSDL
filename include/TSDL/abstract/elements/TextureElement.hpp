@@ -26,6 +26,8 @@ namespace TSDL
             TextureElement(const TextureElement& other);
             TextureElement(const point_2d& size, std::shared_ptr<TSDL_Texture> texture);
 
+            TSDL_Texture& texture();
+
             /*
             Re-render this element
             */

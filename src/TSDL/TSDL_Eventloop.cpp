@@ -129,17 +129,17 @@ void TSDL::TSDL_Eventloop::_run_step()
     #ifndef TSDL_USE_EMSCRIPTEN
         if(_limit_fps.load())
         {
-            clock::time_point now = clock::now();
-            if((now - _time_last_frame) < _fps_target_interval.load()) return;
-            _time_last_frame = now;
+            _now = clock::now();
+            if((_now - _time_last_frame) < _fps_target_interval.load()) return;
+            _time_last_frame = _now;
         }
     #endif
         _render();
         if(_track_fps.load())
         {
-            clock::time_point now = clock::now();
+            _now = clock::now();
             std::scoped_lock lock(_lock_frame_calc);
-            clock::duration diff = now - _time_since_last;
+            clock::duration diff = _now - _time_since_last;
             if(diff >= _fps_update_interval.load())
             {
                 _previous_fps.store(static_cast<double>(_frame_since_last + 1) / std::chrono::duration_cast<std::chrono::seconds>(diff).count());
@@ -209,6 +209,11 @@ void TSDL::TSDL_Eventloop::interrupt()
 #else
     emscripten_cancel_main_loop();
 #endif    
+}
+
+TSDL::TSDL_Eventloop::clock::time_point TSDL::TSDL_Eventloop::now()
+{
+    return _now;
 }
 
 void TSDL::TSDL_Eventloop::track_fps(bool track)
