@@ -15,7 +15,7 @@
 
 namespace TSDL::elements
 {
-    template <template <typename> typename Base, template <typename...> typename Final, template <typename> typename... Attrs>
+    template <template <typename> typename Base, template <template <typename> typename...> typename Final, template <typename> typename... Attrs>
     class ATTRedType: public util::reduce<util::meta_list_template<Attrs...>, Base<Final<Attrs...>>>::type
     {
         private:
@@ -24,7 +24,7 @@ namespace TSDL::elements
         using Parent = typename util::reduce<Attr_List, Impl>::type;
 
         public:
-        friend class Final;
+        friend class Final<Attrs...>;
 
         template <template <typename> typename Attr>
         using push_front_attr = typename Final<Attr, Attrs...>;
@@ -33,10 +33,10 @@ namespace TSDL::elements
         using push_back_attr = typename Final<Attrs..., Attr>;
 
         template <template <typename> typename Attr>
-        using remove_attr = typename make_same_parameterized_template<Final, typename Attr_List::remove<Attr>>;
+        using remove_attr = typename make_same_parameterized_template<Final, typename Attr_List::template remove<Attr>>::type;
 
         template <template <template <typename> typename> typename Predicate>
-        using remove_attr_if = typename make_same_parameterized_template<Final, typename Attr_List::remove_if<Predicate>>;
+        using remove_attr_if = typename make_same_parameterized_template<Final, typename Attr_List::template remove_if<Predicate>>::type;
         
         template <typename ...Args>
         ATTRedType(Args... args): Parent(args...) {}

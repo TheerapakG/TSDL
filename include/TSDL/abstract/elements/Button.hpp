@@ -237,6 +237,7 @@ namespace TSDL::elements
     template <template <typename> typename... Attrs>
     class Button_: public ATTRedType<impl::_Button, Button_, Attrs...>
     {        
+        public:
         template <typename ...Args>
         Button_(Args... args): ATTRedType<impl::_Button, Button_, Attrs...>(args...) {}
 

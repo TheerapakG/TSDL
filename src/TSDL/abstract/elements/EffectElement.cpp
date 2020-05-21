@@ -13,6 +13,11 @@
 
 namespace TSDL::elements
 {
+    point_2d EffectElement::size() const
+    {
+        return _src_size.size();
+    }
+
     void EffectElement::modify_texture_function(const TextureModifyFunc& function)
     {
         _texture_modifier = function;
@@ -56,7 +61,6 @@ namespace TSDL::elements
             _texture_modifier(*_return_texture);
 
             window.renderer().target(_prev_target?make_optional_ref(_prev_target.value()):std::nullopt);
-            window.renderer().clear({0, 0, 0, 0});
             window.renderer().copy_from(
                 *_return_texture, 
                 make_optional_ref(rect{{0, 0}, _current_texture_dim}), 
