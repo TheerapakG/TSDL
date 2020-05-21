@@ -7,27 +7,4 @@
 // LICENSE file.
 //-----------------------------------------------------------------------------
 
-#ifndef TSDL_EFFECTS_FADE_
-#define TSDL_EFFECTS_FADE_
-
-#include <chrono>
-
-// START FWD_DECL
-namespace TSDL
-{
-    class TSDL_Texture;
-
-    namespace elements
-    {
-        class EffectElement;
-    }
-}
-// END FWD_DECL
-
-namespace TSDL::effects
-{
-    void fade_in(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms);
-    void fade_out(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms);
-}
-
-#endif
+#include "effects/fade.hpp"

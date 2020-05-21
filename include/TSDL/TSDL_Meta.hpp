@@ -250,6 +250,13 @@ namespace TSDL
     template <template <typename...> typename T>
     struct is_same_template<T, T>: std::true_type {};
 
+    template <template <template <typename...> typename, template <typename...> typename> typename T>
+    struct as_variadic_template_template
+    {
+        template <template <typename...> typename... Types>
+        using type = typename T<Types...>;
+    };
+
     template <template <typename...> typename Template, typename... Types>
     struct partial
     {
@@ -257,12 +264,18 @@ namespace TSDL
         using type = typename Template<Types..., Rest_Types...>;
     };
 
+    template <typename T>
+    using is_type = partial<std::is_same, T>;
+
     template <template <template <typename...> typename...> typename Template, template <typename...> typename... Types>
     struct partial_template
     {
         template <template <typename...> typename... Rest_Types>
         using type = typename Template<Types..., Rest_Types...>;
     };
+
+    template <template <typename...> typename T>
+    using is_template = partial_template<as_variadic_template_template<is_same_template>::type, T>;
 
     /*
     Make T parameterized by the same template argument of U
@@ -653,6 +666,27 @@ namespace TSDL::traits
 
     template <typename T, template <typename...> typename U>
     inline constexpr bool is_parameterized_template_v = is_parameterized_template<T, U>::value;
+
+    /*
+    Check if T is parameterized type of template U
+    */
+    template <typename T, template <template <typename...> typename...> typename U>
+    struct is_parameterized_template_template
+    {
+        static constexpr bool value = false;
+    };
+
+    /*
+    Check if T is parameterized type of template U
+    */
+    template <template <template <typename...> typename...> typename U, template <typename...> typename... Types>
+    struct is_parameterized_template_template <U<Types...>, U>
+    {
+        static constexpr bool value = true;
+    };
+
+    template <typename T, template <template <typename...> typename...> typename U>
+    inline constexpr bool is_parameterized_template_template_v = is_parameterized_template_template<T, U>::value;
 
     /*
     Get information about the template

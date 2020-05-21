@@ -19,7 +19,7 @@ namespace TSDL
 {
     namespace elements
     {
-        class EffectElement: public attrs::sizable<RenderSizedElement>
+        class EffectElement: public attrs::sized<DependentElement>
         {
             using TextureModifyFunc = std::function<void(TSDL_Texture&)>;
 
@@ -29,13 +29,22 @@ namespace TSDL
             point_2d _current_texture_dim;
             // TODO: texture modifier as effect object vector as documented
             TextureModifyFunc _texture_modifier;
-            TSDL_Renderer& _renderer;
             TSDL_Texture* _src_texture = nullptr; 
             TSDL_Texture* _return_texture = nullptr; 
 
             public:
-            template<typename T, typename U = std::enable_if_t<std::is_base_of_v<attrs::Sized, T>>>
-            EffectElement(const T& src): _src_size(src), _src_element(src) {}
+            template<
+                typename T, 
+                typename U = std::enable_if_t<
+                    _and_v<
+                        std::is_base_of_v<attrs::Sized, T>,
+                        std::is_base_of_v<DependentElement, T>
+                    >
+                >
+            >
+            EffectElement(T& src): _src_size(src), _src_element(src){}
+
+            virtual point_2d size() const override;
 
             void modify_texture_function(const TextureModifyFunc& function);
             void modify_texture_function();

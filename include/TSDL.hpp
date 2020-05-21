@@ -25,6 +25,7 @@
     #include "TSDL/TSDL_Music.hpp"
     #include "TSDL/TSDL_Font.hpp"
 
+    #include "TSDL/abstract/effects.hpp"
     #include "TSDL/abstract/elements.hpp"
 
     #ifdef TSDL_EXPOSE_PYBIND11

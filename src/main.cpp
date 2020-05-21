@@ -64,8 +64,11 @@ void generate_visual_from_path()
         )
     );
 
-    grid->add_child(*pathtextelement, {0, 0});
-    _previous_visual_elements.push_back(pathtextelement);
+    TSDL::elements::EffectElement* pathtexteffect = new TSDL::elements::EffectElement(*pathtextelement);
+
+    grid->add_child(*pathtexteffect, {0, 0});
+    _previous_visual_elements.push_back(pathtexteffect);
+    _dependent_visual_elements.push_back(pathtextelement);
 
     int y = pathtext.size().y + 16;
 
@@ -134,6 +137,8 @@ void generate_visual_from_path()
         _dependent_visual_elements.push_back(buttontextelement);
 
         y += button->size().y;
+
+        TSDL::effects::fade_out(*pathtexteffect, 5000ms);
     }   
 }
 
@@ -198,11 +203,13 @@ int main(int argc, char* argv[])
         delete buttontext;
 
         button.front(buttontextelement);
+
         grid->add_child(button, {SCREEN_WIDTH-384, 0});
 
         generate_visual_from_path();
 
         std::thread t(say_fps);
+
         eventloop.run();
         t.join();        
     }

@@ -9,6 +9,7 @@
 
 #include "elements/attrs.hpp"
 #include "elements/Button.hpp"
+#include "elements/EffectElement.hpp"
 #include "elements/Element.hpp"
 #include "elements/ElementHolder.hpp"
 #include "elements/EventloopAdapter.hpp"
