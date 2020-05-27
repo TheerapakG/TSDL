@@ -9,6 +9,7 @@
 #include <typeinfo>
 #include <filesystem>
 using namespace std::literals::chrono_literals;
+namespace el = TSDL::elements;
 namespace elattrs = TSDL::elements::attrs;
 
 //Screen dimension constants
@@ -54,7 +55,7 @@ void generate_visual_from_path()
 
     TSDL::TSDL_Surface pathtext("Current path: " + current_path.u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
-    TSDL::elements::TextureElement* pathtextelement = new TSDL::elements::TextureElement(
+   el::effectelement<el::TextureElement>* pathtexteffect = new el::effectelement<el::TextureElement>(
         pathtext.size(),
         std::shared_ptr <TSDL::TSDL_Texture> ( 
             new TSDL::TSDL_Texture(
@@ -64,11 +65,8 @@ void generate_visual_from_path()
         )
     );
 
-    TSDL::elements::EffectElement* pathtexteffect = new TSDL::elements::EffectElement(*pathtextelement);
-
     grid->add_child(*pathtexteffect, {0, 0});
     _previous_visual_elements.push_back(pathtexteffect);
-    _dependent_visual_elements.push_back(pathtextelement);
 
     int y = pathtext.size().y + 16;
 
