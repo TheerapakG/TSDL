@@ -18,6 +18,7 @@
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
 
 #include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/utilities/optional_with_base.hpp"
 #include "TSDL/utilities/meta_list.hpp"
 #include <memory>
 #include <functional>
@@ -48,8 +49,7 @@ namespace TSDL::elements
             std::shared_ptr<RenderSizedElement> _normal = std::make_shared<FilledRectangle>(point_2d{0, 0}, color_rgba{128, 128, 128, 128});
             std::shared_ptr<RenderSizedElement> _hover = std::make_shared<FilledRectangle>(point_2d{0, 0}, color_rgba{192, 192, 192, 128});
             std::shared_ptr<RenderSizedElement> _clicked = std::make_shared<FilledRectangle>(point_2d{0, 0}, color_rgba{211, 211, 211, 128});
-            optional_reference<attrs::sizable<RenderSizedElement>> _front;
-            int _padding = 8;
+            util::optional_with_base<attrs::Sized, DependentElement> _front;
 
             ButtonState state = ButtonState::NORMAL;
 
@@ -142,27 +142,28 @@ namespace TSDL::elements
                 _clicked = element;
                 return *this;
             }
-            _Button<Derived>& front(optional_reference<attrs::sizable<RenderSizedElement>> front)
+
+            _Button<Derived>& front(const util::optional_with_base<attrs::Sized, DependentElement>& front)
             {
                 _front = front;
                 return *this;
             }
 
-            std::shared_ptr<RenderSizedElement> normal()
+            const std::shared_ptr<RenderSizedElement>& normal() const
             {
                 return _normal;
             }
-            std::shared_ptr<RenderSizedElement> hover()
+            const std::shared_ptr<RenderSizedElement>& hover() const
             {
                 return _hover;
             }
-            std::shared_ptr<RenderSizedElement> clicked()
+            const std::shared_ptr<RenderSizedElement>& clicked() const
             {
                 return _clicked;
             }
-            attrs::sizable<RenderSizedElement>& front()
+            const util::optional_with_base<attrs::Sized, DependentElement>& front() const
             {
-                return _front.value();
+                return _front;
             }
 
             /*
@@ -215,17 +216,8 @@ namespace TSDL::elements
 
                 if(_front)
                 {
-                    attrs::sizable<RenderSizedElement>& _telement = _front.value().get();
-                    const ::TSDL::point_2d texture_final_size = size() - 2 * ::TSDL::point_2d(_padding, _padding);
-                    const ::TSDL::point_2d texture_size = _telement.size();
-                    double x_ratio = static_cast<double>(texture_final_size.x) / texture_size.x;
-                    double y_ratio = static_cast<double>(texture_final_size.y) / texture_size.y;
-                    double ratio = std::min(x_ratio, y_ratio);
-                    const ::TSDL::point_2d render_size(std::round(ratio * texture_size.x), std::round(ratio * texture_size.y));
-                    if(ratio>0)
-                    {
-                        _telement.render(window, dist + (size() - render_size)/2, render_size);
-                    }
+                    const ::TSDL::point_2d render_size = util::get<attrs::Sized>(_front).size();
+                    util::get<DependentElement>(_front).render(window, dist + (size() - render_size)/2);
                 }
 
                 _Button_Attrs<Derived>::not_update();
@@ -259,7 +251,7 @@ namespace TSDL::elements
             return *this;
         }
 
-        Button_& front(optional_reference<attrs::sizable<RenderSizedElement>> front)
+        Button_& front(const util::optional_with_base<attrs::Sized, DependentElement>& front)
         {
             Impl::front(front);
             return *this;
