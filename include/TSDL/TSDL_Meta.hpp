@@ -205,13 +205,13 @@ namespace TSDL
     using optional_reference = typename std::optional<std::reference_wrapper<typename std::remove_reference_t<T>>>;
 
     template <typename T>
-    optional_reference<T> make_optional_ref(T&& ref)
+    optional_reference<typename std::remove_reference_t<T>> make_optional_ref(T&& ref)
     {
         return ref;
     }
 
     template <typename T>
-    optional_reference<T> make_optional_ref()
+    optional_reference<typename std::remove_reference_t<T>> make_optional_ref()
     {
         return optional_reference<T>();
     }
@@ -230,16 +230,28 @@ namespace TSDL
     using optional_const_reference = typename optional_reference<typename std::add_const_t<typename std::remove_reference_t<T>>>;
 
     template <typename T>
-    optional_const_reference<T> make_optional_const_ref(T&& ref)
+    optional_const_reference<typename std::remove_reference_t<T>> make_optional_const_ref(T&& ref)
     {
         return ref;
     }
 
     template <typename T>
-    optional_const_reference<T> make_optional_const_ref()
+    optional_const_reference<typename std::remove_reference_t<T>> make_optional_const_ref()
     {
         return optional_const_reference<T>();
     }
+
+    template <typename T>
+    struct unreferenced_type {};
+
+    template <typename T>
+    struct unreferenced_type<std::optional<std::reference_wrapper<T>>>
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    using unreferenced_type_t = typename unreferenced_type<T>::type;
 
     template <typename T>
     using transformer = std::function<T(const T&)>;

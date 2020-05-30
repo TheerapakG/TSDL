@@ -22,17 +22,31 @@ namespace TSDL::util
     class optional_with_base
     {
         private:
-        using _Tuple_T = typename get_tuple_t<std::reference_wrapper<Types...>>;
+        using _Tuple_T = typename get_tuple_t<std::reference_wrapper<Types>...>;
         std::optional<_Tuple_T> _references_tuple;
+
+        /*
+        helper for forwarding with other template parameter expansion
+        */
+        template <typename T, typename ignore>
+        constexpr T&& _forward_ignore(std::remove_reference_t<T>&& arg) noexcept
+        {
+            return std::forward<T>(arg);
+        }
+        template <typename T, typename ignore>
+        constexpr T&& _forward_ignore(std::remove_reference_t<T>& arg) noexcept
+        {
+            return std::forward<T>(arg);
+        }
 
         public:
         constexpr optional_with_base() noexcept {}
         constexpr optional_with_base(std::nullopt_t) noexcept {}
 
-        template <typename T, std::enable_if_t<_and_v<std::is_base_of_v<Types, T>...>>>
+        template <typename T/*, std::enable_if_t<_and_v<std::is_base_of_v<Types, T>...>>*/>
         constexpr optional_with_base(const T& value): _references_tuple(std::in_place, static_cast<const Types&>(value)...) {}
-        template <typename T, std::enable_if_t<_and_v<std::is_base_of_v<Types, T>...>>>
-        constexpr optional_with_base(T&& value): _references_tuple(std::in_place, std::forward<Types>(value)...) {}
+        template <typename T/*, std::enable_if_t<_and_v<std::is_base_of_v<Types, T>...>>*/>
+        constexpr optional_with_base(T&& value): _references_tuple(std::in_place, _forward_ignore<T, Types>(value)...) {}
 
         constexpr optional_with_base& operator=(const optional_with_base& other)
         {
@@ -64,41 +78,46 @@ namespace TSDL::util
             return *this;
         }
 
+        constexpr explicit operator bool() const noexcept
+        {
+            return static_cast<bool>(_references_tuple);
+        }
+
         template <typename T, typename... _Types>
         friend constexpr T& get(optional_with_base<_Types...>& val);
 
-        template <typename T, typename... Types>
+        template <typename T, typename... _Types>
         friend constexpr T&& get(optional_with_base<_Types...>&& val);
 
-        template <typename T, typename... Types>
+        template <typename T, typename... _Types>
         friend constexpr const T& get(const optional_with_base<_Types...>& val);
 
-        template <typename T, typename... Types>
+        template <typename T, typename... _Types>
         friend constexpr const T&& get(const optional_with_base<_Types...>&& val);
     };
 
     template <typename T, typename... _Types>
     constexpr T& get(optional_with_base<_Types...>& val)
     {
-        return std::get<T>(val._references_tuple);
+        return std::get<std::reference_wrapper<T>>(val._references_tuple.value());
     }
 
     template <typename T, typename... _Types>
     constexpr T&& get(optional_with_base<_Types...>&& val)
     {
-        return std::get<T>(val._references_tuple);
+        return std::get<std::reference_wrapper<T>>(val._references_tuple.value());
     }
 
     template <typename T, typename... _Types>
     constexpr const T& get(const optional_with_base<_Types...>& val)
     {
-        return std::get<T>(val._references_tuple);
+        return std::get<std::reference_wrapper<T>>(val._references_tuple.value());
     }
 
     template <typename T, typename... _Types>
     constexpr const T&& get(const optional_with_base<_Types...>&& val)
     {
-        return std::get<T>(val._references_tuple);
+        return std::get<std::reference_wrapper<T>>(val._references_tuple.value());
     }
 }
 
