@@ -65,7 +65,7 @@ namespace TSDL
         if the object creation resulted in an error or not
         */
         TSDL_Texture(TSDL_Renderer& renderer, TSDL_Surface& surface);
-        TSDL_Texture(TSDL_Renderer& renderer, const point_2d& size, int access = SDL_TEXTUREACCESS_TARGET);
+        TSDL_Texture(TSDL_Renderer& renderer, const point_2d& size, int access = SDL_TEXTUREACCESS_TARGET, int format = SDL_PIXELFORMAT_RGBA8888);
         TSDL_Texture(TSDL_Renderer& renderer, const std::_TSDL_U8(string)& file);        
         TSDL_Texture(TSDL_Renderer& renderer, TSDL_Buffer& buffer);
         TSDL_Texture(TSDL_Renderer& renderer, const void* mem, size_t size);
@@ -84,6 +84,13 @@ namespace TSDL
         ~TSDL_Texture();
 
         operator SDL_Texture*() const;
+
+        /*
+        raw format of the texture; the actual format may differ, but pixel transfers will use this format
+        */
+        SDL_PixelFormatEnum format() const;
+
+        point_2d size() const;
 
         int blend_mode(SDL_BlendMode mode);
         SDL_BlendMode blend_mode();

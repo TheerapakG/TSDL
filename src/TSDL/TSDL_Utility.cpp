@@ -173,3 +173,12 @@ TSDL::color_rgba::operator TSDL::_color_rgba()
 {
     return std::make_tuple(r, g, b, a);
 }
+
+TSDL::premul_color_rgba::premul_color_rgba(double r, double g, double b, double a): r(r), g(g), b(b), a(a) {}
+
+TSDL::premul_color_rgba::premul_color_rgba(_premul_color_rgba& c): r(std::get<0>(c)), g(std::get<1>(c)), b(std::get<2>(c)), a(std::get<3>(c)) {}
+
+TSDL::premul_color_rgba::operator TSDL::_premul_color_rgba()
+{
+    return std::make_tuple(r, g, b, a);
+}

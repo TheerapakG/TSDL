@@ -179,6 +179,17 @@ namespace TSDL
 
         operator _color_rgba();
     };
+
+    using _premul_color_rgba = get_tuple_t<double, double, double, double>;
+    class premul_color_rgba
+    {
+        public:
+        double r, g, b, a;
+        premul_color_rgba(double r, double g, double b, double a);
+        premul_color_rgba(_premul_color_rgba& c);
+
+        operator _premul_color_rgba();
+    };
 }
 
 bool operator==(const TSDL::point_2d& lhs, const TSDL::point_2d& rhs);

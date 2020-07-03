@@ -30,9 +30,9 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, TSDL::TSDL_Surfa
     _internal_ptr = _t_internal_ptr;
 }
 
-TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const TSDL::point_2d& size, int access)
+TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const TSDL::point_2d& size, int access, int format)
 {
-    SDL_Texture* _t_internal_ptr = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, access, size.x, size.y);
+    SDL_Texture* _t_internal_ptr = SDL_CreateTexture(renderer, format, access, size.x, size.y);
     if (_t_internal_ptr == NULL)
     {
         TSDL::safe_throw<std::runtime_error>("Texture could not be created! SDL Error: " + std::string(SDL_GetError()));
@@ -91,12 +91,34 @@ TSDL::TSDL_Texture::TSDL_Texture(TSDL::TSDL_Renderer& renderer, const void* mem,
 
 TSDL::TSDL_Texture::~TSDL_Texture()
 {
-    if(_internal_ptr != nullptr) SDL_DestroyTexture(_internal_ptr);
+    if(_destroy && (_internal_ptr != nullptr)) SDL_DestroyTexture(_internal_ptr);
 }
 
 TSDL::TSDL_Texture::operator SDL_Texture*() const
 {
     return _internal_ptr;
+}
+
+SDL_PixelFormatEnum TSDL::TSDL_Texture::format() const
+{
+    Uint32 format;
+    int _t = SDL_QueryTexture(_internal_ptr, &format, NULL, NULL, NULL);
+    if(_t != 0)
+    {
+        TSDL::safe_throw<std::runtime_error>("Could not get format! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return static_cast<SDL_PixelFormatEnum>(format);
+}
+
+::TSDL::point_2d TSDL::TSDL_Texture::size() const
+{
+    int w, h;
+    int _t = SDL_QueryTexture(_internal_ptr, NULL, NULL, &w, &h);
+    if(_t != 0)
+    {
+        TSDL::safe_throw<std::runtime_error>("Could not get size! SDL Error: " + std::string(SDL_GetError()));
+    }
+    return {w, h};
 }
 
 int TSDL::TSDL_Texture::blend_mode(SDL_BlendMode mode)

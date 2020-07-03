@@ -93,6 +93,8 @@ TSDL::TSDL_Surface::TSDL_Surface(const void* mem, size_t size): _destroy(true)
     _internal_ptr = _t_internal_ptr;
 }
 
+#ifdef TSDL_USE_TTF
+
 TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, Uint8 r, Uint8 g, Uint8 b, TSDL::TTF_Rendermethod m):
     TSDL::TSDL_Surface(text, font, r, g, b, 255, m){}
 
@@ -154,6 +156,8 @@ TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& f
 
 TSDL::TSDL_Surface::TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, const TSDL::color_rgba& fc, const TSDL::color_rgba& bc):
     TSDL::TSDL_Surface(text, font, fc.r, fc.g, fc.b, fc.a, bc.r, bc.g, bc.b, bc.a){}
+
+#endif
 
 TSDL::TSDL_Surface::~TSDL_Surface()
 {

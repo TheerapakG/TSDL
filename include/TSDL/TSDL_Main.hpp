@@ -12,6 +12,10 @@
 
 #include <SDL2/SDL.h>
 
+#ifdef TSDL_USE_PANGOCAIRO
+#include <pango/pangocairo.h>
+#endif
+
 #ifdef TSDL_USE_FONTCONFIG
 #include <fontconfig/fontconfig.h>
 #endif
@@ -34,6 +38,10 @@ namespace _PY
 namespace TSDL
 {
     extern SDL_Event null_event;
+
+    #ifdef TSDL_USE_PANGOCAIRO
+    extern PangoContext* default_pango_context;
+    #endif
 
     class TSDL
     {

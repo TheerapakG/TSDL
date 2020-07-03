@@ -78,6 +78,7 @@ namespace TSDL
         TSDL_Surface(TSDL_Buffer& buffer);
         TSDL_Surface(const void* mem, size_t size);
 
+        #ifdef TSDL_USE_TTF
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
@@ -105,6 +106,7 @@ namespace TSDL
         */
         TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, Uint8 fr, Uint8 fg, Uint8 fb, Uint8 fa, Uint8 br, Uint8 bg, Uint8 bb, Uint8 ba);
         TSDL_Surface(const std::_TSDL_U8(string)& text, TSDL_Font& font, const color_rgba& fc, const color_rgba& bc);
+        #endif
 
         ~TSDL_Surface();
 
