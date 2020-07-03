@@ -28,6 +28,11 @@
     #include "TSDL/abstract/effects.hpp"
     #include "TSDL/abstract/elements.hpp"
 
+    #ifdef TSDL_USE_PANGOCAIRO
+        #include "TSDL/pangocairo/TSDL_CairoSurface.hpp"
+        #include "TSDL/pangocairo/TSDL_PangoLayout.hpp"
+    #endif
+
     #ifdef TSDL_EXPOSE_PYBIND11
         #include "TSDL/TSDL_PY_Constants.hpp"
         PYBIND11_MODULE(tsdl, m)

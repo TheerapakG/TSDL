@@ -10,7 +10,14 @@
 #ifndef TSDL_FONT_
 #define TSDL_FONT_
 
+#ifdef TSDL_USE_SDLTTF
 #include <SDL2/SDL_ttf.h>
+#endif
+
+#ifdef TSDL_USE_PANGOCAIRO
+#include <pango/pangocairo.h>
+#endif
+
 #include "TSDL_Macro.hpp"
 #include "TSDL_Buffer.hpp"
 #include <vector>
@@ -18,6 +25,10 @@
 #ifdef TSDL_USE_FONTCONFIG
 #include <fontconfig/fontconfig.h>
 #endif
+
+// TODO: seperate ttf and pangocairo implementation into their own file
+
+#ifdef TSDL_USE_SDLTTF
 
 #ifdef TSDL_EXPOSE_PYBIND11
 #include "TSDL_PY_TypeErase.hpp"
@@ -40,19 +51,20 @@ namespace TSDL
 {
     class TSDL_Font
     {
-        private:
-        TTF_Font* _internal_ptr = nullptr;
-        bool _destroy;
-
         public:
         using SDL_Type = TTF_Font;
 
+        private:
+        SDL_Type* _internal_ptr = nullptr;
+        bool _destroy;
+
+        public:
         _PY_DECLARE_TYPEERASE_OWNER(Font)
 
         TSDL_DECLARE_CONSTRUCT(Font)
 
-        TSDL_Font(TTF_Font* ptr);
-        TSDL_Font(TTF_Font* ptr, bool handle_destroy);
+        TSDL_Font(SDL_Type* ptr);
+        TSDL_Font(SDL_Type* ptr, bool handle_destroy);
 
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
@@ -67,15 +79,69 @@ namespace TSDL
 
         ~TSDL_Font();
 
-        operator TTF_Font*() const;
-    };
+        operator SDL_Type*() const;
 
-    #ifdef TSDL_USE_FONTCONFIG
+        /*
+        Get the recommended spacing between lines of text for this font
+        */
+        int skip_height() const;
+    };
+}
+
+#endif // TSDL_USE_SDLTTF
+
+#ifdef TSDL_USE_PANGOCAIRO
+
+#ifdef TSDL_EXPOSE_PYBIND11
+#include "TSDL_PY_TypeErase.hpp"
+_PY_EXPAND_DECLARE_CLASS(Font)
+namespace _PY
+{
+    _PY_EXPAND_DECLARE_CONTEXTMANAGER(Font)
+    _PY_EXPAND_DEFINE_TYPEERASE_OPEN(Font)
+    _PY_GET_CONTEXTMANAGER(Font)<const std::string>
+    _PY_EXPAND_DEFINE_TYPEERASE_CLOSE
+}
+#else
+#define _PY_DECLARE_TYPEERASE_OWNER(TSDL_NAME)
+#endif
+
+namespace TSDL
+{
+    class TSDL_Font
+    {
+        public:
+        using SDL_Type = PangoFontDescription;
+
+        private:
+        SDL_Type* _internal_ptr = nullptr;
+        bool _destroy;
+
+        public:
+        _PY_DECLARE_TYPEERASE_OWNER(Font)
+
+        TSDL_DECLARE_CONSTRUCT(Font)
+
+        TSDL_Font(SDL_Type* ptr);
+        TSDL_Font(SDL_Type* ptr, bool handle_destroy);
+
+        TSDL_Font(const std::_TSDL_U8(string)& font_description);
+
+        ~TSDL_Font();
+
+        operator SDL_Type*() const;
+    };
+}
+#endif // TSDL_USE_PANGOCAIRO
+
+#ifdef TSDL_USE_FONTCONFIG
+namespace TSDL
+{
     std::vector<std::_TSDL_U8(string)> get_all_font_filename();
     std::_TSDL_U8(string) get_family_font_filename(const std::_TSDL_U8(string)& family);
     std::_TSDL_U8(string) get_name_font_filename(const std::_TSDL_U8(string)& name);
-    #endif
 }
+#endif
 
 #ifdef TSDL_EXPOSE_PYBIND11
 

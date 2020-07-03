@@ -25,6 +25,7 @@ NAMESPACE::TSDL_##TSDL_NAME::TSDL_##TSDL_NAME(TSDL_##TSDL_NAME&& other) :       
 NAMESPACE::TSDL_##TSDL_NAME& NAMESPACE::TSDL_##TSDL_NAME::operator=(TSDL_##TSDL_NAME&& other)     \
 {                                                                                                 \
     _internal_ptr = other._internal_ptr;                                                          \
+    _destroy = other._destroy;                                                                    \
     other._destroy = false;                                                                       \
     return *this;                                                                                 \
 }                                                                                                 \

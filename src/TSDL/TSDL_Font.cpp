@@ -14,11 +14,22 @@
 #include "TSDL/TSDL_Main.hpp"
 #endif
 
+#if defined(TSDL_USE_SDLTTF) || defined(TSDL_USE_PANGOCAIRO)
+
 TSDL_DEFINE_CONSTRUCT(TSDL, Font)
 
-TSDL::TSDL_Font::TSDL_Font(TTF_Font* ptr): TSDL_Font(ptr, false) {}
+TSDL::TSDL_Font::TSDL_Font(TSDL_Font::SDL_Type* ptr): TSDL_Font(ptr, false) {}
 
-TSDL::TSDL_Font::TSDL_Font(TTF_Font* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
+TSDL::TSDL_Font::TSDL_Font(TSDL_Font::SDL_Type* ptr, bool handle_destroy): _internal_ptr(ptr), _destroy(handle_destroy) {}
+
+TSDL::TSDL_Font::operator SDL_Type*() const
+{
+    return _internal_ptr;
+}
+
+#endif
+
+#ifdef TSDL_USE_SDLTTF
 
 TSDL::TSDL_Font::TSDL_Font(const std::_TSDL_U8(string)& file, int pt): _destroy(true)
 {
@@ -95,10 +106,59 @@ TSDL::TSDL_Font::~TSDL_Font()
     if(_destroy && (_internal_ptr != nullptr)) TTF_CloseFont(*this);
 }
 
-TSDL::TSDL_Font::operator TTF_Font*() const
+int TSDL::TSDL_Font::skip_height() const
 {
-    return _internal_ptr;
+    return TTF_FontLineSkip(*this);
 }
+
+#ifdef TSDL_EXPOSE_PYBIND11
+
+_PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Font)
+
+void _tsdl_font_py(const py::module& m)
+{
+    py::class_<_PY::_PY_GET_TYPEERASE(Font)>(m, "Font")
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Font)<const std::_TSDL_U8(string), int>())
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Font)<const std::_TSDL_U8(string), int, long>())
+        .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, enter_ctx), py::return_value_policy::reference)
+        .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, enter_ctx), py::return_value_policy::reference)
+        .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, exit_ctx));
+    py::class_<TSDL::TSDL_Font>(m, "_Font");
+}
+
+#endif
+
+#endif
+
+#ifdef TSDL_USE_PANGOCAIRO
+
+TSDL::TSDL_Font::TSDL_Font(const std::_TSDL_U8(string)& font_description): _destroy(true)
+{
+    _internal_ptr = pango_font_description_from_string(reinterpret_cast<const char*>(font_description.c_str()));
+}
+
+TSDL::TSDL_Font::~TSDL_Font()
+{
+    if(_destroy && (_internal_ptr != nullptr)) pango_font_description_free(*this);
+}
+
+#ifdef TSDL_EXPOSE_PYBIND11
+
+_PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Font)
+
+void _tsdl_font_py(const py::module& m)
+{
+    py::class_<_PY::_PY_GET_TYPEERASE(Font)>(m, "Font")
+        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Font)<const std::_TSDL_U8(string)>())
+        .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, enter_ctx), py::return_value_policy::reference)
+        .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, enter_ctx), py::return_value_policy::reference)
+        .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, exit_ctx));
+    py::class_<TSDL::TSDL_Font>(m, "_Font");
+}
+
+#endif
+
+#endif
 
 #ifdef TSDL_USE_FONTCONFIG
 std::vector<std::_TSDL_U8(string)> TSDL::get_all_font_filename()
@@ -179,21 +239,4 @@ std::string TSDL::get_name_font_filename(const std::_TSDL_U8(string)& name)
         FcNameParse((const FcChar8*)(reinterpret_cast<const char*>(name.c_str())))
     );
 }
-#endif
-
-#ifdef TSDL_EXPOSE_PYBIND11
-
-_PY_EXPAND_DEFINE_TYPEERASE_FUNCTIONS(_PY, Font)
-
-void _tsdl_font_py(const py::module& m)
-{
-    py::class_<_PY::_PY_GET_TYPEERASE(Font)>(m, "Font")
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Font)<const std::_TSDL_U8(string), int>())
-        .def(_PY::_PY_GET_TYPEERASE_PY_INIT(Font)<const std::_TSDL_U8(string), int, long>())
-        .def("__enter__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, enter_ctx), py::return_value_policy::reference)
-        .def("create", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, enter_ctx), py::return_value_policy::reference)
-        .def("__exit__", &_PY::_PY_GET_TYPEERASE_FUNCTION(Font, exit_ctx));
-    py::class_<TSDL::TSDL_Font>(m, "_Font");
-}
-
 #endif

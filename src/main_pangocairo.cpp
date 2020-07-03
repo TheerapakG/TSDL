@@ -1,4 +1,4 @@
-﻿#include "TSDL.hpp"
+#include "TSDL.hpp"
 #ifndef TSDL_EXPOSE_PYBIND11
 #ifdef TSDL_EXAMPLE_CPP
 #include <iostream>
@@ -53,15 +53,15 @@ void generate_visual_from_path()
     _previous_visual_elements.clear();
     _dependent_visual_elements.clear();
 
-    TSDL::TSDL_Surface pathtext("Current path: " + current_path.u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+    TSDL::TSDL_Texture pathtext = TSDL::TSDL_PangoLayout()
+        .text("Current path: " + current_path.u8string())
+        .font(*font)
+        .rendered_texture(current_scene->bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
 
     el::effectelement<el::TextureElement>* pathtexteffect = new el::effectelement<el::TextureElement>(
         pathtext.size(),
         std::shared_ptr <TSDL::TSDL_Texture> ( 
-            new TSDL::TSDL_Texture(
-                current_scene->bounded_window().renderer(),
-                pathtext
-            )
+            new TSDL::TSDL_Texture(std::move(pathtext))
         )
     );
 
@@ -70,19 +70,20 @@ void generate_visual_from_path()
 
     int y = pathtext.size().y + 16;
 
-    TSDL::TSDL_Surface buttontext("..", *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
-    TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
-        buttontext.size(),
-        std::shared_ptr <TSDL::TSDL_Texture> ( 
-            new TSDL::TSDL_Texture(
-                current_scene->bounded_window().renderer(),
-                buttontext
-            )
-        )
-    );
+    TSDL::TSDL_Texture buttontext = TSDL::TSDL_PangoLayout()
+        .text("..")
+        .font(*font)
+        .rendered_texture(current_scene->bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
 
     TSDL::elements::Button* button = new TSDL::elements::Button(
         TSDL::point_2d{buttontext.size().x + 32, 64}
+    );
+
+    TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
+        buttontext.size(),
+        std::shared_ptr <TSDL::TSDL_Texture> ( 
+            new TSDL::TSDL_Texture(std::move(buttontext))
+        )
     );
 
     button->front(*buttontextelement);
@@ -105,20 +106,20 @@ void generate_visual_from_path()
         if(!p.is_directory()) continue;
         auto path = p.path();
         if(!path.has_stem()) continue;
-        TSDL::TSDL_Surface buttontext(path.stem().u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+        TSDL::TSDL_Texture buttontext = TSDL::TSDL_PangoLayout()
+            .text(path.stem().u8string())
+            .font(*font)
+            .rendered_texture(current_scene->bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
+
+        TSDL::elements::Button* button = new TSDL::elements::Button(
+            TSDL::point_2d{buttontext.size().x + 32, 64}
+        );
 
         TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
             buttontext.size(),
             std::shared_ptr <TSDL::TSDL_Texture> ( 
-                new TSDL::TSDL_Texture(
-                    current_scene->bounded_window().renderer(),
-                    buttontext
-                )
+                new TSDL::TSDL_Texture(std::move(buttontext))
             )
-        );
-
-        TSDL::elements::Button* button = new TSDL::elements::Button(
-            TSDL::point_2d{buttontext.size().x + 32, 64}
         );
 
         button->front(*buttontextelement);
@@ -172,13 +173,7 @@ int main(int argc, char* argv[])
         bggrid.add_child(mgrid, {0, 0});
         grid = &mgrid.grid();
 
-        #ifdef TSDL_USE_FONTCONFIG
-        std::string font_path = TSDL::get_family_font_filename("sans-serif");
-        std::cout << "using font: " << font_path << " as sans-serif font" << std::endl;
-        TSDL::TSDL_Font font(font_path, 40);
-        #else
-        TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 40);
-        #endif
+        TSDL::TSDL_Font font("Sans-Serif Normal 40");
         ::font = &font;
 
         TSDL::elements::Button::push_back_attr<elattrs::dragable> button(
@@ -186,19 +181,17 @@ int main(int argc, char* argv[])
             ::TSDL::point_2d{256, 64}
         );
 
-        TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Drag Me!", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+        TSDL::TSDL_Texture buttontext = TSDL::TSDL_PangoLayout()
+            .text(u8"Drag Me!")
+            .font(font)
+            .rendered_texture(current_scene->bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
 
         TSDL::elements::TextureElement buttontextelement(
-            buttontext->size(),
+            buttontext.size(),
             std::shared_ptr <TSDL::TSDL_Texture> ( 
-                new TSDL::TSDL_Texture(
-                    current_scene->bounded_window().renderer(),
-                    *buttontext
-                )
+                new TSDL::TSDL_Texture(std::move(buttontext))
             )
         );
-
-        delete buttontext;
 
         button.front(buttontextelement);
 
