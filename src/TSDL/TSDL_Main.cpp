@@ -37,34 +37,14 @@ namespace
         std::function<void(void)> _uninit;
         bool _success = true;
 
-        public:
-        template <typename T, typename U, typename _Err, typename _Throw_Err>
+        public:        
         RAIIinit(
-            std::function<T(void)> init, 
-            std::function<bool(U)> success_test, 
-            std::function<void(void)> uninit, 
-            std::function<_Err(void)> get_error, 
-            std::function<void(const _Throw_Err&)> throw_error
-        ): _uninit(uninit)
+            const std::function<bool(void)>& init,
+            const std::function<void(void)>& uninit,
+            const std::function<void(void)>& throw_error
+        ) : _uninit(uninit)
         {
-            if(!success_test(init()))
-            {
-                const _Throw_Err _err = get_error();
-                _uninit();
-                _success = false;
-                throw_error(_err);
-            }
-        }
-
-        template <typename T, typename U>
-        RAIIinit(
-            std::function<T(void)> init, 
-            std::function<bool(U)> success_test, 
-            std::function<void(void)> uninit,
-            std::function<void(void)> throw_error
-        ): _uninit(uninit)
-        {
-            if(!success_test(init()))
+            if (!init())
             {
                 _uninit();
                 _success = false;
@@ -102,16 +82,14 @@ TSDL::TSDL::TSDL(int frequency)
             []()
             {
                 std::cout << "initializing SDL..." << std::endl;
-                return SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+                return SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) == 0;
             }
         ),
-        std::function<bool(int)>(std::bind(std::equal_to<int>(), _1, 0)),
         std::function(SDL_Quit),
-        std::function(SDL_GetError),
         std::function(
-            [](const std::string& sdl_err)
+            []()
             {
-                safe_throw<std::runtime_error>("SDL could not initialize! SDL_Error: " + sdl_err);
+                safe_throw<std::runtime_error>(std::string("SDL could not initialize! SDL_Error: ") + SDL_GetError());
             }
         )
     );
@@ -141,20 +119,18 @@ TSDL::TSDL::TSDL(int frequency)
     #ifdef TSDL_USE_SDLIMG
     _all_init.emplace(
         std::function(
-            []() -> int
+            []()
             {
                 std::cout << "initializing SDL_image..." << std::endl;
-                int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
-                return IMG_Init(imgFlags) & imgFlags;
+                static constexpr int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
+                return (IMG_Init(imgFlags) & imgFlags) == imgFlags;
             }
         ),
-        std::function(std::logical_not<int>()),
         std::function(IMG_Quit),
-        std::function(IMG_GetError),
         std::function(
-            [](const std::string& img_err)
+            []()
             {
-                safe_throw<std::runtime_error>("SDL_image could not initialize! SDL_image Error: " + img_err);
+                safe_throw<std::runtime_error>(std::string("SDL_image could not initialize! SDL_image Error: ") + IMG_GetError());
             }
         )
     );
@@ -171,16 +147,14 @@ TSDL::TSDL::TSDL(int frequency)
             [frequency]()
             {
                 std::cout << "initializing SDL_mixer..." << std::endl;
-                return Mix_OpenAudio(frequency, MIX_DEFAULT_FORMAT, 2, 2048);
+                return Mix_OpenAudio(frequency, MIX_DEFAULT_FORMAT, 2, 2048) == 0;
             }
         ),
-        std::function<bool(int)>(std::bind(std::equal_to<int>(), _1, 0)),
         std::function(Mix_Quit),
-        std::function(Mix_GetError),
         std::function(
-            [](const std::string& mix_err)
+            []()
             {
-                safe_throw<std::runtime_error>("SDL_mixer could not initialize! SDL_mixer Error: " + mix_err);
+                safe_throw<std::runtime_error>(std::string("SDL_mixer could not initialize! SDL_mixer Error: ") + Mix_GetError());
             }
         )
     );
@@ -197,16 +171,14 @@ TSDL::TSDL::TSDL(int frequency)
             []()
             {
                 std::cout << "initializing SDL_ttf..." << std::endl;
-                return TTF_Init();
+                return TTF_Init() == 0;
             }
         ),
-        std::function<bool(int)>(std::bind(std::equal_to<int>(), _1, 0)),
         std::function(TTF_Quit),
-        std::function(TTF_GetError),
         std::function(
-            [](const std::string& ttf_err)
+            []()
             {
-                safe_throw<std::runtime_error>("SDL_ttf could not initialize! SDL_ttf Error: " + ttf_err);
+                safe_throw<std::runtime_error>(std::string("SDL_ttf could not initialize! SDL_ttf Error: ") + TTF_GetError());
             }
         )
     );
@@ -224,10 +196,9 @@ TSDL::TSDL::TSDL(int frequency)
             []()
             {
                 std::cout << "initializing Fontconfig..." << std::endl;
-                return FcInitLoadConfig();
+                return static_cast<bool>(FcInitLoadConfig());
             }
         ),
-        std::function(std::logical_not<FcConfig*>()),
         std::function(
             []()
             {
