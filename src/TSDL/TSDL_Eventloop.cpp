@@ -23,30 +23,13 @@ using namespace std::literals::chrono_literals;
 namespace TSDL::impl
 {
     optional_reference<TSDL_Eventloop> _current_eventloop;
-}
-
-TSDL::TSDL_Eventloop::TSDL_Eventloop()
-{
-    if (impl::_current_eventloop.has_value())
-    {
-        TSDL::safe_throw<std::runtime_error>("There is already an eventloop, running two eventloop simultaneously is not possible");
-        return;
-    }
-    impl::_current_eventloop = *this;
+    std::recursive_mutex _m_current_eventloop;
 }
 
 #ifdef __cpp_exceptions
 TSDL::TSDL_Eventloop::TSDL_Eventloop(bool thrownoevhandler, bool thrownorenderhandler) :
 _throw_if_no_event_handler(thrownoevhandler),
-_throw_if_no_render_handler(thrownorenderhandler)
-{
-    if (impl::_current_eventloop.has_value())
-    {
-        TSDL::safe_throw<std::runtime_error>("There is already an eventloop, running two eventloop simultaneously is not possible");
-        return;
-    }
-    impl::_current_eventloop = *this;
-}
+_throw_if_no_render_handler(thrownorenderhandler) {}
 #endif
 
 TSDL::TSDL_Eventloop::~TSDL_Eventloop()
@@ -55,7 +38,6 @@ TSDL::TSDL_Eventloop::~TSDL_Eventloop()
     {
         this->interrupt();
     }
-    impl::_current_eventloop.reset();
 }
 
 void TSDL::TSDL_Eventloop::add_event_handler(SDL_EventType evType, TSDL::EventHandler handler)
@@ -88,7 +70,7 @@ void TSDL::TSDL_Eventloop::_reset_fps_count()
 void TSDL::TSDL_Eventloop::_run_step()
 {
     SDL_Event e;
-    while(SDL_PollEvent(&e) != 0)
+    if(SDL_PollEvent(&e) != 0)
     {
         EventHandler h;
         #ifdef __cpp_exceptions
@@ -165,6 +147,14 @@ void TSDL::TSDL_Eventloop::_run_step()
 
 void TSDL::TSDL_Eventloop::run()
 {
+    std::scoped_lock lock(impl::_m_current_eventloop);
+    if (impl::_current_eventloop.has_value())
+    {
+        TSDL::safe_throw<std::runtime_error>("There is already an eventloop, running two eventloop simultaneously is not possible");
+        return;
+    }
+    impl::_current_eventloop = *this;
+
 #ifndef TSDL_USE_EMSCRIPTEN
     if(_track_fps) this->_reset_fps_count();
     _time_last_frame = clock::now();
@@ -208,7 +198,9 @@ void TSDL::TSDL_Eventloop::interrupt()
     }
 #else
     emscripten_cancel_main_loop();
-#endif    
+#endif
+    std::scoped_lock lock(impl::_m_current_eventloop);
+    impl::_current_eventloop.reset();
 }
 
 TSDL::TSDL_Eventloop::clock::time_point TSDL::TSDL_Eventloop::now()
@@ -285,6 +277,7 @@ double TSDL::TSDL_Eventloop::fps_target() const
 
 TSDL::TSDL_Eventloop& TSDL::current_eventloop()
 {
+    std::scoped_lock lock(impl::_m_current_eventloop);
     return TSDL::impl::_current_eventloop.value();
 }
 

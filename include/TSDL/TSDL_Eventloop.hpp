@@ -14,6 +14,7 @@
 #include <map>
 #include <chrono>
 #include <atomic>
+#include <future>
 #include <mutex>
 #include <functional>
 
@@ -74,7 +75,7 @@ namespace TSDL
 
         _PY_DECLARE_TYPEERASE_OWNER(Eventloop)
 
-        TSDL_Eventloop();
+        TSDL_Eventloop() = default;
         #ifdef __cpp_exceptions
         TSDL_Eventloop(bool thrownoevhandler, bool thrownorenderhandler);
         #endif
@@ -83,35 +84,102 @@ namespace TSDL
 
         ~TSDL_Eventloop();
 
+        /*
+        Add event handler
+        not thread-safe
+        */
         void add_event_handler(SDL_EventType evType, EventHandler handler);
 
+        /*
+        Remove event handler
+        not thread-safe
+        */
         void remove_event_handler(SDL_EventType evType);
 
+        /*
+        Set render function
+        not thread-safe
+        */
         void render_function(RenderHandler handler);
 
+        /*
+        Get render function
+        not thread-safe
+        */
         const RenderHandler& render_function();
 
+        /*
+        Start the eventloop
+        not thread-safe
+
+        Note: run this from the main thread only!
+        */
         void run();
 
+        /*
+        Stop the event loop.
+        thread-safe
+        */
         void interrupt();
 
+        /*
+        Return the time that last frame is drawn.
+        not thread-safe
+        */
         clock::time_point now();
 
+        /*
+        Set whether the loop will track fps.
+        thread-safe
+        */
         void track_fps(bool track = true);
 
+        /*
+        Set the interval that the fps counter will be updated.
+        thread-safe
+        */
         void fps_update_interval(clock::duration interval);
 
+        /*
+        Get the interval that the fps counter will be updated.
+        thread-safe
+        */
         clock::duration fps_update_interval() const;
 
+        /*
+        Get current fps.
+        thread-safe
+        */
         double fps() const;
 
+        /*
+        Set whether fps be limited or not.
+        thread-safe
+        */
         void limit_fps(bool limit = true);
 
+        /*
+        Set fps limit target.
+        thread-safe
+        */
         void fps_target(double frames);
 
+        /*
+        Get fps limit target.
+        thread-safe
+        */
         double fps_target() const;
+
+        /*
+        template <typename T>
+        std::promise<T> execute_next_cycle(std::function<T(void)>);
+        */
     };
 
+    /*
+    Get current running eventloop.
+    thread-safe
+    */
     TSDL_Eventloop& current_eventloop();
 }
 
