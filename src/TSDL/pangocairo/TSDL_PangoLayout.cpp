@@ -13,6 +13,7 @@
 #include "TSDL/TSDL_Texture.hpp"
 #include "TSDL/TSDL_Font.hpp"
 #include "TSDL/pangocairo/TSDL_CairoSurface.hpp"
+#include "TSDL/pangocairo/TSDL_CairoContext.hpp"
 
 TSDL::TSDL_PangoLayout::TSDL_PangoLayout(TSDL_PangoLayout&& other): 
     _internal_ptr(other._internal_ptr), 
@@ -73,23 +74,43 @@ TSDL::TSDL_PangoLayout&  TSDL::TSDL_PangoLayout::font(const TSDL_Font& font)
     return *this;
 }
 
+void TSDL::TSDL_PangoLayout::render_context_untidy(TSDL_CairoContext& context, const premul_color_rgba& c)
+{
+    render_context_untidy(context, c.r, c.g, c.b, c.a);
+}
+
+void TSDL::TSDL_PangoLayout::render_context_untidy(TSDL_CairoContext& context, double r, double g, double b, double a)
+{
+    context.render_color(r, g, b, a);
+    pango_cairo_show_layout(context, _internal_ptr);
+}
+
+void TSDL::TSDL_PangoLayout::render_context(TSDL_CairoContext& context, const premul_color_rgba& c)
+{
+    render_context(context, c.r, c.g, c.b, c.a);
+}
+
+void TSDL::TSDL_PangoLayout::render_context(TSDL_CairoContext& context, double r, double g, double b, double a)
+{
+    cairo_pattern_t* source_pattern = cairo_get_source(context);
+    render_context_untidy(context, r, g, b, a);
+    cairo_set_source(context, source_pattern);
+}
+
+TSDL::TSDL_Texture TSDL::TSDL_PangoLayout::rendered_texture(TSDL_Renderer& renderer, const premul_color_rgba& c)
+{
+    return rendered_texture(renderer, c.r, c.g, c.b, c.a);
+}
+
 TSDL::TSDL_Texture TSDL::TSDL_PangoLayout::rendered_texture(TSDL_Renderer& renderer, double r, double g, double b, double a)
 {
     auto _size = size();
     TSDL_Texture _ret(renderer, _size, SDL_TEXTUREACCESS_STREAMING, SDL_PIXELFORMAT_ARGB32);
 
     TSDL_CairoSurface _cairo_surface(_ret);
+    TSDL_CairoContext _cairo_context(_cairo_surface);
 
-    cairo_t* _cairo_context = cairo_create(_cairo_surface);
-    cairo_set_source_rgba(_cairo_context, r, g, b, a);
-    pango_cairo_show_layout(_cairo_context, _internal_ptr);
-    cairo_destroy(_cairo_context);
-
+    render_context_untidy(_cairo_context, r, g, b, a);
     _ret.blend_mode(SDL_BLENDMODE_BLEND);
     return _ret;
-}
-
-TSDL::TSDL_Texture TSDL::TSDL_PangoLayout::rendered_texture(TSDL_Renderer& renderer, premul_color_rgba c)
-{
-    return rendered_texture(renderer, c.r, c.g, c.b, c.a);
 }

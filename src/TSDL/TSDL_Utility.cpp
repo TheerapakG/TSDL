@@ -12,8 +12,11 @@
 #ifndef __cpp_exceptions 
 #include <exception>
 
-std::exception* TSDL::_current_exc;
-std::function<void(void)> TSDL::unhandleable_exc_handler = std::terminate;
+namespace TSDL
+{
+    std::exception* _current_exc;
+    std::function<void(void)> unhandleable_exc_handler = std::terminate;
+}
 
 std::exception& TSDL::get_exc()
 {
@@ -29,6 +32,11 @@ void TSDL::clear_exc()
     }
 }
 #endif
+
+namespace TSDL
+{
+    thread_local const std::thread::id current_thread_id = std::this_thread::get_id();
+}
 
 TSDL::Orientation TSDL::operator|(TSDL::Orientation lhs, TSDL::Orientation rhs)
 {

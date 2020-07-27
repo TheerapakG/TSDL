@@ -11,6 +11,7 @@
 #define TSDL_EVENTLOOP_
 
 #include <SDL2/SDL.h>
+#include <exception>
 #include <map>
 #include <chrono>
 #include <atomic>
@@ -55,6 +56,9 @@ namespace TSDL
         bool _throw_if_no_render_handler = false;
         #endif
 
+        mutable std::mutex _m_func_vector;
+        std::vector<std::function<void(void)>> _pending_func, _running_func;
+
         clock::time_point _now;
 
         std::atomic<bool> _track_fps = true;
@@ -69,6 +73,10 @@ namespace TSDL
         clock::time_point _time_last_frame;
 
         void _reset_fps_count();
+
+        void _handle_event();
+        void _handle_func();
+        void _handle_render();
         void _run_step();
 
         public:
@@ -170,10 +178,27 @@ namespace TSDL
         */
         double fps_target() const;
 
-        /*
         template <typename T>
-        std::promise<T> execute_next_cycle(std::function<T(void)>);
-        */
+        std::promise<T> execute_next_cycle(std::function<T(void)> func)
+        {
+            std::promise<T> _promise;
+            std::function<void(void)> _executing_func = [_promise]() -> void
+            {
+                try
+                {
+                    _promise.set_value(func());
+                }
+                catch(...)
+                {
+                    _promise.set_exception(std::current_exception());
+                }
+            };
+            {
+                std::scoped_lock _lock(_m_func_vector);
+                _pending_func.push_back(_executing_func);
+            }
+            return _promise;
+        }
     };
 
     /*

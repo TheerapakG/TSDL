@@ -9,6 +9,7 @@
 
 #include "TSDL/TSDL_Eventloop.hpp"
 #include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/TSDL_Macro.hpp"
 #include "TSDL/TSDL_Utility.hpp"
 #include <iostream>
 #include <stdexcept>
@@ -67,10 +68,10 @@ void TSDL::TSDL_Eventloop::_reset_fps_count()
     _time_since_last = clock::now();
 }
 
-void TSDL::TSDL_Eventloop::_run_step()
+void TSDL::TSDL_Eventloop::_handle_event()
 {
     SDL_Event e;
-    if(SDL_PollEvent(&e) != 0)
+    while(SDL_PollEvent(&e) != 0)
     {
         EventHandler h;
         #ifdef __cpp_exceptions
@@ -87,12 +88,12 @@ void TSDL::TSDL_Eventloop::_run_step()
             else
             {
                 std::cerr << "No handler for SDL event: " << e.type << " (" << exc.what() << "). You should consider adding handler." << std::endl;
-                return;
+                continue;
             }
         }
         #else
         auto h_it = _map.find(static_cast<SDL_EventType>(e.type));
-        if(h_it != _map.end())
+        if _TSDL_LIKELY(h_it != _map.end())
         {
             h = h_it->second;
         }
@@ -103,26 +104,41 @@ void TSDL::TSDL_Eventloop::_run_step()
         }
         #endif
         h(e);
-        return;
+        continue;
     }
-    
+}
+
+void TSDL::TSDL_Eventloop::_handle_func()
+{
+    {
+        std::scoped_lock _lock(_m_func_vector);
+        std::swap(_running_func, _pending_func);
+    }
+    for(auto f: _running_func) f();
+    _running_func.clear();
+}
+
+void TSDL::TSDL_Eventloop::_handle_render()
+{
     if(_render != nullptr)
     {
     #ifndef TSDL_USE_EMSCRIPTEN
         if(_limit_fps.load())
         {
+            // limit time diff to be _fps_target_interval
             _now = clock::now();
-            if((_now - _time_last_frame) < _fps_target_interval.load()) return;
+            if _TSDL_LIKELY((_now - _time_last_frame) < _fps_target_interval.load()) return;
             _time_last_frame = _now;
         }
     #endif
         _render();
         if(_track_fps.load())
         {
+            // increment _frame_since_last and also store to _previous_fps sometimes
             _now = clock::now();
             std::scoped_lock lock(_lock_frame_calc);
             clock::duration diff = _now - _time_since_last;
-            if(diff >= _fps_update_interval.load())
+            if _TSDL_UNLIKELY(diff >= _fps_update_interval.load())
             {
                 _previous_fps.store(static_cast<double>(_frame_since_last + 1) / std::chrono::duration_cast<std::chrono::seconds>(diff).count());
                 this->_reset_fps_count();
@@ -134,7 +150,7 @@ void TSDL::TSDL_Eventloop::_run_step()
     else
     {
         #ifdef __cpp_exceptions
-        if(_throw_if_no_render_handler)
+        if _TSDL_UNLIKELY(_throw_if_no_render_handler)
         {
             std::throw_with_nested(std::runtime_error("No handler for rendering"));
         }
@@ -145,15 +161,24 @@ void TSDL::TSDL_Eventloop::_run_step()
     }
 }
 
+void TSDL::TSDL_Eventloop::_run_step()
+{
+    _handle_event();
+    _handle_func();
+    _handle_render();
+}
+
 void TSDL::TSDL_Eventloop::run()
 {
-    std::scoped_lock lock(impl::_m_current_eventloop);
-    if (impl::_current_eventloop.has_value())
     {
-        TSDL::safe_throw<std::runtime_error>("There is already an eventloop, running two eventloop simultaneously is not possible");
-        return;
+        std::scoped_lock lock(impl::_m_current_eventloop);
+        if (impl::_current_eventloop.has_value())
+        {
+            TSDL::safe_throw<std::runtime_error>("There is already an eventloop, running two eventloop simultaneously is not possible");
+            return;
+        }
+        impl::_current_eventloop = *this;
     }
-    impl::_current_eventloop = *this;
 
 #ifndef TSDL_USE_EMSCRIPTEN
     if(_track_fps) this->_reset_fps_count();

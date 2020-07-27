@@ -14,6 +14,7 @@
 #include <functional>
 #include <tuple>
 #include <type_traits>
+#include <thread>
 #include <stdexcept>
 
 #ifndef __cpp_exceptions
@@ -22,6 +23,8 @@
 
 namespace TSDL
 {
+    extern thread_local const std::thread::id current_thread_id;
+
 #ifdef __cpp_exceptions    
     template <typename Exc, typename ...Args>
     bool safe_throw(Args... args)

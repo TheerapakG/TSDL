@@ -7,8 +7,8 @@
 // LICENSE file.
 //-----------------------------------------------------------------------------
 
-#ifndef TSDL_CAIROSURFACE_
-#define TSDL_CAIROSURFACE_
+#ifndef TSDL_CAIROCONTEXT_
+#define TSDL_CAIROCONTEXT_
 
 #include <pango/pangocairo.h>
 #include <tuple>
@@ -19,35 +19,36 @@
 
 namespace TSDL
 {
-    class TSDL_Texture;
+    class TSDL_CairoSurface;
 }
 
 namespace TSDL
 {
-    class TSDL_CairoSurface
+    class TSDL_CairoContext
     {
         private:
-        cairo_surface_t* _internal_ptr = nullptr;
+        cairo_t* _internal_ptr = nullptr;
         bool _destroy;
-        std::function<void(void)> _destroy_cb = [](){};
 
         public:
-        using SDL_Type = cairo_surface_t;
+        using SDL_Type = cairo_t;
 
-        TSDL_CairoSurface(TSDL_CairoSurface&& other);
+        TSDL_CairoContext(TSDL_CairoContext&& other);
 
-        TSDL_CairoSurface(SDL_Type* ptr, bool destroy = false);
+        TSDL_CairoContext(SDL_Type* ptr, bool destroy = false);
 
         /*
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        TSDL_CairoSurface();
-        TSDL_CairoSurface(TSDL_Texture& texture);
+        TSDL_CairoContext(TSDL_CairoSurface& surface);
 
-        ~TSDL_CairoSurface();
+        ~TSDL_CairoContext();
 
-        operator cairo_surface_t*() const;
+        operator cairo_t*() const;
+
+        void render_color(const premul_color_rgba& color);
+        void render_color(double r, double g, double b, double a);
     };
 }
 
