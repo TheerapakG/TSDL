@@ -24,6 +24,7 @@ namespace TSDL
     class TSDL_Font;
     class TSDL_Texture;
     class TSDL_Renderer;
+    class TSDL_CairoContext;
 }
 
 namespace TSDL
@@ -61,11 +62,20 @@ namespace TSDL
         TSDL_PangoLayout& font(const TSDL_Font& font);
 
         /*
+        render the layout in the specified color to the context
+        untidy variant do not reset context's source
+        */
+        void render_context_untidy(TSDL_CairoContext& context, const premul_color_rgba& c);
+        void render_context_untidy(TSDL_CairoContext& context, double r, double g, double b, double a);
+        void render_context(TSDL_CairoContext& context, const premul_color_rgba& c);
+        void render_context(TSDL_CairoContext& context, double r, double g, double b, double a);
+
+        /*
         return texture with the layout rendered in the specified color on the transparent background
         returned texture's blend mode is SDL_BLENDMODE_BLEND
         */
+        TSDL_Texture rendered_texture(TSDL_Renderer& renderer, const premul_color_rgba& c);
         TSDL_Texture rendered_texture(TSDL_Renderer& renderer, double r, double g, double b, double a);
-        TSDL_Texture rendered_texture(TSDL_Renderer& renderer, premul_color_rgba c);
     };
 }
 
