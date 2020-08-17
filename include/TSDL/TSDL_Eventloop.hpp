@@ -42,6 +42,38 @@ namespace TSDL
 
     using namespace std::literals::chrono_literals;
 
+    namespace impl
+    {
+        template <typename T>
+        get_tuple_t<
+            std::promise<T>, 
+            std::function<void(void)>
+        > 
+        _bind_function_promise(const std::function<T(void)>& func)
+        {
+            std::promise<T> _promise;
+            std::function<void(void)> _executing_func = [func, &_promise]() -> void
+            {
+                try
+                {
+                    _promise.set_value(func());
+                }
+                catch(...)
+                {
+                    _promise.set_exception(std::current_exception());
+                }
+            };
+            return make_tuple(std::move(_promise), std::move(_executing_func));
+        }
+
+        template <>
+        get_tuple_t<
+            std::promise<void>, 
+            std::function<void(void)>
+        > 
+        _bind_function_promise<void>(const std::function<void(void)>& func);
+    }
+
     class TSDL_Eventloop
     {
         public:
@@ -78,6 +110,32 @@ namespace TSDL
         void _handle_func();
         void _handle_render();
         void _run_step();
+
+        template <typename... Args>
+        void _push_back_function_unlocked(std::function<void(void)>&& func, Args... args)
+        {
+            _pending_func.push_back(func);
+            _push_back_function_unlocked(std::forward<Args...>(args)...);
+        }
+
+        template <typename... Args>
+        void _push_back_function(Args... args)
+        {
+            std::scoped_lock _lock(_m_func_vector);
+            _push_back_function_unlocked(std::forward<Args...>(args)...);
+        }
+
+        template <typename... Args, size_t... I>
+        void _push_back_function_tuple(get_tuple_t<Args...> args_tpl, std::index_sequence<I...>)
+        {
+            _push_back_function(std::get<I>(args_tpl)...);
+        }
+
+        template <typename... Args>
+        void _push_back_function_tuple(get_tuple_t<Args...> args_tpl)
+        {
+            _push_back_function_tuple(args_tpl, std::make_index_sequence<sizeof...(Args)>{});
+        }
 
         public:
 
@@ -181,23 +239,26 @@ namespace TSDL
         template <typename T>
         std::promise<T> execute_next_cycle(std::function<T(void)> func)
         {
-            std::promise<T> _promise;
-            std::function<void(void)> _executing_func = [_promise]() -> void
-            {
-                try
-                {
-                    _promise.set_value(func());
-                }
-                catch(...)
-                {
-                    _promise.set_exception(std::current_exception());
-                }
-            };
-            {
-                std::scoped_lock _lock(_m_func_vector);
-                _pending_func.push_back(_executing_func);
-            }
+            auto [_promise, _executing_func] = impl::_bind_function_promise(func);
+            _push_back_function(_executing_func);
             return _promise;
+        }
+
+        template <typename... Args>
+        get_tuple_t<std::promise<Args>...> batch_execute_next_cycle(std::function<Args(void)>... func)
+        {
+            auto [_promise_tuple, _executing_func_tuple] = std::apply(
+                [](auto&&... _promise_execution_pair)
+                {
+                    return make_tuple(
+                        make_tuple(std::get<0>(_promise_execution_pair)...), 
+                        make_tuple(std::get<1>(_promise_execution_pair)...)
+                    );
+                },
+                make_tuple(impl::_bind_function_promise(func)...)
+            );
+            _push_back_function_tuple(_executing_func_tuple);
+            return _promise_tuple;
         }
     };
 

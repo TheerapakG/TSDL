@@ -32,6 +32,9 @@ namespace TSDL
         struct _template_holder {};
     }
 
+    template <typename T, typename Ignore>
+    using expand = T;
+
     template <bool u, bool ...v>
     struct _and
     {
@@ -61,6 +64,15 @@ namespace TSDL
 
     template <bool ...v>
     inline constexpr bool _or_v = _or<v...>::value;
+
+    template <>
+    struct _not <true> : std::false_type {};
+
+    template <>
+    struct _not <false> : std::true_type {};
+
+    template <bool ...v>
+    inline constexpr bool _not_v = _not<v...>::value;
 
     template <typename T>
     struct remove_all_pointers

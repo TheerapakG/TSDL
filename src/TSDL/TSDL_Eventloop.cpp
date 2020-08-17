@@ -25,6 +25,29 @@ namespace TSDL::impl
 {
     optional_reference<TSDL_Eventloop> _current_eventloop;
     std::recursive_mutex _m_current_eventloop;
+
+    template <>
+    get_tuple_t<
+        std::promise<void>, 
+        std::function<void(void)>
+    > 
+    _bind_function_promise<void>(const std::function<void(void)>& func)
+    {
+        std::promise<void> _promise;
+        std::function<void(void)> _executing_func = [func, &_promise]() -> void
+        {
+            try
+            {
+                func();
+                _promise.set_value();
+            }
+            catch(...)
+            {
+                _promise.set_exception(std::current_exception());
+            }
+        };
+        return make_tuple(std::move(_promise), std::move(_executing_func));
+    }
 }
 
 #ifdef __cpp_exceptions
