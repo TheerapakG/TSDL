@@ -91,6 +91,7 @@ TSDL::point_2d TSDL::point_2d::operator/(const int other) const
 
 TSDL::point_2d& TSDL::point_2d::operator+=(const point_2d& other)
 {
+    // no side effect for self-assign
     x += other.x;
     y += other.y;
     return *this;
@@ -98,6 +99,7 @@ TSDL::point_2d& TSDL::point_2d::operator+=(const point_2d& other)
 
 TSDL::point_2d& TSDL::point_2d::operator-=(const point_2d& other)
 {
+    // no side effect for self-assign
     x -= other.x;
     y -= other.y;
     return *this;

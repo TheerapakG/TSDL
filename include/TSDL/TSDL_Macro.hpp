@@ -10,16 +10,36 @@
 #ifndef TSDL_MACRO_
 #define TSDL_MACRO_
 
+// BEGIN LIKELY
+
 #if __has_cpp_attribute(likely)
 #define _TSDL_LIKELY(x) (x) [[likely]]
-#else
-#define _TSDL_LIKELY(x) (x)
 #endif
+
 #if __has_cpp_attribute(unlikely)
 #define _TSDL_UNLIKELY(x) (x) [[unlikely]]
-#else
+#endif
+
+#ifdef __has_builtin
+#if __has_builtin(__builtin_expect)
+#ifndef _TSDL_LIKELY
+#define _TSDL_LIKELY(x) __builtin_expect(x, 1)
+#endif
+#ifndef _TSDL_UNLIKELY
+#define _TSDL_UNLIKELY(x) __builtin_expect(x, 0)
+#endif
+#endif
+#endif
+
+#ifndef _TSDL_LIKELY
+#define _TSDL_LIKELY(x) (x)
+#endif
+
+#ifndef _TSDL_UNLIKELY
 #define _TSDL_UNLIKELY(x) (x)
 #endif
+
+// END LIKELY
 
 #define TSDL_DECLARE_CONSTRUCT(TSDL_NAME)                 \
 TSDL_##TSDL_NAME(const TSDL_##TSDL_NAME& other) = delete; \
