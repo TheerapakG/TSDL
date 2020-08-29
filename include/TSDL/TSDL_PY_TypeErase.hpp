@@ -73,6 +73,7 @@ template <typename... ConstructTypes>                                           
 class _##TSDL_NAME                                                                                \
 {                                                                                                 \
     private:                                                                                      \
+    bool constructed = false;                                                                     \
     TSDL::TSDL_##TSDL_NAME* _o = nullptr;                                                         \
     std::tuple<ConstructTypes...> _t;                                                             \
                                                                                                   \
@@ -81,23 +82,28 @@ class _##TSDL_NAME                                                              
     ~_##TSDL_NAME(){}                                                                             \
     TSDL::TSDL_##TSDL_NAME* enter()                                                               \
     {                                                                                             \
-        if(_o != nullptr) throw std::runtime_error("Object has already been made!");              \
-        _o = static_cast<TSDL::TSDL_##TSDL_NAME*>(::operator new(sizeof(TSDL::TSDL_##TSDL_NAME)));\
+        if(constructed) throw std::runtime_error("Object has already been made!");                \
+        _o = ::operator new(sizeof(TSDL::TSDL_##TSDL_NAME), alignof(TSDL::TSDL_##TSDL_NAME));     \
         try                                                                                       \
         {                                                                                         \
             _PY_Util::construct_in_place_from_tuple<TSDL::TSDL_##TSDL_NAME>(_o, std::move(_t));   \
+            constructed = true;                                                                   \
         }                                                                                         \
         catch (...)                                                                               \
         {                                                                                         \
-            delete _o;                                                                            \
+            ::operator delete(_o);                                                                \
+            _o = nullptr;                                                                         \
             throw;                                                                                \
         }                                                                                         \
         return _o;                                                                                \
     }                                                                                             \
     void exit()                                                                                   \
     {                                                                                             \
-        _o->~TSDL_##TSDL_NAME();                                                                  \
-        ::operator delete(_o);                                                                    \
+        if(_o != nullptr)                                                                         \
+        {                                                                                         \
+            delete _o;                                                                            \
+            _o = nullptr;                                                                         \
+        }                                                                                         \
     }                                                                                             \
 };                                                                                                \
 
