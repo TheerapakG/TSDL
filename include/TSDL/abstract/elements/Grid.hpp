@@ -18,7 +18,7 @@
 #include <limits>
 #include "TSDL/abstract/elements/ElementHolder.hpp"
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 namespace TSDL::elements
 {

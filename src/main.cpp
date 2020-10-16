@@ -35,7 +35,7 @@ void say_fps()
 
 TSDL::elements::Scene* current_scene = nullptr;
 TSDL::elements::Grid* grid = nullptr;
-TSDL::TSDL_Font* font = nullptr;
+TSDL::Font* font = nullptr;
 static std::filesystem::path current_path = std::filesystem::current_path();
 
 std::vector <TSDL::elements::DependentElement*> _previous_visual_elements;
@@ -53,12 +53,12 @@ void generate_visual_from_path()
     _previous_visual_elements.clear();
     _dependent_visual_elements.clear();
 
-    TSDL::TSDL_Surface pathtext("Current path: " + current_path.u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+    TSDL::Surface pathtext("Current path: " + current_path.u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
     el::effectelement<el::TextureElement>* pathtexteffect = new el::effectelement<el::TextureElement>(
         pathtext.size(),
-        std::shared_ptr <TSDL::TSDL_Texture> ( 
-            new TSDL::TSDL_Texture(
+        std::shared_ptr <TSDL::Texture> ( 
+            new TSDL::Texture(
                 current_scene->bounded_window().renderer(),
                 pathtext
             )
@@ -70,11 +70,11 @@ void generate_visual_from_path()
 
     int y = pathtext.size().y + 16;
 
-    TSDL::TSDL_Surface buttontext("..", *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+    TSDL::Surface buttontext("..", *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
     TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
         buttontext.size(),
-        std::shared_ptr <TSDL::TSDL_Texture> ( 
-            new TSDL::TSDL_Texture(
+        std::shared_ptr <TSDL::Texture> ( 
+            new TSDL::Texture(
                 current_scene->bounded_window().renderer(),
                 buttontext
             )
@@ -105,12 +105,12 @@ void generate_visual_from_path()
         if(!p.is_directory()) continue;
         auto path = p.path();
         if(!path.has_stem()) continue;
-        TSDL::TSDL_Surface buttontext(path.stem().u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+        TSDL::Surface buttontext(path.stem().u8string(), *font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
         TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
             buttontext.size(),
-            std::shared_ptr <TSDL::TSDL_Texture> ( 
-                new TSDL::TSDL_Texture(
+            std::shared_ptr <TSDL::Texture> ( 
+                new TSDL::Texture(
                     current_scene->bounded_window().renderer(),
                     buttontext
                 )
@@ -152,11 +152,11 @@ int main(int argc, char* argv[])
         //Initialize SDL
         TSDL::TSDL tsdl;
 
-        TSDL::TSDL_Eventloop eventloop;
+        TSDL::Eventloop eventloop;
 
         eventloop.add_event_handler(SDL_QUIT, quit_handler);
 
-        TSDL::TSDL_Window window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        TSDL::Window window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
         TSDL::elements::EventloopAdapter evAdapter;
         TSDL::elements::WindowAdapter winAdapter(window);
@@ -175,9 +175,9 @@ int main(int argc, char* argv[])
         #ifdef TSDL_USE_FONTCONFIG
         std::string font_path = TSDL::get_family_font_filename("sans-serif");
         std::cout << "using font: " << font_path << " as sans-serif font" << std::endl;
-        TSDL::TSDL_Font font(font_path, 40);
+        TSDL::Font font(font_path, 40);
         #else
-        TSDL::TSDL_Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 40);
+        TSDL::Font font((std::filesystem::current_path()/"fonts/segoeui.ttf").string(), 40);
         #endif
         ::font = &font;
 
@@ -186,12 +186,12 @@ int main(int argc, char* argv[])
             ::TSDL::point_2d{256, 64}
         );
 
-        TSDL::TSDL_Surface* buttontext = new TSDL::TSDL_Surface(u8"Drag Me!", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
+        TSDL::Surface* buttontext = new TSDL::Surface(u8"Drag Me!", font, {0xFF, 0xFF, 0xFF}, TSDL::TTF_Rendermethod::Blended);
 
         TSDL::elements::TextureElement buttontextelement(
             buttontext->size(),
-            std::shared_ptr <TSDL::TSDL_Texture> ( 
-                new TSDL::TSDL_Texture(
+            std::shared_ptr <TSDL::Texture> ( 
+                new TSDL::Texture(
                     current_scene->bounded_window().renderer(),
                     *buttontext
                 )

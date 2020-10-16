@@ -14,7 +14,7 @@
 #include "TSDL/abstract/elements/Element.hpp"
 #include "TSDL/abstract/elements/ElementHolder.hpp"
 
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 namespace TSDL::elements::attrs
 {

@@ -20,13 +20,13 @@ namespace TSDL
         class TextureElement: public attrs::sizable<RenderSizedElement>
         {
             private:
-            std::shared_ptr<TSDL_Texture> _texture;
+            std::shared_ptr<Texture> _texture;
 
             public:
             TextureElement(const TextureElement& other);
-            TextureElement(const point_2d& size, std::shared_ptr<TSDL_Texture> texture);
+            TextureElement(const point_2d& size, std::shared_ptr<Texture> texture);
 
-            TSDL_Texture& texture();
+            Texture& texture();
 
             /*
             Re-render this element

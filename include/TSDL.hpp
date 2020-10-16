@@ -15,15 +15,15 @@
         namespace py = pybind11;
     #endif
 
-    #include "TSDL/TSDL_Eventloop.hpp"
-    #include "TSDL/TSDL_Main.hpp"
-    #include "TSDL/TSDL_Renderer.hpp"
-    #include "TSDL/TSDL_Surface.hpp"
-    #include "TSDL/TSDL_Texture.hpp"
-    #include "TSDL/TSDL_Window.hpp"
-    #include "TSDL/TSDL_Chunk.hpp"
-    #include "TSDL/TSDL_Music.hpp"
-    #include "TSDL/TSDL_Font.hpp"
+    #include "TSDL/Eventloop.hpp"
+    #include "TSDL/Main.hpp"
+    #include "TSDL/Renderer.hpp"
+    #include "TSDL/Surface.hpp"
+    #include "TSDL/Texture.hpp"
+    #include "TSDL/Window.hpp"
+    #include "TSDL/Chunk.hpp"
+    #include "TSDL/Music.hpp"
+    #include "TSDL/Font.hpp"
 
     #include "TSDL/abstract/effects.hpp"
     #include "TSDL/abstract/elements.hpp"
@@ -34,7 +34,7 @@
     #endif
 
     #ifdef TSDL_EXPOSE_PYBIND11
-        #include "TSDL/TSDL_PY_Constants.hpp"
+        #include "TSDL/PY_Constants.hpp"
         PYBIND11_MODULE(tsdl, m)
         {
             _tsdl_py_constant_py(m);

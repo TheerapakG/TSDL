@@ -14,9 +14,9 @@
 #include <vector>
 #include <map>
 #include <functional>
-#include "TSDL/TSDL_Utility.hpp"
-#include "TSDL/TSDL_Texture.hpp"
-#include "TSDL/TSDL_Renderer.hpp"
+#include "TSDL/Utility.hpp"
+#include "TSDL/Texture.hpp"
+#include "TSDL/Renderer.hpp"
 #include "TSDL/abstract/events/EventType.hpp"
 
 namespace TSDL

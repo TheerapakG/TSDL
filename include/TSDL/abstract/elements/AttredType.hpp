@@ -10,7 +10,7 @@
 #ifndef TSDL_ELEMENTS_ATTREDTYPE_
 #define TSDL_ELEMENTS_ATTREDTYPE_
 
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 #include "TSDL/utilities/meta_list.hpp"
 
 namespace TSDL::elements

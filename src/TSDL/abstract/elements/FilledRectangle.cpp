@@ -9,7 +9,7 @@
 
 #include "TSDL/abstract/elements/FilledRectangle.hpp"
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 TSDL::elements::FilledRectangle::FilledRectangle(const FilledRectangle& other):
     attrs::sizable<RenderSizedElement>(other.size()), _color(other._color) {}

@@ -11,8 +11,8 @@
 #define TSDL_ELEMENTS_ATTRS_SIZABLE_
 
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
-#include "TSDL/TSDL_Main.hpp"
-#include "TSDL/TSDL_Utility.hpp"
+#include "TSDL/Main.hpp"
+#include "TSDL/Utility.hpp"
 
 namespace TSDL::elements::attrs
 {

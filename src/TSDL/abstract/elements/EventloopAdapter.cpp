@@ -11,7 +11,7 @@
 #include <functional>
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 using namespace std::placeholders;
 
@@ -270,7 +270,7 @@ namespace TSDL::elements
         _windows.erase(window_adapter.window().id());
     }
 
-    TSDL_Eventloop::clock::time_point EventloopAdapter::now()
+    Eventloop::clock::time_point EventloopAdapter::now()
     {
         return _evloop.now();
     }

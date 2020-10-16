@@ -10,7 +10,7 @@
 #ifndef TSDL_UTILITIES_META_LIST
 #define TSDL_UTILITIES_META_LIST
 
-#include <TSDL/TSDL_Meta.hpp>
+#include <TSDL/Meta.hpp>
 #include <tuple>
 
 namespace TSDL::util

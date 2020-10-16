@@ -9,7 +9,7 @@
 
 #include "TSDL/abstract/elements/RoundedRectangle.hpp"
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 TSDL::elements::RoundedRectangle::RoundedRectangle(const RoundedRectangle& other):
     attrs::sizable<RenderSizedElement>(other.size()), _color(other._color), _r(other._r) {}
@@ -24,7 +24,7 @@ void TSDL::elements::RoundedRectangle::render(WindowAdapter& window, const ::TSD
 
 void TSDL::elements::RoundedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size)
 {
-    TSDL_Renderer& _render = window.renderer();
+    Renderer& _render = window.renderer();
 
     color_rgba prev_col = _render.render_color();
     _render.render_color(_color); // TODO: check when noexcept signify error
