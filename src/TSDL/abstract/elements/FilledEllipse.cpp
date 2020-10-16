@@ -9,7 +9,7 @@
 
 #include "TSDL/abstract/elements/FilledEllipse.hpp"
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 TSDL::elements::FilledEllipse::FilledEllipse(const FilledEllipse& other):
     attrs::sizable<RenderSizedElement>(other.size()), _color(other._color) {}
@@ -24,7 +24,7 @@ void TSDL::elements::FilledEllipse::render(WindowAdapter& window, const ::TSDL::
 
 void TSDL::elements::FilledEllipse::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size)
 {
-    TSDL_Renderer& _render = window.renderer();
+    Renderer& _render = window.renderer();
 
     color_rgba prev_col = _render.render_color();
     _render.render_color(_color); // TODO: check when noexcept signify error

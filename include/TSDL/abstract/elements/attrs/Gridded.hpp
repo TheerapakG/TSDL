@@ -14,7 +14,7 @@
 #include "TSDL/abstract/elements/attrs/EventForwarder.hpp"
 #include "TSDL/abstract/elements/Grid.hpp"
 
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 namespace TSDL::elements::attrs
 {

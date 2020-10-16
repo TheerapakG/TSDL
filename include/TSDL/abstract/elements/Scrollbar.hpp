@@ -18,7 +18,7 @@
 #include "TSDL/abstract/elements/Button.hpp"
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
 
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 #include <memory>
 
 namespace TSDL::elements

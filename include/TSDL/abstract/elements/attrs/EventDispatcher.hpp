@@ -13,7 +13,7 @@
 #include <set>
 #include <map>
 #include <functional>
-#include "TSDL/TSDL_Utility.hpp"
+#include "TSDL/Utility.hpp"
 #include "TSDL/abstract/elements/attrs/EventLookup.hpp"
 #include "TSDL/abstract/elements/Element.hpp"
 #include "TSDL/abstract/events/EventType.hpp"

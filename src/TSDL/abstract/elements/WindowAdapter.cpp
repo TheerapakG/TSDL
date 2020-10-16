@@ -12,14 +12,14 @@
 
 namespace TSDL::elements
 {
-    WindowAdapter::WindowAdapter(TSDL_Window& window): 
+    WindowAdapter::WindowAdapter(Window& window): 
         _window(window), 
         _renderer(window)
     {
         current_eventloop_adapter().add_window(*this);
     }
 
-    WindowAdapter::WindowAdapter(TSDL_Window& window, Uint32 renderer_flags): 
+    WindowAdapter::WindowAdapter(Window& window, Uint32 renderer_flags): 
         _window(window), 
         _renderer(window, renderer_flags)
     {
@@ -31,12 +31,12 @@ namespace TSDL::elements
         current_eventloop_adapter().remove_window(*this);
     }
             
-    TSDL_Window& WindowAdapter::window()
+    Window& WindowAdapter::window()
     {
         return _window;
     }
             
-    TSDL_Renderer& WindowAdapter::renderer()
+    Renderer& WindowAdapter::renderer()
     {
         return _renderer;
     }

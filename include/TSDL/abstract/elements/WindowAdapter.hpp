@@ -18,9 +18,9 @@
 #include <optional>
 #include "TSDL/abstract/elements/attrs/EventLookup.hpp"
 
-#include "TSDL/TSDL_Meta.hpp"
-#include "TSDL/TSDL_Eventloop.hpp"
-#include "TSDL/TSDL_Renderer.hpp"
+#include "TSDL/Meta.hpp"
+#include "TSDL/Eventloop.hpp"
+#include "TSDL/Renderer.hpp"
 
 namespace TSDL
 {
@@ -31,18 +31,18 @@ namespace TSDL
             private:
             optional_reference<attrs::EventLookupable> _src;
             optional_reference<DependentElement> _d_src;
-            TSDL_Window& _window;
-            TSDL_Renderer _renderer;
+            Window& _window;
+            Renderer _renderer;
             
             public:
             WindowAdapter() = delete;
-            WindowAdapter(TSDL_Window& window);
-            WindowAdapter(TSDL_Window& window, Uint32 renderer_flags);
+            WindowAdapter(Window& window);
+            WindowAdapter(Window& window, Uint32 renderer_flags);
 
             ~WindowAdapter();
 
-            TSDL_Window& window();
-            TSDL_Renderer& renderer();
+            Window& window();
+            Renderer& renderer();
 
             /*
             set source

@@ -18,7 +18,7 @@
 #include "TSDL/abstract/elements/attrs/Sizable.hpp"
 #include "TSDL/abstract/elements/Element.hpp"
 #include "TSDL/abstract/elements/attrs/EventLookup.hpp"
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 namespace TSDL
 {

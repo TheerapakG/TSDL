@@ -13,7 +13,7 @@
 #include "TSDL/abstract/elements/attrs/Sizable.hpp"
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
 
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 namespace TSDL
 {
@@ -22,7 +22,7 @@ namespace TSDL
         class EffectElement
         {
             public:
-            using TextureModifyFunc = std::function<void(TSDL_Texture&)>;
+            using TextureModifyFunc = std::function<void(Texture&)>;
 
             private:
             // TODO: texture modifier as effect object vector as documented
@@ -50,8 +50,8 @@ namespace TSDL
         {
             private:
             point_2d _current_texture_dim;
-            TSDL_Texture* _src_texture = nullptr; 
-            TSDL_Texture* _return_texture = nullptr;
+            Texture* _src_texture = nullptr; 
+            Texture* _return_texture = nullptr;
             bool _req_update = true;
             
             public:
@@ -85,8 +85,8 @@ namespace TSDL
                     if(_src_texture!=nullptr) delete _src_texture;
                     if(_return_texture!=nullptr) delete _return_texture;
                     _current_texture_dim = size();
-                    _src_texture = new TSDL_Texture(window.renderer(), _current_texture_dim);
-                    _return_texture = new TSDL_Texture(window.renderer(), _current_texture_dim);
+                    _src_texture = new Texture(window.renderer(), _current_texture_dim);
+                    _return_texture = new Texture(window.renderer(), _current_texture_dim);
                 }
 
                 auto _prev_target = window.renderer().target();

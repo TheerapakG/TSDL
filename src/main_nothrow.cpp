@@ -13,8 +13,8 @@ using namespace std::literals::chrono_literals;
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 
-TSDL::TSDL_Window* window;
-TSDL::TSDL_Eventloop eventloop;
+TSDL::Window* window;
+TSDL::Eventloop eventloop;
 
 void print_exc()
 {
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     TSDL::TSDL tsdl;
     if(!check(tsdl)) return -1;
 
-    window = new TSDL::TSDL_Window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    window = new TSDL::Window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if(!check(*window)) return -1;
         
     //Get window surface

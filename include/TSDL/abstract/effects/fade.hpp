@@ -15,7 +15,7 @@
 // START FWD_DECL
 namespace TSDL
 {
-    class TSDL_Texture;
+    class Texture;
 
     namespace elements
     {

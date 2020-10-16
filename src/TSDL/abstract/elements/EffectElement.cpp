@@ -9,7 +9,7 @@
 
 #include "TSDL/abstract/elements/EffectElement.hpp"
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 namespace TSDL::elements
 {

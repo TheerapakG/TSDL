@@ -9,7 +9,7 @@
 
 #include "TSDL/abstract/elements/HollowedRectangle.hpp"
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 TSDL::elements::HollowedRectangle::HollowedRectangle(const HollowedRectangle& other):
     attrs::sizable<RenderSizedElement>(other.size()), _color(other._color) {}

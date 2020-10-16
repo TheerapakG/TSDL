@@ -19,9 +19,9 @@
 #include "TSDL/abstract/elements/attrs/EventLookup.hpp"
 #include "TSDL/abstract/elements/attrs/EventDispatcher.hpp"
 
-#include "TSDL/TSDL_Meta.hpp"
-#include "TSDL/TSDL_Eventloop.hpp"
-#include "TSDL/TSDL_Renderer.hpp"
+#include "TSDL/Meta.hpp"
+#include "TSDL/Eventloop.hpp"
+#include "TSDL/Renderer.hpp"
 
 namespace TSDL
 {
@@ -32,7 +32,7 @@ namespace TSDL
         class EventloopAdapter
         {
             private:
-            TSDL_Eventloop& _evloop;
+            Eventloop& _evloop;
             std::set <::TSDL::EventHandler*> _handlers;
             std::unordered_map <Uint32, std::reference_wrapper<WindowAdapter>> _windows;
 
@@ -59,7 +59,7 @@ namespace TSDL
             */
             void register_call_next(std::function<void()> call);
 
-            TSDL_Eventloop::clock::time_point now();
+            Eventloop::clock::time_point now();
 
             const std::unordered_map <Uint32, std::reference_wrapper<WindowAdapter>>& windows();
         };

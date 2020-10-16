@@ -10,8 +10,8 @@
 #ifndef TSDL_UTILITIES_OPTIONAL_WITH_BASE
 #define TSDL_UTILITIES_OPTIONAL_WITH_BASE
 
-#include "TSDL/TSDL_Meta.hpp"
-#include "TSDL/TSDL_Utility.hpp"
+#include "TSDL/Meta.hpp"
+#include "TSDL/Utility.hpp"
 #include <optional>
 #include <tuple>
 #include <functional>

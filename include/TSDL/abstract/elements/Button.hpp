@@ -17,7 +17,7 @@
 #include "TSDL/abstract/elements/FilledRectangle.hpp"
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
 
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 #include "TSDL/utilities/optional_with_base.hpp"
 #include "TSDL/utilities/meta_list.hpp"
 #include <memory>

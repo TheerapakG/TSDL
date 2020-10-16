@@ -16,10 +16,10 @@ namespace TSDL::effects
     void fade_in(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms)
     {
         elements::EventloopAdapter& _ev_adapter = elements::current_eventloop_adapter();
-        TSDL_Eventloop::clock::time_point _start_time = _ev_adapter.now();
-        TSDL_Eventloop::clock::time_point _end_time = _start_time + ms;
+        Eventloop::clock::time_point _start_time = _ev_adapter.now();
+        Eventloop::clock::time_point _end_time = _start_time + ms;
 
-        fx_element.modify_texture_function() = [=, &fx_element, &_ev_adapter](TSDL_Texture& texture) -> void
+        fx_element.modify_texture_function() = [=, &fx_element, &_ev_adapter](Texture& texture) -> void
         {
             if (_ev_adapter.now() >= _end_time)
             {
@@ -40,10 +40,10 @@ namespace TSDL::effects
     void fade_out(elements::EffectElement & fx_element, const std::chrono::milliseconds & ms)
     {
         elements::EventloopAdapter& _ev_adapter = elements::current_eventloop_adapter();
-        TSDL_Eventloop::clock::time_point _start_time = _ev_adapter.now();
-        TSDL_Eventloop::clock::time_point _end_time = _start_time + ms;
+        Eventloop::clock::time_point _start_time = _ev_adapter.now();
+        Eventloop::clock::time_point _end_time = _start_time + ms;
 
-        fx_element.modify_texture_function() = [=, &fx_element, &_ev_adapter](TSDL_Texture& texture) -> void
+        fx_element.modify_texture_function() = [=, &fx_element, &_ev_adapter](Texture& texture) -> void
         {
             if (_ev_adapter.now() >= _end_time)
             {

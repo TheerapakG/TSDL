@@ -10,7 +10,7 @@
 #include "TSDL/abstract/elements/ElementHolder.hpp"
 #include "TSDL/abstract/elements/WindowAdapter.hpp"
 #include "TSDL/abstract/elements/EventloopAdapter.hpp"
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 #include <algorithm>
 
 namespace TSDL::elements

@@ -12,7 +12,7 @@
 
 #include "TSDL/abstract/elements/attrs/Sizable.hpp"
 
-#include "TSDL/TSDL_Meta.hpp"
+#include "TSDL/Meta.hpp"
 
 namespace TSDL
 {
