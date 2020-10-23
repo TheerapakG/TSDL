@@ -18,6 +18,7 @@
 #include <future>
 #include <mutex>
 #include <functional>
+#include "Utility.hpp"
 
 #ifdef TSDL_EXPOSE_PYBIND11
 #include "PY_TypeErase.hpp"
@@ -137,11 +138,13 @@ namespace TSDL
             _push_back_function_tuple(args_tpl, std::make_index_sequence<sizeof...(Args)>{});
         }
 
+        Eventloop(_pconstruct_t, bool thrownoevhandler, bool thrownorenderhandler);
+
         public:
 
         _PY_DECLARE_TYPEERASE_OWNER(Eventloop)
 
-        Eventloop() = default;
+        Eventloop();
         #ifdef __cpp_exceptions
         Eventloop(bool thrownoevhandler, bool thrownorenderhandler);
         #endif

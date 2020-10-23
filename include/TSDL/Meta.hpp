@@ -65,14 +65,11 @@ namespace TSDL
     template <bool ...v>
     inline constexpr bool _or_v = _or<v...>::value;
 
-    template <>
-    struct _not <true> : std::false_type {};
+    template <bool v>
+    struct _not : std::bool_constant<!v> {};
 
-    template <>
-    struct _not <false> : std::true_type {};
-
-    template <bool ...v>
-    inline constexpr bool _not_v = _not<v...>::value;
+    template <bool v>
+    inline constexpr bool _not_v = _not<v>::value;
 
     template <typename T>
     struct remove_all_pointers

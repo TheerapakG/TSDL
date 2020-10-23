@@ -25,6 +25,13 @@ namespace TSDL
 {
     extern thread_local const std::thread::id current_thread_id;
 
+    /*
+    Helper type allowing class to call its private constructor
+    */
+    struct _pconstruct_t {};
+
+    inline constexpr _pconstruct_t pconstruct;
+
 #ifdef __cpp_exceptions    
     template <typename Exc, typename ...Args>
     bool safe_throw(Args... args)

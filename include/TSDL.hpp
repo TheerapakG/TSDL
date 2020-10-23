@@ -25,12 +25,12 @@
     #include "TSDL/Music.hpp"
     #include "TSDL/Font.hpp"
 
-    #include "TSDL/abstract/effects.hpp"
-    #include "TSDL/abstract/elements.hpp"
+    #include "TSDL/visuals/effects.hpp"
+    #include "TSDL/visuals/elements.hpp"
 
     #ifdef TSDL_USE_PANGOCAIRO
-        #include "TSDL/pangocairo/TSDL_CairoSurface.hpp"
-        #include "TSDL/pangocairo/TSDL_PangoLayout.hpp"
+        #include "TSDL/pangocairo/CairoSurface.hpp"
+        #include "TSDL/pangocairo/PangoLayout.hpp"
     #endif
 
     #ifdef TSDL_EXPOSE_PYBIND11
