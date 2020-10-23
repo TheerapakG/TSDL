@@ -33,7 +33,7 @@ TSDL::PangoLayout::~PangoLayout()
     if(_destroy && _internal_ptr != nullptr) g_object_unref(_internal_ptr);
 }
 
-TSDL::PangoLayout::operator PangoLayout*() const
+TSDL::PangoLayout::operator SDL_Type*() const
 {
     return _internal_ptr;
 }
@@ -46,7 +46,7 @@ TSDL::PangoLayout&  TSDL::PangoLayout::text(const std::_TSDL_U8(string)& str)
 
 std::_TSDL_U8(string) TSDL::PangoLayout::text()
 {
-    return (const _char*)(pango_layout_get_text(_internal_ptr)); //eww
+    return (const _TSDL_char*)(pango_layout_get_text(_internal_ptr)); //eww
 }
 
 TSDL::point_2d TSDL::PangoLayout::size()

@@ -50,10 +50,22 @@ namespace TSDL::impl
     }
 }
 
+TSDL::Eventloop::Eventloop(_pconstruct_t, bool thrownoevhandler, bool thrownorenderhandler)
+{
+    std::scoped_lock lock(impl::_m_current_eventloop);
+    if (impl::_current_eventloop.has_value())
+    {
+        TSDL::safe_throw<std::runtime_error>("There is already an eventloop, running two eventloop simultaneously is not possible");
+        return;
+    }
+    impl::_current_eventloop = *this;
+}
+
+TSDL::Eventloop::Eventloop(): Eventloop(pconstruct, false, false) {}
+
 #ifdef __cpp_exceptions
 TSDL::Eventloop::Eventloop(bool thrownoevhandler, bool thrownorenderhandler) :
-_throw_if_no_event_handler(thrownoevhandler),
-_throw_if_no_render_handler(thrownorenderhandler) {}
+Eventloop(pconstruct, thrownoevhandler, thrownorenderhandler) {}
 #endif
 
 TSDL::Eventloop::~Eventloop()
@@ -193,16 +205,6 @@ void TSDL::Eventloop::_run_step()
 
 void TSDL::Eventloop::run()
 {
-    {
-        std::scoped_lock lock(impl::_m_current_eventloop);
-        if (impl::_current_eventloop.has_value())
-        {
-            TSDL::safe_throw<std::runtime_error>("There is already an eventloop, running two eventloop simultaneously is not possible");
-            return;
-        }
-        impl::_current_eventloop = *this;
-    }
-
 #ifndef TSDL_USE_EMSCRIPTEN
     if(_track_fps) this->_reset_fps_count();
     _time_last_frame = clock::now();

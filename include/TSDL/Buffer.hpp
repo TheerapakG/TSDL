@@ -50,7 +50,7 @@ namespace TSDL
         If exceptions is disabled, use TSDL::check_integrity to check
         if the object creation resulted in an error or not
         */
-        Buffer(const std::_U8(string)& file, const std::string& mode);
+        Buffer(const std::_TSDL_U8(string)& file, const std::string& mode);
         Buffer(void* mem, size_t size);
         Buffer(const void* mem, size_t size);
 

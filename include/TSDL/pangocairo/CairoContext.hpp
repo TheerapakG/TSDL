@@ -15,7 +15,7 @@
 #include <utility>
 #include <functional>
 
-#include "TSDL/Macro.hpp"
+#include "TSDL/Utility.hpp"
 
 namespace TSDL
 {

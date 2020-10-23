@@ -32,11 +32,11 @@ namespace TSDL
     class PangoLayout
     {
         private:
-        PangoLayout* _internal_ptr = nullptr;
+        ::PangoLayout* _internal_ptr = nullptr;
         bool _destroy;
 
         public:
-        using SDL_Type = PangoLayout;
+        using SDL_Type = ::PangoLayout;
 
         PangoLayout(PangoLayout&& other);
 
@@ -46,7 +46,7 @@ namespace TSDL
 
         ~PangoLayout();
 
-        operator PangoLayout*() const;
+        operator SDL_Type*() const;
 
         PangoLayout& text(const std::_TSDL_U8(string)& str);
         std::_TSDL_U8(string) text();
