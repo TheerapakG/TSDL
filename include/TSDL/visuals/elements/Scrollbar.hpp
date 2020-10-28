@@ -28,7 +28,7 @@ namespace TSDL::elements
         using namespace std::placeholders;
 
         template <typename Scrollbar_T>
-        class _Bar: public attrs::dragable<_Button<_Bar<Scrollbar_T>>>
+        class _Bar: public attrs::dragable<_Sizable_Button<_Bar<Scrollbar_T>>>
         {
             private:
                 Scrollbar_T* _scrollbar_ptr;
@@ -36,12 +36,12 @@ namespace TSDL::elements
             public:
             template <typename ...Args>
             _Bar(attrs::DragablePosTransformer pos_transform, const point_2d& size, Scrollbar_T* scrollbar):
-                attrs::dragable<_Button<_Bar>>(pos_transform, size), _scrollbar_ptr(scrollbar) {}
+                attrs::dragable<_Sizable_Button<_Bar>>(pos_transform, size), _scrollbar_ptr(scrollbar) {}
 
             template <events::EventType eventtype>
             bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
             {
-                return attrs::dragable<_Button<_Bar<Scrollbar_T>>>::dispatch_templated_event<eventtype>(caller, event);
+                return attrs::dragable<_Sizable_Button<_Bar<Scrollbar_T>>>::dispatch_templated_event<eventtype>(caller, event);
             }
 
             template <>

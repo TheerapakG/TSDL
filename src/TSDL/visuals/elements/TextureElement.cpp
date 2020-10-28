@@ -22,12 +22,12 @@ TSDL::Texture& TSDL::elements::TextureElement::texture()
     return *_texture;
 }
 
-void TSDL::elements::TextureElement::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
+void TSDL::elements::TextureElement::render(WindowAdapter& window, const ::TSDL::point_2d& dist) const
 {
     render(window, dist, size());
 }
 
-void TSDL::elements::TextureElement::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size)
+void TSDL::elements::TextureElement::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) const
 {
     window.renderer().copy_from(
         *_texture, 

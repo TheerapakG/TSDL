@@ -86,7 +86,7 @@ namespace TSDL::elements
     /*
     Re-render this element
     */
-    void GridWithScrollbar::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
+    void GridWithScrollbar::render(WindowAdapter& window, const ::TSDL::point_2d& dist) const
     {
         point_2d _grid_size = grid().size();
         hbar->content_width(_grid_size.x + 2*_margin.x);

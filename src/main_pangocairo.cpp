@@ -5,7 +5,7 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
-#include <vector>
+#include <stack>
 #include <typeinfo>
 #include <filesystem>
 using namespace std::literals::chrono_literals;
@@ -33,87 +33,59 @@ void say_fps()
     }
 }
 
-TSDL::elements::Scene* current_scene = nullptr;
+TSDL::elements::WindowAdapter* current_window = nullptr;
 TSDL::elements::Grid* grid = nullptr;
 TSDL::Font* font = nullptr;
-static std::filesystem::path current_path = std::filesystem::current_path();
 
-std::vector <TSDL::elements::DependentElement*> _previous_visual_elements;
-std::vector <TSDL::elements::DependentElement*> _dependent_visual_elements;
-
-void generate_visual_from_path()
+class DirectoryScene
 {
-    for(auto el: _previous_visual_elements)
+    private:
+    std::filesystem::path _path;
+    el::FilledRectangle _bg = el::FilledRectangle({SCREEN_WIDTH, SCREEN_HEIGHT});
+    el::Grid _m_grid;
+    el::GridWithScrollbar _grid;
+    std::stack<el::DependentElement*> elements;
+    int _curr_y = 0;
+    el::Scene _sc_ctrl{*current_window, _m_grid};
+
+    public:
+    DirectoryScene(const std::filesystem::path& path);
+
+    private:
+    template <typename T, typename... Args>
+    void _add(T* element, Args&&... args)
     {
-        grid->remove_child(*el);
-        delete el;
+        _grid.grid().add_child(*element, std::forward<Args>(args)...);
+        elements.push(element);
     }
-    for(auto el: _dependent_visual_elements) delete el;
 
-    _previous_visual_elements.clear();
-    _dependent_visual_elements.clear();
-
-    TSDL::Texture pathtext = TSDL::PangoLayout()
-        .text("Current path: " + current_path.u8string())
-        .font(*font)
-        .rendered_texture(current_scene->bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
-
-    el::effectelement<el::TextureElement>* pathtexteffect = new el::effectelement<el::TextureElement>(
-        pathtext.size(),
-        std::shared_ptr <TSDL::Texture> ( 
-            new TSDL::Texture(std::move(pathtext))
-        )
-    );
-
-    grid->add_child(*pathtexteffect, {0, 0});
-    _previous_visual_elements.push_back(pathtexteffect);
-
-    int y = pathtext.size().y + 16;
-
-    TSDL::Texture buttontext = TSDL::PangoLayout()
-        .text("..")
-        .font(*font)
-        .rendered_texture(current_scene->bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
-
-    TSDL::elements::Button* button = new TSDL::elements::Button(
-        TSDL::point_2d{buttontext.size().x + 32, 64}
-    );
-
-    TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
-        buttontext.size(),
-        std::shared_ptr <TSDL::Texture> ( 
-            new TSDL::Texture(std::move(buttontext))
-        )
-    );
-
-    button->front(*buttontextelement);
-    button->on_button_activated() =
-    [](const TSDL::elements::Caller& caller, const SDL_Event&) -> bool
+    void _add_title()
     {
-        current_path = current_path.parent_path();
-        TSDL::elements::current_eventloop_adapter().register_call_next(generate_visual_from_path);
-        return true;
-    };
-
-    grid->add_child(*button, {0, y});
-    _previous_visual_elements.push_back(button);
-    _dependent_visual_elements.push_back(buttontextelement);
-
-    y += button->size().y;
-
-    for(auto p: std::filesystem::directory_iterator(current_path, std::filesystem::directory_options::skip_permission_denied))
-    {
-        if(!p.is_directory()) continue;
-        auto path = p.path();
-        if(!path.has_stem()) continue;
-        TSDL::Texture buttontext = TSDL::PangoLayout()
-            .text(path.stem().u8string())
+        TSDL::Texture pathtext = TSDL::PangoLayout()
+            .text("Current path: " + _path.u8string())
             .font(*font)
-            .rendered_texture(current_scene->bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
+            .rendered_texture(_sc_ctrl.bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
 
-        TSDL::elements::Button* button = new TSDL::elements::Button(
-            TSDL::point_2d{buttontext.size().x + 32, 64}
+        el::effectelement<el::TextureElement>* pathtexteffect = new el::effectelement<el::TextureElement>(
+            pathtext.size(),
+            std::shared_ptr <TSDL::Texture> ( 
+                new TSDL::Texture(std::move(pathtext))
+            )
         );
+
+        _add(pathtexteffect, TSDL::point_2d{0, _curr_y});
+
+        TSDL::effects::fade_out(*pathtexteffect, 5000ms);
+
+        _curr_y += pathtext.size().y + 16;
+    }
+
+    void _add_button(const std::_TSDL_U8(string)& str, el::EventHandler& on_press)
+    {
+        TSDL::Texture buttontext = TSDL::PangoLayout()
+            .text(str)
+            .font(*font)
+            .rendered_texture(_sc_ctrl.bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
 
         TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
             buttontext.size(),
@@ -121,24 +93,77 @@ void generate_visual_from_path()
                 new TSDL::Texture(std::move(buttontext))
             )
         );
+        elements.push(buttontextelement);
 
+        TSDL::elements::Button* button = new TSDL::elements::Button(
+            TSDL::point_2d{buttontext.size().x + 32, 64}
+        );
         button->front(*buttontextelement);
-        button->on_button_activated() =
-        [path](const TSDL::elements::Caller& caller, const SDL_Event&) -> bool
+        button->on_button_activated() = on_press;
+
+        _add(button, TSDL::point_2d{0, _curr_y});
+        _curr_y += button->size().y;
+    }
+
+    void _add_parent_dir()
+    {
+        _add_button(
+            "..",
+            el::EventHandler{
+                [this](const TSDL::elements::Caller& caller, const SDL_Event&) -> bool
+                {
+                    auto path = _path;
+                    delete this;
+                    new DirectoryScene(path.parent_path());
+                    return true;
+                }
+            }
+        );
+    }
+
+    void _add_subdirs()
+    {
+        for(auto p: std::filesystem::directory_iterator(_path, std::filesystem::directory_options::skip_permission_denied))
         {
-            current_path = path;
-            TSDL::elements::current_eventloop_adapter().register_call_next(generate_visual_from_path);
-            return true;
-        };
+            if(!p.is_directory()) continue;
+            auto path = p.path();
+            if(!path.has_stem()) continue;
+            _add_button(
+                path.stem().u8string(),
+                el::EventHandler{
+                    [this, path](const TSDL::elements::Caller& caller, const SDL_Event&) -> bool
+                    {
+                        delete this;
+                        new DirectoryScene(path);
+                        return true;
+                    }
+                }
+            );
+        }
+    }
 
-        grid->add_child(*button, {0, y});
-        _previous_visual_elements.push_back(button);
-        _dependent_visual_elements.push_back(buttontextelement);
+    public:
+    ~DirectoryScene()
+    {
+        while(!elements.empty())
+        {
+            // probably the easiest way to ensure the destruction order
+            delete elements.top();
+            elements.pop(); 
+        }
+    }
+};
 
-        y += button->size().y;
+DirectoryScene::DirectoryScene(const std::filesystem::path& path) :    
+    _path(path),
+    _grid({SCREEN_WIDTH, SCREEN_HEIGHT}, 16)
+{
+    _m_grid.add_child(_bg, {0, 0});
+    _m_grid.add_child(_grid, {0, 0});
 
-        TSDL::effects::fade_out(*pathtexteffect, 5000ms);
-    }   
+    _add_title();
+    _add_parent_dir();
+    _add_subdirs();
 }
 
 int main(int argc, char* argv[])
@@ -161,43 +186,12 @@ int main(int argc, char* argv[])
 
         TSDL::elements::EventloopAdapter evAdapter;
         TSDL::elements::WindowAdapter winAdapter(window);
-
-        TSDL::elements::Grid bggrid;
-        TSDL::elements::Scene _scene(winAdapter, bggrid);
-        current_scene = &_scene;
-
-        TSDL::elements::FilledRectangle bg({SCREEN_WIDTH, SCREEN_HEIGHT});
-        bggrid.add_child(bg, {0, 0});
-
-        TSDL::elements::GridWithScrollbar mgrid({SCREEN_WIDTH, SCREEN_HEIGHT}, 16);
-        bggrid.add_child(mgrid, {0, 0});
-        grid = &mgrid.grid();
+        ::current_window = &winAdapter;
 
         TSDL::Font font("Sans-Serif Normal 40");
         ::font = &font;
 
-        TSDL::elements::Button::push_back_attr<elattrs::dragable> button(
-            [](const ::TSDL::point_2d& start, const ::TSDL::point_2d& dist) -> ::TSDL::point_2d { return start + dist; }, 
-            ::TSDL::point_2d{256, 64}
-        );
-
-        TSDL::Texture buttontext = TSDL::PangoLayout()
-            .text(u8"Drag Me!")
-            .font(font)
-            .rendered_texture(current_scene->bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
-
-        TSDL::elements::TextureElement buttontextelement(
-            buttontext.size(),
-            std::shared_ptr <TSDL::Texture> ( 
-                new TSDL::Texture(std::move(buttontext))
-            )
-        );
-
-        button.front(buttontextelement);
-
-        grid->add_child(button, {SCREEN_WIDTH-384, 0});
-
-        generate_visual_from_path();
+        new DirectoryScene(std::filesystem::current_path());
 
         std::thread t(say_fps);
 

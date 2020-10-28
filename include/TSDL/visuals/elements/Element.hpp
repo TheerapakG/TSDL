@@ -57,7 +57,7 @@ namespace TSDL
         class DependentElement: virtual public Element
         {
             private:
-            std::atomic<bool> _update = true;
+            mutable std::atomic<bool> _update = true;
             std::vector<std::reference_wrapper<::TSDL::elements::ElementHolder>> _holders;
 
             public:
@@ -77,7 +77,7 @@ namespace TSDL
             /*
             Reverse what update() did after this cycle finished but before the next cycle begins
             */
-            void not_update();
+            void not_update() const;
 
             /*
             Query if parent need to update this element on the next cycle
@@ -87,7 +87,7 @@ namespace TSDL
             /*
             Re-render this element
             */
-            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) = 0;
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) const = 0;
         };
 
         class RenderSizedElement: public DependentElement
@@ -98,7 +98,7 @@ namespace TSDL
             /*
             Forces this element to be rendered with specified size
             */
-            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) = 0;
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) const = 0;
         };
     }
 }

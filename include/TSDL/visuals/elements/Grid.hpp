@@ -365,7 +365,6 @@ namespace TSDL::elements
             virtual typename Subelement_vector::iterator add_child(const Subelement& formed_subelement, int order) override
             {
                 auto it = _Grid_Attrs<Derived>::add_child(formed_subelement, order);
-                if(std::next(it)!=get_child_order().end()) return it;
                 if(_left_origin.has_value()||_middle_origin.has_value()||_right_origin.has_value()) return it;
 
                 auto& [element, dim] = formed_subelement;
@@ -491,7 +490,7 @@ namespace TSDL::elements
         /*
         Re-render this element
         */
-        virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) override;
+        virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) const override;
     };
 }
 

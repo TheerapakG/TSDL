@@ -31,7 +31,7 @@ void TSDL::elements::DependentElement::update()
     _update = true;
 }
 
-void TSDL::elements::DependentElement::not_update()
+void TSDL::elements::DependentElement::not_update() const
 {
     current_eventloop_adapter().register_not_update(*this);
 }

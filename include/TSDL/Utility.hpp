@@ -155,8 +155,8 @@ namespace TSDL
         rect(const std::pair<point_2d, point_2d>& point_pair);
         rect(const point_2d& topleft, const point_2d& bottomright);
 
-        point_2d topleft();
-        point_2d bottomright();
+        point_2d topleft() const;
+        point_2d bottomright() const;
 
         bool operator!=(const rect & other) const;
 
