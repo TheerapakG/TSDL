@@ -193,12 +193,12 @@ bool TSDL::elements::ElementHolder::need_update() const
         );
 }
 
-void TSDL::elements::ElementHolder::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
+void TSDL::elements::ElementHolder::render(WindowAdapter& window, const ::TSDL::point_2d& dist) const
 {
     ::TSDL::point_2d r_topleft = _render_position.topleft();
     ::TSDL::point_2d r_bottomright = _render_position.bottomright();
 
-    for(Subelement& subelement: _subelements_order)
+    for(const Subelement& subelement: _subelements_order)
     {
         auto& [el_ptr, dim] = subelement;
         DependentElement* el = el_ptr;

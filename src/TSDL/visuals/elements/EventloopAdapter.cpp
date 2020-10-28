@@ -250,7 +250,7 @@ namespace TSDL::elements
         _evloop.remove_event_handler(SDL_MOUSEBUTTONUP);
     }
 
-    void EventloopAdapter::register_not_update(DependentElement& element)
+    void EventloopAdapter::register_not_update(const DependentElement& element)
     {
         _not_update_el.emplace(element);
     }

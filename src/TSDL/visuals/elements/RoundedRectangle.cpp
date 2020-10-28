@@ -17,12 +17,12 @@ TSDL::elements::RoundedRectangle::RoundedRectangle(const RoundedRectangle& other
 TSDL::elements::RoundedRectangle::RoundedRectangle(const ::TSDL::point_2d& size, int r, const ::TSDL::color_rgba& color):
     attrs::sizable<RenderSizedElement>(size), _color(color), _r(r) {}
 
-void TSDL::elements::RoundedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
+void TSDL::elements::RoundedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist) const
 {
     render(window, dist, size());
 }
 
-void TSDL::elements::RoundedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size)
+void TSDL::elements::RoundedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) const
 {
     Renderer& _render = window.renderer();
 

@@ -29,12 +29,12 @@ namespace TSDL::elements
         /*
         Re-render this element
         */
-        virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) override;
+        virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) const override;
 
         /*
         Forces this element to be rendered with specified size
         */
-        virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) override;
+        virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) const override;
     };
 }
 

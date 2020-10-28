@@ -142,12 +142,12 @@ TSDL::rect::rect(const point_2d& topleft, const point_2d& bottomright): SDL_Rect
     }
 ) {}
 
-TSDL::point_2d TSDL::rect::topleft()
+TSDL::point_2d TSDL::rect::topleft() const
 {
     return {x, y};
 }
 
-TSDL::point_2d TSDL::rect::bottomright()
+TSDL::point_2d TSDL::rect::bottomright() const
 {
     return {x+w, y+h};
 }

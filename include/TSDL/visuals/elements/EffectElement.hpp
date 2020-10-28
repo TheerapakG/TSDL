@@ -49,10 +49,10 @@ namespace TSDL
         public T, public EffectElement
         {
             private:
-            point_2d _current_texture_dim;
-            Texture* _src_texture = nullptr; 
-            Texture* _return_texture = nullptr;
-            bool _req_update = true;
+            mutable point_2d _current_texture_dim;
+            mutable Texture* _src_texture = nullptr; 
+            mutable Texture* _return_texture = nullptr;
+            mutable bool _req_update = true;
             
             public:
             template <typename ...Args>
@@ -78,7 +78,7 @@ namespace TSDL
             /*
             Re-render this element
             */
-            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) override
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) const override
             {
                 if(size()!=_current_texture_dim)
                 {

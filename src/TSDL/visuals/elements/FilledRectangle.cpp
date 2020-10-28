@@ -17,12 +17,12 @@ TSDL::elements::FilledRectangle::FilledRectangle(const FilledRectangle& other):
 TSDL::elements::FilledRectangle::FilledRectangle(const ::TSDL::point_2d& size, const ::TSDL::color_rgba& color):
     attrs::sizable<RenderSizedElement>(size), _color(color) {}
 
-void TSDL::elements::FilledRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
+void TSDL::elements::FilledRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist) const
 {
     render(window, dist, size());
 }
 
-void TSDL::elements::FilledRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size)
+void TSDL::elements::FilledRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) const
 {
     window.renderer().fill_rect(
         _color,

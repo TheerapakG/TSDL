@@ -17,12 +17,12 @@ TSDL::elements::HollowedRectangle::HollowedRectangle(const HollowedRectangle& ot
 TSDL::elements::HollowedRectangle::HollowedRectangle(const ::TSDL::point_2d& size, const ::TSDL::color_rgba& color, int thickness):
     attrs::sizable<RenderSizedElement>(size), _color(color), _thickness(thickness) {}
 
-void TSDL::elements::HollowedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist)
+void TSDL::elements::HollowedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist) const
 {
     render(window, dist, size());
 }
 
-void TSDL::elements::HollowedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size)
+void TSDL::elements::HollowedRectangle::render(WindowAdapter& window, const ::TSDL::point_2d& dist, const ::TSDL::point_2d& size) const
 {
     window.renderer().fill_rect(
         _color,

@@ -136,7 +136,7 @@ namespace TSDL
             /*
             Re-render this element
             */
-            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) override;
+            virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) const override;
         };
 
         bool operator==(const ElementHolder& lhs, const ElementHolder& rhs);

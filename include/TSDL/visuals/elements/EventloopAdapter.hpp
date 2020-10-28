@@ -36,7 +36,7 @@ namespace TSDL
             std::set <::TSDL::EventHandler*> _handlers;
             std::unordered_map <Uint32, std::reference_wrapper<WindowAdapter>> _windows;
 
-            std::queue<std::reference_wrapper<DependentElement>> _not_update_el;
+            std::queue<std::reference_wrapper<const DependentElement>> _not_update_el;
             std::queue<std::function<void()>> _calls;
 
             void add_window(WindowAdapter& window_adapter);
@@ -52,7 +52,7 @@ namespace TSDL
             /*
             Call not_update on the specified element after render finished
             */
-            void register_not_update(DependentElement& element);
+            void register_not_update(const DependentElement& element);
 
             /*
             Call `call` on next loop iteration
