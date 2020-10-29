@@ -26,6 +26,9 @@ namespace TSDL
 
 namespace TSDL::effects
 {
+    void fade_in_now(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms);
+    void fade_out_now(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms);
+
     void fade_in(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms);
     void fade_out(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms);
 }

@@ -75,7 +75,7 @@ class DirectoryScene
 
         _add(pathtexteffect, TSDL::point_2d{0, _curr_y});
 
-        TSDL::effects::fade_out(*pathtexteffect, 5000ms);
+        TSDL::effects::fade_in(*pathtexteffect, 5000ms);
 
         _curr_y += pathtext.size().y + 16;
     }
@@ -191,9 +191,9 @@ int main(int argc, char* argv[])
         TSDL::Font font("Sans-Serif Normal 40");
         ::font = &font;
 
-        new DirectoryScene(std::filesystem::current_path());
-
         std::thread t(say_fps);
+
+        new DirectoryScene(std::filesystem::current_path());
 
         eventloop.run();
         t.join();        
