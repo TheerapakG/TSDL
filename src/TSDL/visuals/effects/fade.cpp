@@ -13,7 +13,7 @@
 
 namespace TSDL::effects
 {
-    void fade_in(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms)
+    void fade_in_now(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms)
     {
         elements::EventloopAdapter& _ev_adapter = elements::current_eventloop_adapter();
         Eventloop::clock::time_point _start_time = _ev_adapter.now();
@@ -37,7 +37,7 @@ namespace TSDL::effects
         };
     }
 
-    void fade_out(elements::EffectElement & fx_element, const std::chrono::milliseconds & ms)
+    void fade_out_now(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms)
     {
         elements::EventloopAdapter& _ev_adapter = elements::current_eventloop_adapter();
         Eventloop::clock::time_point _start_time = _ev_adapter.now();
@@ -45,6 +45,66 @@ namespace TSDL::effects
 
         fx_element.modify_texture_function() = [=, &fx_element, &_ev_adapter](Texture& texture) -> void
         {
+            if (_ev_adapter.now() >= _end_time)
+            {
+                if (texture.blend_mode() == SDL_BLENDMODE_BLEND) texture.blend_mode(SDL_BLENDMODE_NONE);
+                fx_element.modify_texture_function() = nullptr;
+                return;
+            }
+            else
+            {
+                if (texture.blend_mode() == SDL_BLENDMODE_NONE) texture.blend_mode(SDL_BLENDMODE_BLEND);
+                std::chrono::duration<double, std::milli> _duration = _ev_adapter.now() - _start_time;
+                double _opacity_multiplier = 1.0 - (_duration / ms);
+                texture.alpha_multiplier(static_cast<Uint8>(_opacity_multiplier * 255));
+            }
+        };
+    }
+
+    void fade_in(elements::EffectElement& fx_element, const std::chrono::milliseconds& ms)
+    {
+        elements::EventloopAdapter& _ev_adapter = elements::current_eventloop_adapter();
+        bool _triggered = false;
+        Eventloop::clock::time_point _start_time, _end_time;
+
+        fx_element.modify_texture_function() = [=, &fx_element, &_ev_adapter](Texture& texture) mutable -> void
+        {
+            if (!_triggered)
+            {
+                _triggered = true;
+                _start_time = _ev_adapter.now();
+                _end_time = _start_time + ms;
+            }
+            if (_ev_adapter.now() >= _end_time)
+            {
+                if (texture.blend_mode() == SDL_BLENDMODE_BLEND) texture.blend_mode(SDL_BLENDMODE_NONE);
+                fx_element.modify_texture_function() = nullptr;
+                return;
+            }
+            else
+            {
+                if (texture.blend_mode() == SDL_BLENDMODE_NONE) texture.blend_mode(SDL_BLENDMODE_BLEND);
+                std::chrono::duration<double, std::milli> _duration = _ev_adapter.now() - _start_time;
+                double _opacity_multiplier = _duration / ms;
+                texture.alpha_multiplier(static_cast<Uint8>(_opacity_multiplier * 255));
+            }
+        };
+    }
+
+    void fade_out(elements::EffectElement & fx_element, const std::chrono::milliseconds & ms)
+    {
+        elements::EventloopAdapter& _ev_adapter = elements::current_eventloop_adapter();
+        bool _triggered = false;
+        Eventloop::clock::time_point _start_time, _end_time;
+
+        fx_element.modify_texture_function() = [=, &fx_element, &_ev_adapter](Texture& texture) mutable -> void
+        {
+            if (!_triggered)
+            {
+                _triggered = true;
+                _start_time = _ev_adapter.now();
+                _end_time = _start_time + ms;
+            }
             if (_ev_adapter.now() >= _end_time)
             {
                 if (texture.blend_mode() == SDL_BLENDMODE_BLEND) texture.blend_mode(SDL_BLENDMODE_NONE);

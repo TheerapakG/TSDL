@@ -106,6 +106,7 @@ void TSDL::Eventloop::_reset_fps_count()
 void TSDL::Eventloop::_handle_event()
 {
     SDL_Event e;
+    _now = clock::now();
     while(SDL_PollEvent(&e) != 0)
     {
         EventHandler h;
@@ -155,13 +156,13 @@ void TSDL::Eventloop::_handle_func()
 
 void TSDL::Eventloop::_handle_render()
 {
+    _now = clock::now();
     if(_render != nullptr)
     {
     #ifndef TSDL_USE_EMSCRIPTEN
         if(_limit_fps.load())
         {
             // limit time diff to be _fps_target_interval
-            _now = clock::now();
             if _TSDL_LIKELY((_now - _time_last_frame) < _fps_target_interval.load()) return;
             _time_last_frame = _now;
         }
@@ -175,7 +176,7 @@ void TSDL::Eventloop::_handle_render()
             clock::duration diff = _now - _time_since_last;
             if _TSDL_UNLIKELY(diff >= _fps_update_interval.load())
             {
-                _previous_fps.store(static_cast<double>(_frame_since_last + 1) / std::chrono::duration_cast<std::chrono::seconds>(diff).count());
+                _previous_fps.store((static_cast<double>(_frame_since_last) + 1) / std::chrono::duration_cast<std::chrono::seconds>(diff).count());
                 this->_reset_fps_count();
             }
             else _frame_since_last ++;
