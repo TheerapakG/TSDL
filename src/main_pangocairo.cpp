@@ -5,6 +5,7 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
+#include <memory>
 #include <stack>
 #include <typeinfo>
 #include <filesystem>
@@ -33,11 +34,11 @@ void say_fps()
     }
 }
 
-TSDL::elements::WindowAdapter* current_window = nullptr;
-TSDL::elements::Grid* grid = nullptr;
 TSDL::Font* font = nullptr;
 
-class DirectoryScene
+std::unique_ptr<el::SceneCommon> current_scene;
+
+class DirectoryScene: public el::InstantBindScene<el::Grid, DirectoryScene>
 {
     private:
     std::filesystem::path _path;
@@ -46,10 +47,9 @@ class DirectoryScene
     el::GridWithScrollbar _grid;
     std::stack<el::DependentElement*> elements;
     int _curr_y = 0;
-    el::Scene _sc_ctrl{*current_window, _m_grid};
 
     public:
-    DirectoryScene(const std::filesystem::path& path);
+    DirectoryScene(el::WindowAdapter& window, const std::filesystem::path& path);
 
     private:
     template <typename T, typename... Args>
@@ -64,13 +64,11 @@ class DirectoryScene
         TSDL::Texture pathtext = TSDL::PangoLayout()
             .text("Current path: " + _path.u8string())
             .font(*font)
-            .rendered_texture(_sc_ctrl.bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
+            .rendered_texture(bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
 
         el::effectelement<el::TextureElement>* pathtexteffect = new el::effectelement<el::TextureElement>(
             pathtext.size(),
-            std::shared_ptr <TSDL::Texture> ( 
-                new TSDL::Texture(std::move(pathtext))
-            )
+            std::make_shared<TSDL::Texture>(std::move(pathtext))
         );
 
         _add(pathtexteffect, TSDL::point_2d{0, _curr_y});
@@ -85,13 +83,11 @@ class DirectoryScene
         TSDL::Texture buttontext = TSDL::PangoLayout()
             .text(str)
             .font(*font)
-            .rendered_texture(_sc_ctrl.bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
+            .rendered_texture(bounded_window().renderer(), {1.0, 1.0, 1.0, 1.0});
 
         TSDL::elements::TextureElement* buttontextelement = new TSDL::elements::TextureElement(
             buttontext.size(),
-            std::shared_ptr <TSDL::Texture> ( 
-                new TSDL::Texture(std::move(buttontext))
-            )
+            std::make_shared<TSDL::Texture>(std::move(buttontext))
         );
         elements.push(buttontextelement);
 
@@ -112,9 +108,12 @@ class DirectoryScene
             el::EventHandler{
                 [this](const TSDL::elements::Caller& caller, const SDL_Event&) -> bool
                 {
-                    auto path = _path;
-                    delete this;
-                    new DirectoryScene(path.parent_path());
+                    el::current_eventloop_adapter().register_call_next(
+                        [this]()
+                        {
+                            current_scene = std::make_unique<DirectoryScene>(bounded_window(), _path.parent_path());
+                        }
+                    );
                     return true;
                 }
             }
@@ -133,8 +132,12 @@ class DirectoryScene
                 el::EventHandler{
                     [this, path](const TSDL::elements::Caller& caller, const SDL_Event&) -> bool
                     {
-                        delete this;
-                        new DirectoryScene(path);
+                        el::current_eventloop_adapter().register_call_next(
+                            [this, path]()
+                            {
+                                current_scene = std::make_unique<DirectoryScene>(bounded_window(), path);
+                            }
+                        );
                         return true;
                     }
                 }
@@ -143,7 +146,22 @@ class DirectoryScene
     }
 
     public:
-    ~DirectoryScene()
+    virtual el::Grid& target() override
+    {
+        return _m_grid;
+    }
+
+    virtual const el::Grid& target() const override
+    {
+        return _m_grid;
+    }
+
+    virtual void on_unbound_window(el::WindowAdapter&) override
+    {
+        current_scene = nullptr;
+    }
+
+    virtual ~DirectoryScene()
     {
         while(!elements.empty())
         {
@@ -154,7 +172,8 @@ class DirectoryScene
     }
 };
 
-DirectoryScene::DirectoryScene(const std::filesystem::path& path) :    
+DirectoryScene::DirectoryScene(el::WindowAdapter& window, const std::filesystem::path& path):
+    el::InstantBindScene<el::Grid, DirectoryScene>{window},
     _path(path),
     _grid({SCREEN_WIDTH, SCREEN_HEIGHT}, 16)
 {
@@ -186,14 +205,13 @@ int main(int argc, char* argv[])
 
         TSDL::elements::EventloopAdapter evAdapter;
         TSDL::elements::WindowAdapter winAdapter(window);
-        ::current_window = &winAdapter;
 
         TSDL::Font font("Sans-Serif Normal 40");
         ::font = &font;
 
         std::thread t(say_fps);
 
-        new DirectoryScene(std::filesystem::current_path());
+        ::current_scene = std::make_unique<DirectoryScene>(winAdapter, std::filesystem::current_path());
 
         eventloop.run();
         t.join();        

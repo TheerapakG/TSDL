@@ -24,6 +24,8 @@
 
 namespace TSDL
 {
+    extern SDL_Event null_event;
+
     namespace elements
     {
         class WindowAdapter: public attrs::staticeventlookup<Element, WindowAdapter>
@@ -55,6 +57,7 @@ namespace TSDL
             >>
             void src(T& src)
             {
+                if(_src) get_ref(_src).dispatch_event({*this, point_2d{0, 0}}, events::EventType::UnboundWindow, null_event);
                 _src = src;
                 _d_src = src;
             }

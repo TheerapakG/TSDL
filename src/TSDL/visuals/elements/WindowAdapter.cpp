@@ -28,6 +28,7 @@ namespace TSDL::elements
 
     WindowAdapter::~WindowAdapter()
     {
+        if(_src) get_ref(_src).dispatch_event({*this, point_2d{0, 0}}, events::EventType::UnboundWindow, null_event);
         current_eventloop_adapter().remove_window(*this);
     }
             
@@ -43,6 +44,7 @@ namespace TSDL::elements
 
     void WindowAdapter::src(std::nullopt_t)
     {
+        if(_src) get_ref(_src).dispatch_event({*this, point_2d{0, 0}}, events::EventType::UnboundWindow, null_event);
         _src.reset();
         _d_src.reset();
     }

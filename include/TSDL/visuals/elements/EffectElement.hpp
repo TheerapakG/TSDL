@@ -85,9 +85,10 @@ namespace TSDL
                     if(_src_texture!=nullptr) delete _src_texture;
                     if(_return_texture!=nullptr) delete _return_texture;
                     _current_texture_dim = size();
-                    _src_texture = new Texture(window.renderer(), _current_texture_dim);
-                    _return_texture = new Texture(window.renderer(), _current_texture_dim);
                 }
+
+                if(!_src_texture) _src_texture = new Texture(window.renderer(), _current_texture_dim);
+                if(!_return_texture) _return_texture = new Texture(window.renderer(), _current_texture_dim);
 
                 auto _prev_target = window.renderer().target();
 
