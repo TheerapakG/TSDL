@@ -17,45 +17,84 @@
 namespace TSDL::elements
 {
     /*
-    * Scene is a class that automatically unbind target as eventloop's source when destructed
+    * SceneCommon provides common base for Scenes
     */
-    class Scene
+   class SceneCommon
+   {
+       public:
+       virtual ~SceneCommon() = default;
+   };
+
+    /*
+    * Scene is a class that helps binding and unbinding target to the WindowAdapter
+    */
+    template <typename T, typename Derived>
+    class Scene: public SceneCommon, public attrs::staticeventlookup<DependentElement, Derived>
     {
         private:
-        std::reference_wrapper<const DependentElement> _target;
-        WindowAdapter& _window;
-        bool _unbind = false;
+        optional_reference<WindowAdapter> _window;
 
-        public:        
-        template <typename T, typename U = std::enable_if_t<
-            _and_v<
-                std::is_base_of_v<DependentElement, T>,
-                std::is_base_of_v<attrs::EventLookupable, T>
-            >
-        >>
-        Scene(WindowAdapter& window, T& target): _target(target), _window(window), _unbind(true)
+        public:
+        using target_t = typename T;
+
+        Scene(): attrs::staticeventlookup<DependentElement, Derived>{} {};
+        Scene(const Scene&) = delete;
+        Scene(Scene&&) = default;
+
+        virtual T& target() = 0;
+        virtual const T& target() const = 0;
+        virtual void on_unbound_window(WindowAdapter& window) = 0;
+
+        /*
+        * Set window's render source to the scene.
+        * Functionally equivalent to window.src(scene). Provided for readability.
+        */
+        void bind_to(WindowAdapter& window)
         {
-            window.src(target);
+            if (_window)
+            {
+                // TODO: throw
+                return;
+            }
+            window.src(*this);
+            _window = window;
         }
 
-        Scene(Scene&& other);
-
-        template <typename T, typename U = std::enable_if_t<
-            _and_v<
-                std::is_base_of_v<DependentElement, T>,
-                std::is_base_of_v<attrs::EventLookupable, T>
-            >
-        >>
-        Scene& operator=(T& target)
+        template<events::EventType eventtype>
+        bool dispatch_templated_event(const Caller& caller, const SDL_Event& event)
         {
-            _target = target;
-            window.src(target);
-            return *this;
+            return target().dispatch_event(caller, eventtype, event);
         }
 
-        WindowAdapter& bounded_window();
+        template<>
+        bool dispatch_templated_event<events::EventType::UnboundWindow>(const Caller& caller, const SDL_Event& event)
+        {
+            _window.reset();
+            return target().dispatch_event(caller, events::EventType::UnboundWindow, event);
+        }
 
-        virtual ~Scene();
+        WindowAdapter& bounded_window()
+        {
+            return get_ref(_window);
+        }
+
+        virtual void render(WindowAdapter& window, const ::TSDL::point_2d& dist) const final
+        {
+            target().render(window, dist);
+        }
+    };
+
+    /*
+    * InstantBindScene is a Scene that automatically bind to window on instantiation
+    */
+    template <typename T, typename Derived>
+    class InstantBindScene : public Scene<T, Derived>
+    {
+        public:
+        InstantBindScene(WindowAdapter& window): Scene<T, Derived>()
+        {
+            bind_to(window);
+        }
     };
 }
 

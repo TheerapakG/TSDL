@@ -49,7 +49,8 @@ namespace TSDL
             MouseWheel,
             ElementResized,
             ButtonActivated,
-            Dragged // Dragable dragged
+            Dragged, // Dragable dragged
+            UnboundWindow
         };
         // If added event here, also add it in EventLookup
     }

@@ -121,6 +121,7 @@ namespace TSDL::elements::attrs
                 STATIC_LOOKUP_CASE(events::EventType::ElementResized)
                 STATIC_LOOKUP_CASE(events::EventType::ButtonActivated)
                 STATIC_LOOKUP_CASE(events::EventType::Dragged) // Dragable dragged
+                STATIC_LOOKUP_CASE(events::EventType::UnboundWindow)
                 default:
                     break;
             }
