@@ -199,6 +199,8 @@ int main(int argc, char* argv[])
 
         TSDL::Eventloop eventloop;
 
+        eventloop.limit_fps();
+        eventloop.fps_target(60);
         eventloop.add_event_handler(SDL_QUIT, quit_handler);
 
         TSDL::Window window("TSDL Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
